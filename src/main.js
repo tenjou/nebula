@@ -58,7 +58,7 @@ meta.class("Editor",
 			}
 		}
 
-		update();
+		draw();
 
 		window.requestAnimationFrame(this._renderFunc);
 	},

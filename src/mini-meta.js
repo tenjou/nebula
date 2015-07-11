@@ -11,6 +11,8 @@ var verticeBuffer = null;
 
 var camera = new Float32Array(2);
 var viewportSize = new Float32Array(2);
+var scaledViewportSize = new Float32Array(2);
+
 var inverseTextureSize = new Float32Array(2);
 var tileSize = 32;
 var inverseTileSize = 1 / tileSize;
@@ -90,6 +92,15 @@ function loadImg()
 	img.src = "assets/tilemap.png";
 }
 
+function loadImg2()
+{
+	texture2 = gl.createTexture();
+
+	var img = new Image();
+	img.onload = function() { prepareTexture2(img); }
+	img.src = "assets/spelunky0.png";
+}
+
 function prepareTexture(img, repeat)
 {
 	gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -108,6 +119,25 @@ function prepareTexture(img, repeat)
 
 	inverseTextureSize[0] = 1 / img.width;
 	inverseTextureSize[1] = 1 / img.height;
+
+	loadImg2();
+}
+
+function prepareTexture2(img, repeat)
+{
+	gl.bindTexture(gl.TEXTURE_2D, texture2);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+	if(repeat) {
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);		
+	}
+	else {
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);		
+	}
 
 	ready = true;
 }
@@ -134,19 +164,28 @@ function init()
 		uniform vec2 viewportSize; \
 		uniform vec2 camera; \
 		uniform vec2 inverseTextureSize; \
-		varying highp vec2 texCoord; \
+		varying vec2 texCoord; \
+		varying vec2 pixelCoord; \
 		void main() { \
-			gl_Position = vec4(position, 0, 1); \
-			texCoord = vec2(uv.x, uv.y); \
+			gl_Position = vec4(position, 0.0, 1.0); \
+			pixelCoord = (uv * viewportSize) + camera; \
+			texCoord = pixelCoord * inverseTextureSize * vec2(1.0 / 32.0, 1.0 / 32.0); \
 		}";
 
 	var fragmentShaderSrc = 
 		"precision mediump float; \
 		varying vec2 texCoord; \
-		uniform sampler2D sampler; \
+		varying vec2 pixelCoord; \
+		uniform sampler2D atlasTexture; \
+		uniform sampler2D dataTexture; \
 		uniform vec2 inverseTextureSize; \
 		void main() { \
-		  gl_FragColor = texture2D(sampler, texCoord); \
+			vec4 tile = texture2D(dataTexture, texCoord); \
+			if(tile.x == 1.0 && tile.y == 1.0) { discard; } \
+			float tileSize = 32.0;\
+			vec2 spriteOffset = floor(tile.xy * 256.0) * tileSize; \
+			vec2 spriteCoord = mod(pixelCoord, tileSize); \
+			gl_FragColor = texture2D(atlasTexture, (spriteOffset * spriteCoord) * vec2(0.023809523809523808, 0.029411764705882353)); \
 		}";
 
 	shader = createShader(gl, vertexShaderSrc, fragmentShaderSrc);
@@ -193,12 +232,17 @@ function update()
 	gl.vertexAttribPointer(shader.attrib.uv, 2, gl.FLOAT, false, 16, 8);
 
 	gl.uniform2fv(shader.uniform.viewportSize, viewportSize);
-	
-
+	// gl.uniform2fv(shader.uniform.inverseViewportSize, inverseViewportSize);
+	// gl.uniform1f(shader.uniform.tileSize, tileSize);
+	// gl.uniform1f(shader.uniform.inverseTileSize, inverseTileSize);
 
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, texture);
-	gl.uniform1i(shader.uniform.sampler, 0);
+	gl.uniform1i(shader.uniform.atlasTexture, 0);
+
+	gl.activeTexture(gl.TEXTURE1);
+	gl.bindTexture(gl.TEXTURE_2D, texture2);
+	gl.uniform1i(shader.uniform.dataTexture, 1);
 
 	gl.uniform2fv(shader.uniform.camera, camera);
 	gl.uniform2fv(shader.uniform.inverseTextureSize, inverseTextureSize);
@@ -230,8 +274,8 @@ function onMouseUp(event) {
 function onMouseMove(event)
 {
 	if(isMouseDown) {
-		camera[0] = event.pageX;
-		camera[1] = event.pageY;
+		camera[0] -= event.movementX;
+		camera[1] -= event.movementY;
 	}
 }
 
