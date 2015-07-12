@@ -234,10 +234,10 @@ meta.class("PaletteWidget", "Widget",
 	{
 		var x = (event.clientX - this.element.offsetLeft) / this.scale;
 		var y = (event.clientY - this.element.offsetTop) / this.scale;
-		var gridX = Math.floor(x / this.cellWidth);
-		var gridY = Math.floor(y / this.cellHeight);
-		this.cursorX = gridX * this.cellWidth;
-		this.cursorY = gridY * this.cellHeight;
+		this.gridX = Math.floor(x / this.cellWidth);
+		this.gridY = Math.floor(y / this.cellHeight);
+		this.cursorX = this.gridX * this.cellWidth;
+		this.cursorY = this.gridY * this.cellHeight;
 
 		this.flags |= this.Flag.NEED_RENDER;
 	},
@@ -247,6 +247,7 @@ meta.class("PaletteWidget", "Widget",
 	ctx: null,
 
 	scale: 1,
+	gridX: 0, gridY: 0,
 	numGridX: 0, numGridY: 0,
 
 	cursor: null,

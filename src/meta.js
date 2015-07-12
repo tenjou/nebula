@@ -4,7 +4,6 @@ var canvas = null;
 var gl = null;
 var shader = null;
 var quadVertBuffer = null;
-var isMouseDown = false;
 var camera = new Float32Array(2);
 var viewportSize = new Float32Array(2);
 var scaledViewportSize = new Float32Array(2);
@@ -15,9 +14,13 @@ var inverseTileSize = 1.0 / tileSize;
 var tileScale = 1.0;
 var mapWidth = 100;
 var mapHeight = 100;
+var mapData = null;
 
 var textureSpritesheet = null;
 var textureData = null;
+
+var buttons = new Array(256 + 10);
+var isPanning = false;
 
 function init()
 {
@@ -28,10 +31,6 @@ function init()
 		console.error("no webgl");
 		return false;
 	}
-
-	canvas.addEventListener("mousedown", onMouseDown, false);
-	canvas.addEventListener("mouseup", onMouseUp, false);
-	canvas.addEventListener("mousemove", onMouseMove, false);
 
 	window.addEventListener("resize", onResize, false);
 	window.addEventListener("orientationchange", onResize, false);
@@ -60,6 +59,17 @@ function init()
 	quadVertBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, quadVertBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(quadVertices), gl.STATIC_DRAW);
+}
+
+function ready()
+{
+	canvas.addEventListener("mousedown", onMouseDown, false);
+	canvas.addEventListener("mouseup", onMouseUp, false);
+	canvas.addEventListener("mousemove", onMouseMove, false);
+	window.addEventListener("keydown", onKeyDown, false);	
+	window.addEventListener("keyup", onKeyUp, false);
+
+	draw(); 
 }
 
 function onResize()
@@ -109,41 +119,70 @@ function loadSpritesheet()
 
 function loadLayerData()
 {
+	mapData = new Uint8Array(mapWidth * mapHeight * 4);
+
 	inverseDataTextureSize[0] = 1 / mapWidth;
 	inverseDataTextureSize[1] = 1 / mapHeight;
 
-	var image = new Uint8Array(mapWidth * mapHeight * 4);
-	for(var i = 0; i < image.length; i += 4) {
-		image[i + 0] = Math.floor((Math.random() * 1000) % 4); // r
-		image[i + 1] = Math.floor((Math.random() * 1000) % 4); // g
-		image[i + 2] = 0; // b
-		image[i + 3] = 0; // a
-	}
-
 	textureData = gl.createTexture();
-
 	gl.bindTexture(gl.TEXTURE_2D, textureData);
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, mapWidth, mapHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, image);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, mapWidth, mapHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, mapData);
 
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-	draw(); 
+	ready();
 }
 
-function onMouseDown(event) {
-	isMouseDown = true;
+function paintCell(cellX, cellY)
+{
+	var index = (cellX + (cellY * mapHeight)) * 4;
+	var widget = editor.widgets[0];
+	mapData[index + 0] = widget.gridX;
+	mapData[index + 1] = widget.gridY;
+
+	gl.bindTexture(gl.TEXTURE_2D, textureData);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, mapWidth, mapHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, mapData);	
 }
 
-function onMouseUp(event) {
-	isMouseDown = false;
+function startPanning() {
+	document.body.style.cursor = "move";
+	isPanning = true;
+}
+
+function endPanning() {
+	document.body.style.cursor = "initial";
+	isPanning = false;
+}
+
+function onMouseDown(event) 
+{
+	buttons[256 + event.button] = true;
+
+	if(event.button === 0) {
+		var cellX = Math.floor((event.x + camera[0]) / tileSize);
+		var cellY = Math.floor((event.y + camera[1]) / tileSize);
+		paintCell(cellX, cellY);
+	}
+	else if(event.button === 1) {
+		startPanning();
+	}
+}
+
+function onMouseUp(event) 
+{
+	buttons[256 + event.button] = false;
+
+	if(event.button === 1) {
+		endPanning();
+	}
 }
 
 function onMouseMove(event)
 {
-	if(isMouseDown) 
+	if(isPanning) 
 	{
 		var x = camera[0] - event.movementX;
 		var y = camera[1] - event.movementY;
@@ -167,6 +206,20 @@ function onMouseMove(event)
 		camera[0] = x;
 		camera[1] = y;
 	}
+	// Is left button pressed?
+	else if(buttons[256]) {
+		var cellX = Math.floor((event.x + camera[0]) / tileSize);
+		var cellY = Math.floor((event.y + camera[1]) / tileSize);
+		paintCell(cellX, cellY);	
+	}
+}
+
+function onKeyDown(event) {
+	buttons[event.keyCode] = true;
+}
+
+function onKeyUp(event) {
+	buttons[event.keyCode] = false;
 }
 
 function Shader(program) 
