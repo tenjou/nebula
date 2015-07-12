@@ -135,8 +135,6 @@ function paintCell(cellX, cellY)
 	layer.data[index + 0] = widget.gridX;
 	layer.data[index + 1] = widget.gridY;
 
-	console.log(currLayer, layer.data[index + 0], layer.data[index + 1])
-
 	gl.bindTexture(gl.TEXTURE_2D, layer.texture);
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, mapWidth, mapHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, layer.data);	
 }
@@ -161,8 +159,8 @@ function onMouseDown(event)
 			startPanning();
 		}
 		else {
-			var cellX = Math.floor((event.x + camera[0]) / tileSize);
-			var cellY = Math.floor((event.y + camera[1]) / tileSize);
+			var cellX = Math.floor(((event.x / tileScale) + camera[0])  / tileSize);
+			var cellY = Math.floor(((event.y / tileScale) + camera[1])  / tileSize);
 			paintCell(cellX, cellY);	
 		}
 	}
@@ -189,8 +187,8 @@ function onMouseMove(event)
 {
 	if(isPanning) 
 	{
-		var x = camera[0] - event.movementX;
-		var y = camera[1] - event.movementY;
+		var x = camera[0] - (event.movementX / tileScale);
+		var y = camera[1] - (event.movementY / tileScale);
 		var maxTileX = Math.floor((x + viewportSize[0]) / tileSize);
 		var maxTileY = Math.floor((y + viewportSize[1]) / tileSize);
 
@@ -213,8 +211,8 @@ function onMouseMove(event)
 	}
 	// Is left button pressed?
 	else if(buttons[256]) {
-		var cellX = Math.floor((event.x + camera[0]) / tileSize);
-		var cellY = Math.floor((event.y + camera[1]) / tileSize);
+		var cellX = Math.floor(((event.x / tileScale) + camera[0])  / tileSize);
+		var cellY = Math.floor(((event.y / tileScale) + camera[1])  / tileSize);
 		paintCell(cellX, cellY);	
 	}
 }
@@ -227,8 +225,8 @@ function onKeyDown(event)
 	
 	switch(keyCode)
 	{
-		case 49: currLayer = 0; break;
-		case 50: currLayer = 1; break;
+		case 49: currLayer = 0; document.getElementById("layer").innerHTML = "layer: 1"; break;
+		case 50: currLayer = 1; document.getElementById("layer").innerHTML = "layer: 2"; break;
 	}
 }
 
