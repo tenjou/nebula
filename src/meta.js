@@ -66,6 +66,7 @@ function ready()
 	canvas.addEventListener("mousedown", onMouseDown, false);
 	canvas.addEventListener("mouseup", onMouseUp, false);
 	canvas.addEventListener("mousemove", onMouseMove, false);
+	canvas.addEventListener("mousewheel", onMouseWheel, false);
 	window.addEventListener("keydown", onKeyDown, false);	
 	window.addEventListener("keyup", onKeyUp, false);
 
@@ -74,8 +75,6 @@ function ready()
 
 function onResize()
 {
-	// canvas.width = window.innerWidth * window.devicePixelRatio;
-	// canvas.height = window.innerHeight * window.devicePixelRatio;
     var width = canvas.parentElement.clientWidth * window.devicePixelRatio;
     var height = canvas.parentElement.clientHeight * window.devicePixelRatio;
 
@@ -161,10 +160,16 @@ function onMouseDown(event)
 {
 	buttons[256 + event.button] = true;
 
-	if(event.button === 0) {
-		var cellX = Math.floor((event.x + camera[0]) / tileSize);
-		var cellY = Math.floor((event.y + camera[1]) / tileSize);
-		paintCell(cellX, cellY);
+	if(event.button === 0) 
+	{
+		if(buttons[32]) {
+			startPanning();
+		}
+		else {
+			var cellX = Math.floor((event.x + camera[0]) / tileSize);
+			var cellY = Math.floor((event.y + camera[1]) / tileSize);
+			paintCell(cellX, cellY);	
+		}
 	}
 	else if(event.button === 1) {
 		startPanning();
@@ -175,7 +180,12 @@ function onMouseUp(event)
 {
 	buttons[256 + event.button] = false;
 
-	if(event.button === 1) {
+	if(event.button === 0) {
+		if(buttons[32]) {
+			endPanning();
+		}
+	}
+	else if(event.button === 1) {
 		endPanning();
 	}
 }
@@ -220,6 +230,11 @@ function onKeyDown(event) {
 
 function onKeyUp(event) {
 	buttons[event.keyCode] = false;
+}
+
+function onMouseWheel(event) {
+	tileScale += event.wheelDeltaY * 0.001;
+	setTileScale(tileScale);
 }
 
 function Shader(program) 
