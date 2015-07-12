@@ -1,5 +1,6 @@
 "use strict";
 
+var metaReady = false;
 var canvas = null;
 var gl = null;
 var shader = null;
@@ -70,7 +71,7 @@ function ready()
 	window.addEventListener("keydown", onKeyDown, false);	
 	window.addEventListener("keyup", onKeyUp, false);
 
-	draw(); 
+	metaReady = true;
 }
 
 function onResize()
@@ -109,6 +110,8 @@ function loadSpritesheet()
 
 		inverseSpriteTextureSize[0] = 1 / image.width;
 		inverseSpriteTextureSize[1] = 1 / image.height;
+		inverseDataTextureSize[0] = 1 / mapWidth;
+		inverseDataTextureSize[1] = 1 / mapHeight;		
 
 		loadLayerData();
 	});
@@ -118,19 +121,8 @@ function loadSpritesheet()
 
 function loadLayerData()
 {
-	mapData = new Uint8Array(mapWidth * mapHeight * 4);
-
-	inverseDataTextureSize[0] = 1 / mapWidth;
-	inverseDataTextureSize[1] = 1 / mapHeight;
-
-	textureData = gl.createTexture();
-	gl.bindTexture(gl.TEXTURE_2D, textureData);
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, mapWidth, mapHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, mapData);
-
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+	createLayer(0);
+	createLayer(1).empty();
 
 	ready();
 }
@@ -139,11 +131,14 @@ function paintCell(cellX, cellY)
 {
 	var index = (cellX + (cellY * mapHeight)) * 4;
 	var widget = editor.widgets[0];
-	mapData[index + 0] = widget.gridX;
-	mapData[index + 1] = widget.gridY;
+	var layer = layers[currLayer];
+	layer.data[index + 0] = widget.gridX;
+	layer.data[index + 1] = widget.gridY;
 
-	gl.bindTexture(gl.TEXTURE_2D, textureData);
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, mapWidth, mapHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, mapData);	
+	console.log(currLayer, layer.data[index + 0], layer.data[index + 1])
+
+	gl.bindTexture(gl.TEXTURE_2D, layer.texture);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, mapWidth, mapHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, layer.data);	
 }
 
 function startPanning() {
@@ -224,8 +219,17 @@ function onMouseMove(event)
 	}
 }
 
-function onKeyDown(event) {
-	buttons[event.keyCode] = true;
+function onKeyDown(event) 
+{
+	var keyCode = event.keyCode;
+
+	buttons[keyCode] = true;
+	
+	switch(keyCode)
+	{
+		case 49: currLayer = 0; break;
+		case 50: currLayer = 1; break;
+	}
 }
 
 function onKeyUp(event) {
@@ -304,6 +308,8 @@ function createShader(vertexShaderSrc, fragmentShaderSrc)
 
 function draw() 
 {
+	if(!metaReady) { return; }
+
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 	gl.useProgram(shader.program);
@@ -320,6 +326,9 @@ function draw()
 	gl.uniform1f(shader.uniform.tileSize, tileSize);
 	gl.uniform1f(shader.uniform.inverseTileSize, inverseTileSize);
 
+	gl.uniform2fv(shader.uniform.viewOffset, camera);
+	gl.uniform2fv(shader.uniform.inverseTileTextureSize, inverseDataTextureSize);
+
 	gl.activeTexture(gl.TEXTURE0);
 	gl.uniform1i(shader.uniform.sprites, 0);
 	gl.bindTexture(gl.TEXTURE_2D, textureSpritesheet);
@@ -327,12 +336,13 @@ function draw()
 	gl.activeTexture(gl.TEXTURE1);
 	gl.uniform1i(shader.uniform.tiles, 1);
 
-	gl.uniform2fv(shader.uniform.viewOffset, camera);
-	gl.uniform2fv(shader.uniform.inverseTileTextureSize, inverseDataTextureSize);
-
-	gl.bindTexture(gl.TEXTURE_2D, textureData);
-
-	gl.drawArrays(gl.TRIANGLES, 0, 6);
+	var layer;
+	var numLayers = layers.length;
+	for(var n = 0; n < numLayers; n++) {
+		layer = layers[n];
+		gl.bindTexture(gl.TEXTURE_2D, layer.texture);
+		gl.drawArrays(gl.TRIANGLES, 0, 6);
+	}
 }
 
 var tilemapVertexShader = [
@@ -377,3 +387,47 @@ var tilemapFragmentShader = [
 	"	gl_FragColor = texture2D(sprites, (spriteOffset + spriteCoord) * inverseSpriteTextureSize);",
 	"}"
 ].join("\n");
+
+var layers = [];
+var currLayer = 0;
+
+function MapLayer() 
+{
+	var size = mapWidth * mapHeight * 4;
+
+	this.texture = gl.createTexture();
+	this.data = new Uint8Array(size);
+
+	gl.bindTexture(gl.TEXTURE_2D, this.texture);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, mapWidth, mapHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.data);
+
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+}
+
+MapLayer.prototype = 
+{
+	empty: function()
+	{
+		var size = mapWidth * mapHeight * 4;
+		for(var n = 0; n < size; n++) {
+			this.data[n] = 5;
+		}
+
+		gl.bindTexture(gl.TEXTURE_2D, this.texture);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, mapWidth, mapHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.data);
+
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+	}
+}
+
+function createLayer(index) {
+	var layer = new MapLayer();
+	layers[index] = layer;
+	return layer;
+}
