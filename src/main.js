@@ -9,6 +9,13 @@ meta.class("Editor",
 
 		this.createToolbars();
 
+		this.stats = new Stats();
+		this.stats.setMode(0);
+		this.stats.domElement.style.position = 'absolute';
+		this.stats.domElement.style.right = '0px';
+		this.stats.domElement.style.bottom = '0px';
+		document.body.appendChild(this.stats.domElement);
+
 		init();
 
 		var that = this;
@@ -44,6 +51,9 @@ meta.class("Editor",
 
 	render: function() 
 	{
+		this.stats.end();
+		this.stats.begin();
+
 		var widget;
 		var num = this.renderWidgets.length;
 		for(var n = 0; n < num; n++) {
