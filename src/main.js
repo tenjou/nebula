@@ -4,17 +4,17 @@ meta.class("Editor",
 {
 	start: function()
 	{
-		this.widgets = [];
-		this.renderWidgets = [];
+		this.createMenu();
+		this.createFooter();
+		this.createRightToolbar();
+		this.createScreen();
 
-		this.createToolbars();
+		var self = this;
+		window.addEventListener("resize", function() {
+			self.onResize();
+		}, false);
 
-		this.stats = new Stats();
-		this.stats.setMode(0);
-		this.stats.domElement.style.position = 'absolute';
-		this.stats.domElement.style.right = '0px';
-		this.stats.domElement.style.bottom = '0px';
-		document.body.appendChild(this.stats.domElement);
+		this.onResize();
 
 		init();
 
@@ -23,11 +23,66 @@ meta.class("Editor",
 		this.render();
 	},
 
-	createToolbars: function() 
+	createMenu: function()
+	{
+		this.menu = document.createElement("div");
+		this.menu.setAttribute("class", "menu");
+		this.menu.style.height = "30px";
+		document.body.appendChild(this.menu);
+
+		this.createMenuLogo();
+	},
+
+	createMenuLogo: function()
+	{
+		var logo = document.createElement("div");
+		logo.setAttribute("class", "logo");
+		logo.innerHTML = "meta"
+		this.menu.appendChild(logo);
+	},
+
+	createFooter: function()
+	{
+		this.footer = document.createElement("div");
+		this.footer.setAttribute("class", "footer");
+		this.footer.style.height = "30px";
+		document.body.appendChild(this.footer);
+	},
+
+	createRightToolbar: function() 
+	{
+		this.rightToolbar = document.createElement("div");
+		this.rightToolbar.setAttribute("class", "right-toolbar");
+		document.body.appendChild(this.rightToolbar);
+
+		var style = this.rightToolbar.style;
+		style.width = "200px";
+		style.backgroundColor = "black";
+		style.borderLeft = "2px solid #111";
+
+		this.loadRightToolbar();
+	},
+
+	loadRightToolbar: function()
 	{
 		var palette = new PaletteWidget("palette");
 		palette.loadAtlas("assets/tilemap.png", 32, 32);
-		this.widgets.push(palette);	
+		this.widgets.push(palette);			
+	},
+
+	createScreen: function()
+	{
+		this.screen = document.createElement("div");
+		this.screen.setAttribute("class", "screen");
+		document.body.appendChild(this.screen);
+
+		this.createCanvas();
+	},
+
+	createCanvas: function()
+	{
+		this.canvas = document.createElement("canvas");
+		this.screen.appendChild(this.canvas);
 	},
 
 	addRender: function(widget) 
@@ -51,9 +106,6 @@ meta.class("Editor",
 
 	render: function() 
 	{
-		this.stats.end();
-		this.stats.begin();
-
 		var widget;
 		var num = this.renderWidgets.length;
 		for(var n = 0; n < num; n++) {
@@ -69,7 +121,42 @@ meta.class("Editor",
 		window.requestAnimationFrame(this._renderFunc);
 	},
 
+	onResize: function()
+	{
+		this.screenWidth = window.innerWidth;
+		this.screenHeight = window.innerHeight;
+
+		this.menu.style.width = this.screenWidth + "px";
+
+		this.footer.style.width = this.screenWidth + "px";
+		this.footer.style.top = (this.screenHeight - 30) + "px";
+
+		var style = this.rightToolbar.style;
+		style.height = (this.screenHeight - 60) + "px";
+		style.top = "30px";
+		style.left = (this.screenWidth - 202) + "px";
+
+		style = this.screen.style;
+		style.width = (this.screenWidth - 202) + "px";
+		style.height = (this.screenHeight - 60) + "px";
+		style.top = "30px";
+
+		var num = this.widgets.length;
+		for(var n = 0; n < num; n++) {
+			this.widgets[n].updatePos();
+		}
+	},
+
 	//
-	widgets: null,
-	renderWidgets: null
+	screenWidth: 0,
+	screenHeight: 0,
+
+	menu: null,
+	footer: null,
+	rightToolbar: null,
+	screen: null,
+	canvas: null,
+
+	widgets: [],
+	renderWidgets: []
 });

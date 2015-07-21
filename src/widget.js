@@ -28,10 +28,14 @@ meta.class("Widget",
 		this.element.setAttribute("class", "content");
 		this.parentElement.appendChild(this.element);
 
-		var toolbar = document.querySelector(".toolbar");
-		toolbar.appendChild(this.parentElement);
+		editor.rightToolbar.appendChild(this.parentElement);
 
 		this.onCreate();
+	},
+
+	updatePosition: function()
+	{
+
 	},
 
 	_subscribeInput: function() 
@@ -130,6 +134,20 @@ meta.class("PaletteWidget", "Widget",
 
 		this.checker = document.createElement("canvas");
 		this.checkerCtx = this.checker.getContext("2d");	
+	},
+
+	updatePos: function()
+	{
+		this.x = 2;
+		this.y = 0;
+
+		var element = this.element;
+		do 
+		{
+			this.x += element.offsetLeft || 0;
+			this.y += element.offsetTop || 0;
+			element = element.offsetParent;
+		} while(element);]
 	},
 
 	_prepareAtlas: function()
@@ -232,8 +250,8 @@ meta.class("PaletteWidget", "Widget",
 
 	onInputDown: function(event)
 	{
-		var x = (event.clientX - this.element.offsetLeft) / this.scale;
-		var y = (event.clientY - this.element.offsetTop) / this.scale;
+		var x = (event.clientX - this.x) / this.scale;
+		var y = (event.clientY - this.y) / this.scale;
 		this.gridX = Math.floor(x / this.cellWidth);
 		this.gridY = Math.floor(y / this.cellHeight);
 		this.cursorX = this.gridX * this.cellWidth;
@@ -245,6 +263,8 @@ meta.class("PaletteWidget", "Widget",
 	//
 	canvas: null,
 	ctx: null,
+
+	x: 0, y: 0,
 
 	scale: 1,
 	gridX: 0, gridY: 0,

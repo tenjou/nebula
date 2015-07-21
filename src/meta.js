@@ -1,7 +1,6 @@
 "use strict";
 
 var metaReady = false;
-var canvas = null;
 var gl = null;
 var shader = null;
 var quadVertBuffer = null;
@@ -25,9 +24,7 @@ var isPanning = false;
 
 function init()
 {
-	canvas = document.getElementById("canvas");
-
-	gl = canvas.getContext("experimental-webgl", { alpha: false });
+	gl = editor.canvas.getContext("experimental-webgl", { alpha: false });
 	if(!gl) {
 		console.error("no webgl");
 		return false;
@@ -64,10 +61,14 @@ function init()
 
 function ready()
 {
-	canvas.addEventListener("mousedown", onMouseDown, false);
-	canvas.addEventListener("mouseup", onMouseUp, false);
-	canvas.addEventListener("mousemove", onMouseMove, false);
-	canvas.addEventListener("mousewheel", onMouseWheel, false);
+	document.oncontextmenu = function() {
+		return false;
+	};
+
+	editor.canvas.addEventListener("mousedown", onMouseDown, false);
+	editor.canvas.addEventListener("mouseup", onMouseUp, false);
+	editor.canvas.addEventListener("mousemove", onMouseMove, false);
+	editor.canvas.addEventListener("mousewheel", onMouseWheel, false);
 	window.addEventListener("keydown", onKeyDown, false);	
 	window.addEventListener("keyup", onKeyUp, false);
 
@@ -76,11 +77,11 @@ function ready()
 
 function onResize()
 {
-    var width = canvas.parentElement.clientWidth * window.devicePixelRatio;
-    var height = canvas.parentElement.clientHeight * window.devicePixelRatio;
+    var width = editor.canvas.parentElement.clientWidth * window.devicePixelRatio;
+    var height = editor.canvas.parentElement.clientHeight * window.devicePixelRatio;
 
-	canvas.width = width;
-	canvas.height = height;
+	editor.canvas.width = width;
+	editor.canvas.height = height;
 
 	gl.viewport(0, 0, width, height);
 
@@ -151,6 +152,8 @@ function endPanning() {
 
 function onMouseDown(event) 
 {
+	event.preventDefault();
+
 	buttons[256 + event.button] = true;
 
 	if(event.button === 0) 
@@ -164,7 +167,7 @@ function onMouseDown(event)
 			paintCell(cellX, cellY);	
 		}
 	}
-	else if(event.button === 1) {
+	else if(event.button === 1 || event.button === 2) {
 		startPanning();
 	}
 }
@@ -178,7 +181,7 @@ function onMouseUp(event)
 			endPanning();
 		}
 	}
-	else if(event.button === 1) {
+	else if(event.button === 1 || event.button === 2) {
 		endPanning();
 	}
 }
