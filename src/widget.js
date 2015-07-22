@@ -7,17 +7,24 @@ meta.class("Widget",
 		if(params) {
 			this.params = params;
 		}
+
+		this.flags |= this.Flag.VISIBLE;
+
+		var self = this;
 		
 		this.parentElement = document.createElement("div");
 		this.parentElement.setAttribute("id", name);
 
 		this.headerElement = document.createElement("div");
 		this.headerElement.setAttribute("class", "header");
+		this.headerElement.addEventListener("click", function() {
+			self.toggleVisible();
+		});
 		this.parentElement.appendChild(this.headerElement);
 
-		var headerIcon = document.createElement("i");
-		headerIcon.setAttribute("class", "fa fa-chevron-right");
-		this.headerElement.appendChild(headerIcon);
+		this.headerIcon = document.createElement("i");
+		this.headerIcon.setAttribute("class", "fa fa-chevron-down");
+		this.headerElement.appendChild(this.headerIcon);
 
 		var headerName = document.createElement("span");
 		headerName.setAttribute("class", "name");
@@ -33,9 +40,32 @@ meta.class("Widget",
 		this.onCreate();
 	},
 
-	updatePosition: function()
+	updatePos: function()
 	{
+		this.x = 2;
+		this.y = 0;
 
+		var element = this.element;
+		do 
+		{
+			this.x += element.offsetLeft || 0;
+			this.y += element.offsetTop || 0;
+			element = element.offsetParent;
+		} while(element);
+	},
+
+	toggleVisible: function()
+	{
+		if(this.flags & this.Flag.VISIBLE) {
+			this.element.style.display = "none";
+			this.headerIcon.setAttribute("class", "fa fa-chevron-right");
+			this.flags &= ~this.Flag.VISIBLE;
+		}
+		else {
+			this.element.style.display = "block";
+			this.headerIcon.setAttribute("class", "fa fa-chevron-down");
+			this.flags |= this.Flag.VISIBLE;
+		}
 	},
 
 	_subscribeInput: function() 
@@ -103,12 +133,16 @@ meta.class("Widget",
 	Flag: {
 		INPUT: 1 << 0,
 		RENDERING: 1 << 1,
-		NEED_RENDER: 1 << 2
+		NEED_RENDER: 1 << 2,
+		VISIBLE: 1 << 3
 	},
 
 	//
+	x: 0, y: 0,
+
 	parentElement: null,
 	headerElement: null,
+	headerIcon: null,
 	element: null,
 
 	params: null,
@@ -134,20 +168,6 @@ meta.class("PaletteWidget", "Widget",
 
 		this.checker = document.createElement("canvas");
 		this.checkerCtx = this.checker.getContext("2d");	
-	},
-
-	updatePos: function()
-	{
-		this.x = 2;
-		this.y = 0;
-
-		var element = this.element;
-		do 
-		{
-			this.x += element.offsetLeft || 0;
-			this.y += element.offsetTop || 0;
-			element = element.offsetParent;
-		} while(element);]
 	},
 
 	_prepareAtlas: function()
@@ -264,8 +284,6 @@ meta.class("PaletteWidget", "Widget",
 	canvas: null,
 	ctx: null,
 
-	x: 0, y: 0,
-
 	scale: 1,
 	gridX: 0, gridY: 0,
 	numGridX: 0, numGridY: 0,
@@ -279,4 +297,12 @@ meta.class("PaletteWidget", "Widget",
 
 	atlas: null,
 	cellWidth: 0, cellHeight: 0 
+});
+
+meta.class("LayerWidget", "Widget",
+{
+	onCreate: function()
+	{
+
+	}
 });

@@ -163,7 +163,7 @@ function onMouseDown(event)
 		}
 		else {
 			var cellX = Math.floor(((event.x / tileScale) + camera[0])  / tileSize);
-			var cellY = Math.floor(((event.y / tileScale) + camera[1])  / tileSize);
+			var cellY = Math.floor((((event.y - 30) / tileScale) + camera[1])  / tileSize);
 			paintCell(cellX, cellY);	
 		}
 	}
@@ -215,7 +215,7 @@ function onMouseMove(event)
 	// Is left button pressed?
 	else if(buttons[256]) {
 		var cellX = Math.floor(((event.x / tileScale) + camera[0])  / tileSize);
-		var cellY = Math.floor(((event.y / tileScale) + camera[1])  / tileSize);
+		var cellY = Math.floor((((event.y - 30) / tileScale) + camera[1])  / tileSize);
 		paintCell(cellX, cellY);	
 	}
 }
