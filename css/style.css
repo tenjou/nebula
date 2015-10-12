@@ -61,7 +61,7 @@ span {
 	width: 160px; 
 	height: 160px;
 	margin: 6px;
-	background: #ccc url(/gradient.jpg); 
+	background: #ccc url(../gradient.jpg); 
 	background-size: cover;  
 	box-shadow: 0 0 16px rgba(0, 0, 0, 0.72);
 	color: white;
