@@ -2,5 +2,5 @@
 
 var meta =
 {
-	
+	channels: []
 };

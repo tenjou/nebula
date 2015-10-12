@@ -122,8 +122,8 @@ function loadSpritesheet()
 
 function loadLayerData()
 {
-	createLayer(0);
-	createLayer(1).empty();
+	createLayer("Terrain", 0);
+	createLayer("Props", 1).empty();
 
 	ready();
 }
@@ -392,8 +392,10 @@ var tilemapFragmentShader = [
 var layers = [];
 var currLayer = 0;
 
-function MapLayer() 
+function MapLayer(name) 
 {
+	this.name = name;
+	
 	var size = mapWidth * mapHeight * 4;
 
 	this.texture = gl.createTexture();
@@ -424,11 +426,19 @@ MapLayer.prototype =
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-	}
+	},
+
+	name: ""
 }
 
-function createLayer(index) {
-	var layer = new MapLayer();
+var channelCreateLayer = meta.createChannel("create-layer");
+
+function createLayer(name, index) 
+{
+	var layer = new MapLayer(name);
 	layers[index] = layer;
+
+	channelCreateLayer.emit(layer);
+
 	return layer;
 }

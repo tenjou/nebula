@@ -13,7 +13,7 @@ meta.class("Widget",
 		var self = this;
 		
 		this.parentElement = document.createElement("div");
-		this.parentElement.setAttribute("id", name);
+		this.parentElement.setAttribute("class", "widget");
 
 		this.headerElement = document.createElement("div");
 		this.headerElement.setAttribute("class", "header");
@@ -130,6 +130,22 @@ meta.class("Widget",
 		return (this.flags & this.Flag.RENDERING) === 0; 
 	},
 
+	get contentHeader()
+	{
+		if(!this._contentHeader) {
+			this._contentHeader = document.createElement("div");
+
+			if(this.element.children.length > 0) {
+				this.element.insertBefore(this._contentHeader, this.element.children[0]);
+			}
+			else {
+				this.element.appendChild(this._contentHeader);
+			}
+		}
+
+		return this._contentHeader;
+	},
+
 	Flag: {
 		INPUT: 1 << 0,
 		RENDERING: 1 << 1,
@@ -144,9 +160,31 @@ meta.class("Widget",
 	headerElement: null,
 	headerIcon: null,
 	element: null,
+	_contentHeader: null,
 
 	params: null,
 	flags: 0
+});
+
+meta.class("UI.Menu", 
+{
+	init: function(owner)
+	{
+		this.element = document.createElement("ul");
+		this.element.setAttribute("class", "menu");
+		owner.contentHeader.appendChild(this.element);
+	},
+
+	addOption: function(name, cb) 
+	{
+		var option = document.createElement("li");
+		option.addEventListener("click", cb);
+		option.innerHTML = name;
+		this.element.appendChild(option);
+	},
+
+	//
+	element: null
 });
 
 meta.class("PaletteWidget", "Widget", 
@@ -167,7 +205,7 @@ meta.class("PaletteWidget", "Widget",
 		this.cursorCtx = this.cursor.getContext("2d");
 
 		this.checker = document.createElement("canvas");
-		this.checkerCtx = this.checker.getContext("2d");	
+		this.checkerCtx = this.checker.getContext("2d");
 	},
 
 	_prepareAtlas: function()
@@ -303,6 +341,56 @@ meta.class("LayerWidget", "Widget",
 {
 	onCreate: function()
 	{
+		var self = this;
 
-	}
+		this.menu = new UI.Menu(this);
+		this.menu.addOption("new", function() {
+			self.onNew();
+		});
+		
+		this.loadLayers();
+	},
+
+	loadLayers: function()
+	{
+		meta.subscribe(this, "create-layer", this._onCreateLayerCb);
+
+		this.list = document.createElement("ul");
+
+		var num = layers.length;
+		for(var n = 0; n < num; n++) {
+			this.createLayer(layer);
+		}
+
+		this.element.appendChild(this.list);
+	},
+
+	onNew: function()
+	{
+		console.log("new");
+	},
+
+	_onCreateLayerCb: function(layer) 
+	{
+		console.log(layer.name)
+		var layerElement = document.createElement("li");
+
+		var visibleButton = document.createElement("i");
+		visibleButton.setAttribute("class", "fa fa-eye");
+		layerElement.appendChild(visibleButton);
+
+		var name = document.createElement("span");
+		name.setAttribute("contenteditable", "true");
+		name.innerHTML = layer.name;
+		layerElement.appendChild(name);
+
+		var deleteButton = document.createElement("i");
+		deleteButton.setAttribute("class", "fa fa-times");
+		layerElement.appendChild(deleteButton);
+
+		this.list.appendChild(layerElement);
+	},
+
+	//
+	list: null
 });

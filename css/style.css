@@ -1,14 +1,18 @@
 * { 
 	padding: 0; 
 	margin: 0;
-   -moz-user-select: none;
-   -khtml-user-select: none;
-   -webkit-user-select: none;
-   -ms-user-select: none;
-   user-select: none;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	user-drag: none; 
+	-webkit-user-drag: none;	
 }
 
 body {
+	background-color: #29272C;
 	font-size: 12px;
 	font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;	
 }
@@ -19,45 +23,95 @@ canvas {
 	display: block;
 }
 
+ul {
+	list-style-type: none;
+}
+
+table {
+    border-spacing: 0;
+}
+
+span {
+	-webkit-touch-callout: initial;
+	-webkit-user-select: initial;
+	-khtml-user-select: initial;
+	-moz-user-select: initial;
+	-ms-user-select: initial;
+	user-select: initial;
+}
+
+.template {
+	display: none;
+}
+
 .screen {
 	position: absolute;
 }
 
-.right-toolbar {
-	position: absolute;
-	font-family: "Lucida Sans", "Lucida Grande", sans-serif;
+#room-browser .holder {
+    height: 100%;
+    padding: 5px;
+    box-sizing: border-box;
 }
-
-.right-toolbar .header {
-	line-height: 24px;
-	font-weight: bold;
-	text-transform: uppercase;
-	font-size: 11px;
-	color: #ccc;	
-	cursor: pointer;
-	border-top: 1px dashed #212121;
-	border-bottom: 1px dashed #212121;
-}
-
-i.fa {
-	margin-right: 7px;
-	margin-left: 8px;
-}
-
-i.fa-chevron-right {
-	margin-left: 10px;
-}
-
-.menu, .footer {
-	background-color: black;
-	position: absolute;
-	line-height: 30px;
-}
-
-.menu .logo {
+#room-browser .holder .item {
+	display: flex;
+	flex-flow: column;	
+	position: relative;
+	float: left;
+	width: 160px; 
+	height: 160px;
+	margin: 6px;
+	background: #ccc url(/gradient.jpg); 
+	background-size: cover;  
+	box-shadow: 0 0 16px rgba(0, 0, 0, 0.72);
 	color: white;
-	margin-left: 10px;
-	margin-right: 10px;
-	font-size: 16px;
-	font-weight: bold;
+}
+#room-browser .holder .item:hover, 
+#room-browser .holder .active {
+	outline: 3px solid #f5f5f5;
+}
+#room-browser .holder .header {
+	flex: 0 1 auto;
+	background: rgba(0, 0, 0, 0.4);
+}
+#room-browser .holder .header .content {
+	padding: 6px;
+}
+#room-browser .holder .content {
+	flex: 1 1 auto;
+}
+#room-browser .holder .close {
+    float: right;
+    background-color: rgba(0, 0, 0, 0.2);
+    width: 11px;
+    padding: 6px;
+    text-align: center;
+}
+#room-browser .holder .close:hover {
+	background-color: #43a6e2;
+}
+#room-browser .img-holder {
+	position: absolute;
+	width: 90%;
+	height: 90%;
+	left: 5%;
+	top: 5%;
+}
+#room-browser img {
+	display: block;
+	position: absolute;
+	margin: auto;
+	max-width: 90%;
+	max-height: 90%;
+    top: 5%;
+    left: 5%;
+    right: 5%;
+    bottom: 5%;	
+}
+#room-browser .holder .res-info {
+	float: right; 
+	padding: 4px;
+	background: rgba(0, 0, 0, 0.4);
+	font-size: 9px;
+    color: white;
 }

@@ -7,34 +7,43 @@
 
 		<title>META Editor</title>
 
-		<link rel="stylesheet" type="text/css" href="css/style.css">
-
-		<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+		<link href="css/style.css" rel="stylesheet">
+		<link href="css/font-awesome.min.css" rel="stylesheet">
 		<link href="http://fonts.googleapis.com/css?family=Open+Sans:400,700,600" rel="stylesheet" type="text/css">	
-		<link href="http://fonts.googleapis.com/css?family=Oswald" rel="stylesheet" type="text/css">	
+		<link href="http://fonts.googleapis.com/css?family=Oswald" rel="stylesheet" type="text/css">
 
-		<script src="lib/stats.min.js"></script>		
+		<script src="lib/stats.min.js"></script>	
 
-		<script src="src/meta/meta.js"></script>
-		<script src="src/meta/utilities.js"></script>
-		<script src="src/meta/class.js"></script>
-		<script src="src/meta/resource/resource.js"></script>
-		<script src="src/meta/resource/resource-texture.js"></script>
-		<script src="src/meta/resource/resource-sound.js"></script>
-		<script src="src/meta/input/input.js"></script>
-		<script src="src/meta/renderer/renderer.js"></script>
-		<script src="src/meta/renderer/renderer-canvas.js"></script>
-		<script src="src/meta/renderer/renderer-webgl.js"></script>
+		<script src="http://meta2d.com/meta.js"></script>	
 
-		<script src="src/editor.js"></script>
-		<script src="src/widget.js"></script>
-		<script src="src/meta.js"></script>		
+		<script src="src2/Room.js"></script>
+		<script src="src2/editor.js"></script>
 
-		<script src="src/plugins/fps.js"></script>
-
-		<script src="src/loader.js"></script>
+		<script src="src2/plugins/browser/Browser.Room.js"></script>
+		<script src="src2/plugins/browser/Browser.Holder.js"></script>
+		<script src="src2/plugins/browser/Browser.Item.js"></script>
 	</head>
 
-	<body onload="editor.start();">
+	<body>
+		<div id="stuff" style="display: hidden;"></div>
+
+		<div class="template">
+			<div id="template-browser-item">
+				<div class="item">
+					<div class="header">
+						<div class="close">
+							<i class="fa fa-times"></i>
+						</div>
+						<div class="content">
+							<span class="name"></span>
+						</div>
+					</div>
+
+					<div class="content" style="position: relative;">
+						<img/>
+					</div>
+				</div>
+			</div>
+		</div>
 	</body>
 </html>
