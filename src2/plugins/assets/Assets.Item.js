@@ -2,14 +2,26 @@
 
 meta.class("Assets.Item",
 {
-	init: function() 
+	init: function(holder) 
 	{
-		var self = this;
+		this.holder = holder;
 
+		var self = this;
 		var template = document.getElementById("template-assets-item");
 		this.element = template.children[0].cloneNode(true);
+		this.element.addEventListener("click", function(event) { self.activate(); }, false);
 		this.element.addEventListener("dragover", function(event) { self.handleDragOver(event); }, false);
 		this.element.addEventListener("drop", function(event) { self.handleFileSelect(event); }, false);	
+	},
+
+	activate: function()
+	{
+		if(this.holder.activeItem) {
+			this.holder.activeItem.element.setAttribute("class", "item");
+		}
+
+		this.holder.activeItem = this;
+		this.element.setAttribute("class", "item active");
 	},
 
 	handleDragOver: function(event) 
@@ -60,5 +72,6 @@ meta.class("Assets.Item",
 	},
 
 	//
-	element: null
+	element: null,
+	holder: null
 });

@@ -43,7 +43,7 @@ meta.class("Assets.Holder",
 					var wildcardIndex = name.indexOf(".");
 					var idName = name.substr(0, wildcardIndex);
 
-					var item = new Assets.Item();
+					var item = new Assets.Item(self);
 					item.name = idName;
 					item.img = fileResult.target.result;
 					self.element.appendChild(item.element);
@@ -64,5 +64,6 @@ meta.class("Assets.Holder",
 
 	//
 	element: null,
-	holder: null
+	
+	activeItem: null
 });
