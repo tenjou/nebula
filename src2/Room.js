@@ -16,8 +16,10 @@ meta.class("Room",
 		this.data = {};
 	},
 
-	load: function() 
+	load: function(data) 
 	{
+		this.data = data;
+
 		editor.screen.appendChild(this.element);
 
 		if(this.onLoad) {

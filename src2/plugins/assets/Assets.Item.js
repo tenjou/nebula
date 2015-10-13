@@ -17,8 +17,6 @@ meta.class("Assets.Item",
 		event.stopPropagation();
 		event.preventDefault();
 		event.dataTransfer.dropEffect = "copy";
-
-		console.log("drag-over-item");
 	},	
 
 	handleFileSelect: function(event)
@@ -51,8 +49,6 @@ meta.class("Assets.Item",
 			})(file);
 			reader.readAsDataURL(file);
 		}
-
-		console.log("file-select")
 	},
 
 	set name(name) {

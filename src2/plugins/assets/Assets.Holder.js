@@ -16,8 +16,6 @@ meta.class("Assets.Holder",
 		event.stopPropagation();
 		event.preventDefault();
 		event.dataTransfer.dropEffect = "copy";
-
-		console.log("drag-over");
 	},	
 
 	handleFileSelect: function(event)
@@ -42,20 +40,29 @@ meta.class("Assets.Holder",
 				return function(fileResult) 
 				{
 					var name = encodeURIComponent(file.name);
+					console.log(file);
 					var wildcardIndex = name.indexOf(".");
+					var idName = name.substr(0, wildcardIndex);
 
 					var item = new Assets.Item();
-					item.name = name.substr(0, wildcardIndex);
+					item.name = idName;
 					item.img = fileResult.target.result;
 					self.element.appendChild(item.element);
+
+					self.data[idName] = {
+						name: idName,
+						path: "",
+						ext: name.substr(wildcardIndex + 1),
+						lastModified: file.lastModified
+					};
+					editor.saveJSON();
 				}
 			})(file);
 			reader.readAsDataURL(file);
 		}
-
-		console.log("file-select")
 	},
 
 	//
-	element: null
+	element: null,
+	holder: null
 });

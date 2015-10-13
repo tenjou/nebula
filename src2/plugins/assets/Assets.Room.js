@@ -9,7 +9,7 @@ meta.class("Assets.Room", "Room",
 	},
 
 	onLoad: function() {
-		console.log("resource");
+		this.holder.data = this.data;
 	},
 
 	onUnload: function() {

@@ -89,9 +89,47 @@ meta.class("Editor.FileSystem",
 			});
 	},	
 
-	write: function(filename, cb)
+	write: function(filename, contents, cb)
 	{
+		var self = this;
 
+		this.fs.getFile(filename, {},
+			function(fileEntry) {
+				self.handleWriteDone(fileEntry, contents, cb);
+			},
+			function(fileError) {
+				self.handleError(fileError, cb, "write", filename);
+			});
+	},
+
+	handleWriteDone: function(fileEntry, contents, cb)
+	{
+		var self = this;
+
+		fileEntry.createWriter(
+			function(fileWritter) 
+			{
+				fileWritter.onwriteend = function() 
+				{
+					if(cb) {
+						cb(true);
+					}
+				};
+
+				fileWritter.onerror = function() 
+				{
+					console.error("(FileSystem::write) Could not write in " + fileEntry.name);
+					if(cb) {
+						cb(false);
+					}
+				};
+
+				var blob = new Blob([ contents ], { type: "text/plain" });
+				fileWritter.write(blob);
+			},
+			function(fileError) {
+				self.handleError(fileError, cb, "createWritter", filename);
+			});
 	},
 
 	remove: function(filename, cb)
@@ -101,7 +139,7 @@ meta.class("Editor.FileSystem",
 
 	handleError: function(fileError, cb, type, filename) 
 	{
-		if(fileError.name !== "NotFoundError")
+		if(type === "read" && fileError.name !== "NotFoundError")
 		{
 			if(filename) {
 				console.error("(FileSystem::" + type + ")", "[" + filename + "]", fileError.name);

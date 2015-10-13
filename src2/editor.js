@@ -34,8 +34,6 @@ var editor =
 
 	createJSON: function()
 	{
-		this.data = {};
-
 		this.fileSystem.create("editor.json", 
 			function() {
 				editor.continueLoad();
@@ -44,7 +42,19 @@ var editor =
 
 	loadJSON: function(contents)
 	{
+		this.data = JSON.parse(contents);
+
 		editor.continueLoad();
+	},
+
+	saveJSON: function()
+	{
+		var contents = JSON.stringify(this.data);
+
+		this.fileSystem.write("editor.json", contents,
+			function() {
+				console.log("[db saved]");
+			});
 	},
 
 	continueLoad: function()
@@ -53,13 +63,18 @@ var editor =
 		editor.registerRoom(Assets.Room);
 
 		this.onResize();
+
+		this.saveJSON();
 	},
 
 	registerRoom: function(cls) 
 	{
 		var room = new cls();
+
+		var roomData = {};
+		this.data[room.name] = roomData;
 		this.rooms[room.name] = room;
-		room.load();
+		room.load(roomData);
 	},
 
 	createScreen: function()
