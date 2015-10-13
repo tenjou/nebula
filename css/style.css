@@ -48,12 +48,12 @@ span {
 	position: absolute;
 }
 
-#room-browser .holder {
+#room-assets .holder {
     height: 100%;
     padding: 5px;
     box-sizing: border-box;
 }
-#room-browser .holder .item {
+#room-assets .holder .item {
 	display: flex;
 	flex-flow: column;	
 	position: relative;
@@ -66,38 +66,38 @@ span {
 	box-shadow: 0 0 16px rgba(0, 0, 0, 0.72);
 	color: white;
 }
-#room-browser .holder .item:hover, 
-#room-browser .holder .active {
+#room-assets .holder .item:hover, 
+#room-assets .holder .active {
 	outline: 3px solid #f5f5f5;
 }
-#room-browser .holder .header {
+#room-assets .holder .header {
 	flex: 0 1 auto;
 	background: rgba(0, 0, 0, 0.4);
 }
-#room-browser .holder .header .content {
+#room-assets .holder .header .content {
 	padding: 6px;
 }
-#room-browser .holder .content {
+#room-assets .holder .content {
 	flex: 1 1 auto;
 }
-#room-browser .holder .close {
+#room-assets .holder .close {
     float: right;
     background-color: rgba(0, 0, 0, 0.2);
     width: 11px;
     padding: 6px;
     text-align: center;
 }
-#room-browser .holder .close:hover {
+#room-assets .holder .close:hover {
 	background-color: #43a6e2;
 }
-#room-browser .img-holder {
+#room-assets .img-holder {
 	position: absolute;
 	width: 90%;
 	height: 90%;
 	left: 5%;
 	top: 5%;
 }
-#room-browser img {
+#room-assets img {
 	display: block;
 	position: absolute;
 	margin: auto;
@@ -108,7 +108,7 @@ span {
     right: 5%;
     bottom: 5%;	
 }
-#room-browser .holder .res-info {
+#room-assets .holder .res-info {
 	float: right; 
 	padding: 4px;
 	background: rgba(0, 0, 0, 0.4);

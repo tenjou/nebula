@@ -4,17 +4,53 @@ var editor =
 {
 	start: function()
 	{
-		meta.classLoaded();
-
 		this.createScreen();
-
-		this.rooms = {};
-		editor.registerRoom(Browser.Room);
 
 		var self = this;
 		window.addEventListener("resize", function() {
 			self.onResize();
 		}, false);
+
+		// fileSystem:
+		this.fileSystem = new Editor.FileSystem();
+		this.fileSystem.onReady.add(function() {
+			editor.load();
+		});
+	},
+
+	load: function()
+	{
+		this.fileSystem.read("editor.json",
+			function(result) 
+			{
+				if(!result) {
+					editor.createJSON();
+				}
+				else {
+					editor.loadJSON(result);
+				}
+			});
+	},
+
+	createJSON: function()
+	{
+		this.data = {};
+
+		this.fileSystem.create("editor.json", 
+			function() {
+				editor.continueLoad();
+			});
+	},
+
+	loadJSON: function(contents)
+	{
+		editor.continueLoad();
+	},
+
+	continueLoad: function()
+	{
+		this.rooms = {};
+		editor.registerRoom(Assets.Room);
 
 		this.onResize();
 	},
@@ -95,6 +131,8 @@ var editor =
 	},
 
 	//
+	data: null,
+
 	screen: null,
 
 	header: null,

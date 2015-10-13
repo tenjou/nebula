@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Browser.Holder",
+meta.class("Assets.Holder",
 {
 	init: function() 
 	{
@@ -44,7 +44,7 @@ meta.class("Browser.Holder",
 					var name = encodeURIComponent(file.name);
 					var wildcardIndex = name.indexOf(".");
 
-					var item = new Browser.Item();
+					var item = new Assets.Item();
 					item.name = name.substr(0, wildcardIndex);
 					item.img = fileResult.target.result;
 					self.element.appendChild(item.element);

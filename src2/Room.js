@@ -12,6 +12,8 @@ meta.class("Room",
 		if(this.onInit) {
 			this.onInit();
 		}
+
+		this.data = {};
 	},
 
 	load: function() 
@@ -47,5 +49,6 @@ meta.class("Room",
 	//
 	widgets: null,
 	element: null,
+	data: null,
 	name: "unknown"
 });

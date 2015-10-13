@@ -1,10 +1,10 @@
 "use strict";
 
-meta.class("Browser.Room", "Room", 
+meta.class("Assets.Room", "Room", 
 {
 	onInit: function() 
 	{
-		this.holder = new Browser.Holder();
+		this.holder = new Assets.Holder();
 		this.element.appendChild(this.holder.element);
 	},
 
@@ -24,5 +24,5 @@ meta.class("Browser.Room", "Room",
 	},
 
 	//
-	name: "browser"
+	name: "assets"
 });
