@@ -34,6 +34,8 @@ var editor =
 
 	createJSON: function()
 	{
+		this.data = {};
+
 		this.fileSystem.create("editor.json", 
 			function() {
 				editor.continueLoad();

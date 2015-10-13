@@ -40,7 +40,6 @@ meta.class("Assets.Holder",
 				return function(fileResult) 
 				{
 					var name = encodeURIComponent(file.name);
-					console.log(file);
 					var wildcardIndex = name.indexOf(".");
 					var idName = name.substr(0, wildcardIndex);
 
@@ -52,9 +51,10 @@ meta.class("Assets.Holder",
 					self.data[idName] = {
 						name: idName,
 						path: "",
-						ext: name.substr(wildcardIndex + 1),
+						ext: file.type,
 						lastModified: file.lastModified
 					};
+					//editor.fileSystem.write("assets/")
 					editor.saveJSON();
 				}
 			})(file);

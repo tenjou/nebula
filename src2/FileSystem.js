@@ -93,7 +93,7 @@ meta.class("Editor.FileSystem",
 	{
 		var self = this;
 
-		this.fs.getFile(filename, {},
+		this.fs.getFile(filename, { create: true },
 			function(fileEntry) {
 				self.handleWriteDone(fileEntry, contents, cb);
 			},
@@ -111,9 +111,17 @@ meta.class("Editor.FileSystem",
 			{
 				fileWritter.onwriteend = function() 
 				{
-					if(cb) {
-						cb(true);
+					console.log("truncated");
+
+					fileWritter.onwriteend = function() 
+					{
+						if(cb) {
+							cb(true);
+						}						
 					}
+
+					var blob = new Blob([ contents ], { type: "text/plain" });
+					fileWritter.write(blob);
 				};
 
 				fileWritter.onerror = function() 
@@ -124,8 +132,7 @@ meta.class("Editor.FileSystem",
 					}
 				};
 
-				var blob = new Blob([ contents ], { type: "text/plain" });
-				fileWritter.write(blob);
+				fileWritter.truncate(1);
 			},
 			function(fileError) {
 				self.handleError(fileError, cb, "createWritter", filename);
@@ -133,6 +140,50 @@ meta.class("Editor.FileSystem",
 	},
 
 	remove: function(filename, cb)
+	{
+
+	},
+
+	readDir: function(name, cb)
+	{
+		var self = this;
+		var dirReader = this.fs.createReader();
+		var entries = [];
+
+		dirReader.readEntries(
+			function(results) 
+			{
+				if(results.length) 
+				{
+					entries = entries.concat(results);
+					
+					if(cb) {
+						cb(entries);
+					}
+				}
+			},
+			function(fileError) {
+				self.handleError(fileError, cb, "readDir", name);
+			});
+	},
+
+	createDir: function(name, cb)
+	{
+		var self = this;
+
+		this.fs.getDirectory(name, { create: true },
+			function(dirEntry) 
+			{
+				if(cb) {
+					cb(true);
+				}
+			},
+			function(fileError) {
+				self.handleError(fileError, cb, "createDir", name);
+			});
+	},
+
+	removeDir: function(name, cb)
 	{
 
 	},
