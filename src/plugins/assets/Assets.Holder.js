@@ -54,7 +54,11 @@ meta.class("Assets.Holder",
 						ext: file.type,
 						lastModified: file.lastModified
 					};
-					//editor.fileSystem.write("assets/")
+
+					// editor.fileSystem.write("assets/", file.type, 
+					// 	function(fileEntry) {
+					// 		console.log("saved");
+					// 	});
 					editor.saveJSON();
 				}
 			})(file);

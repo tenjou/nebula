@@ -4,9 +4,6 @@ var editor =
 {
 	start: function()
 	{
-		this.createMenu();
-		this.createFooter();
-		this.createRightToolbar();
 		this.createScreen();
 
 		var self = this;
@@ -14,68 +11,107 @@ var editor =
 			self.onResize();
 		}, false);
 
-		this.onResize();
+		// fileSystem:
+		this.fileSystem = new Editor.FileSystem();
+		this.fileSystem.onReady.add(function() {
+			editor.loadProject();
+		});
+	},
 
-		for(var key in editor.plugin) {
-			new editor.plugin[key]();
+	loadProject: function()
+	{
+		this.projectName = window.location.hash;
+		if(!this.projectName) {
+			this.projectName = "test";
+			window.location.hash = this.projectName;
+		}
+		else {
+			this.projectName = this.projectName.substr(1);
 		}
 
-		init();
+		this.fileSystem.checkDir(this.projectName, 
+			function(result) 
+			{
+				if(!result) {
+					editor.createProject(editor.projectName);
+				}
+				else {
+					editor.loadCfg();
+				}
+			});
 
-		var that = this;
-		this._renderFunc = function() { that.render(); };
-		this.render();
+		this.fileSystem.rootDir = this.projectName + "/";
 	},
 
-	createMenu: function()
+	createProject: function(name)
 	{
-		this.menu = document.createElement("div");
-		this.menu.setAttribute("id", "menu");
-		this.menu.style.height = "30px";
-		document.body.appendChild(this.menu);
+		console.log("(editor.createProject) Create project - " + name);
 
-		this.createMenuLogo();
+		editor.fileSystem.createDir(name,
+			function() {
+				editor.loadCfg();
+			});
 	},
 
-	createMenuLogo: function()
+	loadCfg: function()
 	{
-		var logo = document.createElement("div");
-		logo.setAttribute("class", "logo");
-		logo.innerHTML = "meta"
-		this.menu.appendChild(logo);
+		this.fileSystem.read(this.projectPath + "editor.json",
+			function(result) 
+			{
+				if(!result) {
+					editor.createCfg();
+				}
+				else {
+					editor.parseCfg(result);
+				}
+			});		
 	},
 
-	createFooter: function()
+	createCfg: function()
 	{
-		this.footer = document.createElement("div");
-		this.footer.setAttribute("class", "footer");
-		this.footer.style.height = "30px";
-		document.body.appendChild(this.footer);
+		this.data = {};
+
+		this.fileSystem.create(this.projectPath + "editor.json", 
+			function() {
+				editor.continueLoad();
+			});
 	},
 
-	createRightToolbar: function() 
+	parseCfg: function(contents)
 	{
-		this.rightToolbar = document.createElement("div");
-		this.rightToolbar.setAttribute("class", "right-toolbar");
-		document.body.appendChild(this.rightToolbar);
+		this.data = JSON.parse(contents);
 
-		var style = this.rightToolbar.style;
-		style.width = "200px";
-		style.backgroundColor = "black";
-		style.boxShadow = "-2px 0px 0px rgba(0, 0, 0, 0.07)";
-		style.zIndex = "100";
-
-		this.loadRightToolbar();
+		editor.continueLoad();
 	},
 
-	loadRightToolbar: function()
+	saveJSON: function()
 	{
-		var palette = new PaletteWidget("palette");
-		palette.loadAtlas("assets/tilemap.png", 32, 32);
-		this.widgets.push(palette);	
+		var contents = JSON.stringify(this.data);
 
-		var layers = new LayerWidget("layers");
-		this.widgets.push(layers);			
+		this.fileSystem.write(this.projectPath + "editor.json", contents,
+			function() {
+				console.log("[db saved]");
+			});
+	},
+
+	continueLoad: function()
+	{
+		this.rooms = {};
+		editor.registerRoom(Assets.Room);
+
+		this.onResize();
+
+		this.saveJSON();
+	},
+
+	registerRoom: function(cls) 
+	{
+		var room = new cls();
+
+		var roomData = {};
+		this.data[room.name] = roomData;
+		this.rooms[room.name] = room;
+		room.load(roomData);
 	},
 
 	createScreen: function()
@@ -84,49 +120,33 @@ var editor =
 		this.screen.setAttribute("class", "screen");
 		document.body.appendChild(this.screen);
 
-		this.createCanvas();
-	},
+		// var margin = 5;
 
-	createCanvas: function()
-	{
-		this.canvas = document.createElement("canvas");
-		this.screen.appendChild(this.canvas);
-	},
+		// this.headerPlate = new EditorUI.Plate();
+		// this.screen.appendChild(this.headerPlate.element);
 
-	addRender: function(widget) 
-	{
-		if(widget.flags & widget.Flag.RENDERING) { return; }
+		// this.leftPlate = new EditorUI.Plate();
+		// this.leftPlate.margin(margin, 0, margin, 0);
+		// this.screen.appendChild(this.leftPlate.element);
 
-		this.renderWidgets.push(widget);
-	},
+		// this.rightPlate = new EditorUI.Plate();
+		// this.rightPlate.margin(margin, 0, margin, 0);
+		// this.screen.appendChild(this.rightPlate.element);	
 
-	removeRender: function(widget)
-	{
-		if((widget.flags & widget.Flag.RENDERING) === 0) { return; }
+		// this.viewportPlate = new EditorUI.Plate();
+		// this.viewportPlate.margin(margin, margin, margin, margin);
+		// this.screen.appendChild(this.viewportPlate.element);
 
-		var num = this.widgets.length;
-		for(var n = 0; n < num; n++) {
-			if(this.widgets[n] === widget) {
-				this.widgets.splice(n, 1);
-			}
-		}
-	},
+		// meta.engine.container = this.viewportPlate.element;	
 
-	render: function() 
-	{
-		var widget;
-		var num = this.renderWidgets.length;
-		for(var n = 0; n < num; n++) {
-			widget = this.renderWidgets[n];
-			if(widget.flags & widget.Flag.NEED_RENDER) {
-				widget.render();
-				widget.flags &= ~widget.Flag.NEED_RENDER;
-			}
-		}
+		// this.header = new EditorUI.Header();
+		// this.screen.appendChild(this.header.element);
 
-		draw();
+		// //
+		// var widgetFlags = EditorUI.WidgetFlag;
 
-		window.requestAnimationFrame(this._renderFunc);
+		// this.widget = new EditorUI.Widget(widgetFlags.HEADER | widgetFlags.FOOTER);
+		//this.screen.appendChild(this.widget.element);
 	},
 
 	onResize: function()
@@ -134,41 +154,50 @@ var editor =
 		this.screenWidth = window.innerWidth;
 		this.screenHeight = window.innerHeight;
 
-		this.menu.style.width = this.screenWidth + "px";
+		var style = this.screen.style;
+		style.width = this.screenWidth + "px";
+		style.height = this.screenHeight + "px";
 
-		this.footer.style.width = this.screenWidth + "px";
-		this.footer.style.top = (this.screenHeight - 30) + "px";
-
-		var style = this.rightToolbar.style;
-		style.height = (this.screenHeight - 60) + "px";
-		style.top = "30px";
-		style.left = (this.screenWidth - 200) + "px";
-
-		style = this.screen.style;
-		style.width = (this.screenWidth - 200) + "px";
-		style.height = (this.screenHeight - 60) + "px";
-		style.top = "30px";
-
-		var num = this.widgets.length;
-		for(var n = 0; n < num; n++) {
-			this.widgets[n].updatePos();
+		for(var key in this.rooms) {
+			this.rooms[key].handleResize();
 		}
-	},
 
-	plugin: function(name, obj) {
-		meta.class("editor.plugin." + name, obj);
+		// console.log(this.screenWidth, this.screenHeight);
+
+		// this.headerPlate.width = this.screenWidth;
+		// this.headerPlate.height = 30;
+
+		// this.leftPlate.width = 210;
+		// this.leftPlate.height = this.screenHeight - this.headerPlate.height;
+		// this.leftPlate.y = this.headerPlate.height;
+
+		// this.rightPlate.width = 210;
+		// this.rightPlate.height = this.screenHeight - this.headerPlate.height;
+		// this.rightPlate.x = this.screenWidth - this.rightPlate.width;
+		// this.rightPlate.y = this.headerPlate.height;
+
+		// this.viewportPlate.width = this.screenWidth - 420;
+		// this.viewportPlate.height = this.screenHeight - 30;
+		// this.viewportPlate.x = this.rightPlate.width;
+		// this.viewportPlate.y = this.headerPlate.height;
 	},
 
 	//
+	projectName: null,
+	data: null,
+
+	screen: null,
+
+	header: null,
+	widget: null,
+
 	screenWidth: 0,
 	screenHeight: 0,
 
-	menu: null,
-	footer: null,
-	rightToolbar: null,
-	screen: null,
-	canvas: null,
+	rooms: null
+};
 
-	widgets: [],
-	renderWidgets: []
+meta.onInit = function() {
+	meta.engine.container = document.getElementById("stuff");
+	editor.start();
 };

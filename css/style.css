@@ -38,6 +38,8 @@ span {
 	-moz-user-select: initial;
 	-ms-user-select: initial;
 	user-select: initial;
+	user-drag: initial; 
+	-webkit-user-drag: initial;		
 }
 
 .template {

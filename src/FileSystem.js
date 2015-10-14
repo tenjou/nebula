@@ -29,15 +29,13 @@ meta.class("Editor.FileSystem",
 		this.fs = fs.root;
 		this.ready = true;
 		this.onReady.emit(this, true);
-
-		console.log("Opened file system: " + fs.name);
 	},	
 
 	create: function(filename, cb)
 	{
 		var self = this;
 
-		this.fs.getFile(filename, {
+		this.fs.getFile(this.rootDir + filename, {
 				create: true
 			},
 			function(fileEntry) 
@@ -58,7 +56,7 @@ meta.class("Editor.FileSystem",
 	{
 		var self = this;
 
-		this.fs.getFile(filename, {},
+		this.fs.getFile(this.rootDir + filename, {},
 			function(fileEntry) {
 				self.handleReadDone(fileEntry, cb);
 			},
@@ -93,7 +91,7 @@ meta.class("Editor.FileSystem",
 	{
 		var self = this;
 
-		this.fs.getFile(filename, { create: true },
+		this.fs.getFile(this.rootDir + filename, { create: true },
 			function(fileEntry) {
 				self.handleWriteDone(fileEntry, contents, cb);
 			},
@@ -111,8 +109,6 @@ meta.class("Editor.FileSystem",
 			{
 				fileWritter.onwriteend = function() 
 				{
-					console.log("truncated");
-
 					fileWritter.onwriteend = function() 
 					{
 						if(cb) {
@@ -144,6 +140,22 @@ meta.class("Editor.FileSystem",
 
 	},
 
+	checkDir: function(name, cb)
+	{
+		var self = this;
+
+		this.fs.getDirectory(this.rootDir + name, {},
+			function(dirEntry) 
+			{
+				if(cb) {
+					cb(true);
+				}
+			},
+			function(fileError) {
+				self.handleError(fileError, cb, "checkDir", name);
+			});
+	},
+
 	readDir: function(name, cb)
 	{
 		var self = this;
@@ -171,7 +183,7 @@ meta.class("Editor.FileSystem",
 	{
 		var self = this;
 
-		this.fs.getDirectory(name, { create: true },
+		this.fs.getDirectory(this.rootDir + name, { create: true },
 			function(dirEntry) 
 			{
 				if(cb) {
@@ -201,7 +213,7 @@ meta.class("Editor.FileSystem",
 		}
 
 		if(cb) {
-			cb(null);
+			cb(false);
 		}		
 	},
 
@@ -209,5 +221,7 @@ meta.class("Editor.FileSystem",
 	ready: false,
 
 	fs: null,
-	onReady: null
+	onReady: null,
+
+	rootDir: ""
 });
