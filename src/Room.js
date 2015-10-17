@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Room", 
+meta.class("Editor.Room", 
 {
 	init: function() 
 	{

@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Assets.Holder",
+module.class("Holder",
 {
 	init: function() 
 	{
@@ -42,11 +42,15 @@ meta.class("Assets.Holder",
 					var name = encodeURIComponent(file.name);
 					var wildcardIndex = name.indexOf(".");
 					var idName = name.substr(0, wildcardIndex);
+					var ext = name.substr(wildcardIndex);
+					console.log(ext);
 
-					var item = new Assets.Item(self);
+					var item = new module.exports.Item(self);
 					item.name = idName;
 					item.img = fileResult.target.result;
 					self.element.appendChild(item.element);
+
+					var blob = dataURItoBlob(fileResult.target.result, file.type);
 
 					self.data[idName] = {
 						name: idName,
@@ -55,10 +59,9 @@ meta.class("Assets.Holder",
 						lastModified: file.lastModified
 					};
 
-					// editor.fileSystem.write("assets/", file.type, 
-					// 	function(fileEntry) {
-					// 		console.log("saved");
-					// 	});
+					console.log("assets/" + idName + ext);
+
+					editor.fileSystem.writeBlob("assets/" + idName + ext, blob)
 					editor.saveJSON();
 				}
 			})(file);
@@ -71,3 +74,17 @@ meta.class("Assets.Holder",
 	
 	activeItem: null
 });
+
+function dataURItoBlob(dataURI, type) 
+{
+	var binary = atob(dataURI.split(",")[1]);
+	var length = binary.length;
+	var array = new Uint8Array(length);
+
+	for(var n = 0; n < length; n++) {
+	    array[n] = binary.charCodeAt(n);
+	}
+
+	return new Blob([ array ], { type: type });
+}
+

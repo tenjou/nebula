@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Assets.Item",
+module.class("Item",
 {
 	init: function(holder) 
 	{

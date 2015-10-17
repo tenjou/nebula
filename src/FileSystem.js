@@ -135,6 +135,53 @@ meta.class("Editor.FileSystem",
 			});
 	},
 
+	writeBlob: function(filename, blob, cb)
+	{
+		var self = this;
+
+		this.fs.getFile(this.rootDir + filename, { create: true },
+			function(fileEntry) {
+				self.handleWriteBlobDone(fileEntry, blob, cb);
+			},
+			function(fileError) {
+				self.handleError(fileError, cb, "writeBlob", filename);
+			});
+	},
+
+	handleWriteBlobDone: function(fileEntry, blob, cb)
+	{
+		var self = this;
+
+		fileEntry.createWriter(
+			function(fileWritter) 
+			{
+				fileWritter.onwriteend = function() 
+				{
+					fileWritter.onwriteend = function() 
+					{
+						if(cb) {
+							cb(true);
+						}						
+					}
+
+					fileWritter.write(blob);
+				};
+
+				fileWritter.onerror = function() 
+				{
+					console.error("(FileSystem::writeBlob) Could not write blob in " + fileEntry.name);
+					if(cb) {
+						cb(false);
+					}
+				};
+
+				fileWritter.truncate(1);
+			},
+			function(fileError) {
+				self.handleError(fileError, cb, "createWritter", filename);
+			});
+	},	
+
 	remove: function(filename, cb)
 	{
 
@@ -159,20 +206,28 @@ meta.class("Editor.FileSystem",
 	readDir: function(name, cb)
 	{
 		var self = this;
-		var dirReader = this.fs.createReader();
-		var entries = [];
 
-		dirReader.readEntries(
-			function(results) 
+		this.fs.getDirectory(this.rootDir + name, {},
+			function(dirEntry) 
 			{
-				if(results.length) 
-				{
-					entries = entries.concat(results);
-					
-					if(cb) {
-						cb(entries);
-					}
-				}
+				var dirReader = dirEntry.createReader();
+				var entries = [];
+
+				dirReader.readEntries(
+					function(results) 
+					{
+						if(results.length) 
+						{
+							entries = entries.concat(results);
+							
+							if(cb) {
+								cb(entries);
+							}
+						}
+					},
+					function(fileError) {
+						self.handleError(fileError, cb, "readDir", name);
+					});
 			},
 			function(fileError) {
 				self.handleError(fileError, cb, "readDir", name);

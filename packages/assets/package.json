@@ -1,0 +1,11 @@
+{
+	"name": "assets",
+	"main": "src/assets.js",
+	"include": [
+		"src/Room.js",
+		"src/Holder.js",
+		"src/Item.js"
+	],
+	"version": "0.0.1",
+	"license": "MIT"
+}

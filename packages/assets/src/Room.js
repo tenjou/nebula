@@ -1,14 +1,17 @@
 "use strict";
 
-meta.class("Assets.Room", "Room", 
+module.class("Room", "Editor.Room", 
 {
 	onInit: function() 
 	{
-		this.holder = new Assets.Holder();
+		this.holder = new module.exports.Holder();
 		this.element.appendChild(this.holder.element);
 	},
 
-	onLoad: function() {
+	onLoad: function() 
+	{
+
+
 		this.holder.data = this.data;
 	},
 

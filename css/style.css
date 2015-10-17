@@ -48,6 +48,22 @@ span {
 
 .screen {
 	position: absolute;
+	color: white;
+}
+
+#loading-screen {
+	display: table;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.6);
+}
+
+#loading-screen span {
+	display: table-cell;
+    text-align: center;
+    font-weight: bold;
+    font-size: 15px;
+    vertical-align: middle;
 }
 
 #room-assets .holder {
