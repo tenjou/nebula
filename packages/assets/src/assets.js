@@ -12,28 +12,19 @@ module.exports =
 
 	},
 
-	load: function()
+	load: function() 
 	{
-		var self = this;
+		this.room = new this.Room();
+		editor.registerRoom(this.room);
 
-		editor.fileSystem.checkDir("assets", 
-			function(result) 
-			{
-				if(!result) 
-				{
-					editor.fileSystem.createDir("assets", 
-						function() {
-							self.loadAssets();
-						});
-				}
-				else {
-					self.loadAssets();
-				}
-			});
+		this.loadAssets();
 	},
 
 	loadAssets: function()
 	{
 		console.log("load-assets");
-	}
+	},
+
+	//
+	room: null
 };

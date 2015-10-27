@@ -7,6 +7,7 @@ meta.class("Editor.Module",
 	},
 
 	//
+	info: null,
 	data: null,
 	includesToLoad: 0
 });

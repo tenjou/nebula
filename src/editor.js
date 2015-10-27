@@ -4,21 +4,25 @@ var editor =
 {
 	start: function()
 	{
+		this.rooms = [];
+
 		this.createScreen();
 		this.createLoadingScreen();
 
 		var self = this;
-		window.addEventListener("resize", function() {
-			self.onResize();
-		}, false);
+		window.addEventListener("resize", 
+			function() {
+				self.onResize();
+			}, false);
 
 		this.onResize();
 
-		// // fileSystem:
-		// this.fileSystem = new Editor.FileSystem();
-		// this.fileSystem.onReady.add(function() {
-		// 	editor.startEditor();
-		// });
+		// fileSystem:
+		this.fileSystem = new Editor.FileSystem();
+		this.fileSystem.onReady.add(
+			function() {
+				editor.startEditor();
+			});
 	},
 
 	startEditor: function()
@@ -40,7 +44,7 @@ var editor =
 			name = "test";
 		}
 		else {
-			name = this.projectName.substr(1);
+			name = name.substr(1);
 		}
 
 		this.loadWorkspace(name);
@@ -49,21 +53,29 @@ var editor =
 	loadWorkspace: function(name)
 	{
 		this.state = "loading-workspace";
+		this.loadingText.innerHTML = "LOADING WORKSPACE";
 
-		this.fileSystem.checkDir(this.projectName, 
-			function(result) 
-			{
-				window.location.hash = name;
-				editor.projectName = name;
-				editor.fileSystem.rootDir = name + "/";
+		if(!this.desktop)
+		{
+			this.fileSystem.checkDir(this.projectName, 
+				function(result) 
+				{
+					window.location.hash = name;
+					editor.projectName = name;
+					editor.fileSystem.rootDir = name + "/";
 
-				if(!result) {
-					editor.createProject(name);
-				}
-				else {
-					editor.loadProject(name);
-				}
-			});
+					if(!result) {
+						editor.createProject(name);
+					}
+					else {
+						editor.loadProject(name);
+					}
+				});	
+		}
+		else
+		{
+			
+		}
 	},
 
 	createProject: function(name)
@@ -80,7 +92,7 @@ var editor =
 
 	createProject_Folder: function()
 	{
-		editor.fileSystem.createDir("../" + this.data.name,
+		editor.fileSystem.createDir("../" + this.projectName,
 			function() {
 				editor.createProject_InstallPackages();
 			});	
@@ -88,6 +100,7 @@ var editor =
 
 	createProject_InstallPackages: function()
 	{
+		this.flags |= this.Flag.UPDATE_JSON;
 		this.installPackage("assets");
 	},
 
@@ -104,7 +117,17 @@ var editor =
 
 	finishLoading: function()
 	{
-		this.saveJSON();
+		this.handleConfig();
+		this.loadingScreen.style.display = "none";
+	},
+
+	handleConfig: function()
+	{
+		this.onResize();
+
+		if(this.flags & this.Flag.UPDATE_JSON) {
+			this.saveJSON();
+		}
 	},
 
 	createCfg: function()
@@ -127,10 +150,12 @@ var editor =
 	saveJSON: function()
 	{
 		var contents = JSON.stringify(this.data);
+		var self = this;
 
 		this.fileSystem.write("editor.json", contents,
 			function() {
-				console.log("(DB saved)");
+				self.flags &= ~self.Flag.UPDATE_JSON;
+				console.log("(JSON Updated)");
 			});
 	},
 
@@ -144,14 +169,10 @@ var editor =
 		this.saveJSON();
 	},
 
-	registerRoom: function(cls) 
+	registerRoom: function(room) 
 	{
-		var room = new cls();
-
-		var roomData = {};
-		this.data[room.name] = roomData;
-		this.rooms[room.name] = room;
-		room.load(roomData);
+		room.load();
+		this.rooms.push(room);
 	},
 
 	createScreen: function()
@@ -194,9 +215,9 @@ var editor =
 		this.loadingScreen = document.createElement("div");
 		this.loadingScreen.setAttribute("id", "loading-screen");
 		
-		var span = document.createElement("span");
-		span.innerHTML = "LOADING";
-		this.loadingScreen.appendChild(span);
+		this.loadingText = document.createElement("span");
+		this.loadingText.innerHTML = "LOADING";
+		this.loadingScreen.appendChild(this.loadingText);
 
 		this.screen.appendChild(this.loadingScreen);
 	},
@@ -258,13 +279,14 @@ var editor =
 		});
 	},
 
-	_handleRegisterPackage: function(data)
+	_handleRegisterPackage: function(info)
 	{
 		var module = new Editor.Module();
-		module.data = data;
-		this.packages[data.name] = module;
+		module.info = info;
+		module.data = {};
+		this.packages[info.name] = module;
 
-		console.log("Package registered: \"" + data.name + "\"");
+		console.log("Package registered: \"" + info.name + "\"");
 
 		this.packagesToRegister--;
 		if(this.packagesToRegister === 0) {
@@ -298,7 +320,7 @@ var editor =
 
 		var self = this;
 		var module = this.package(name);
-		var path = "packages/" + name + "/" + module.data.main;
+		var path = "packages/" + name + "/" + module.info.main;
 
 		this._includeScript(path, name, 
 			function() {
@@ -308,7 +330,7 @@ var editor =
 
 	handlePackageIncludes: function(module)
 	{
-		var includes = module.data.include;
+		var includes = module.info.include;
 		if(includes) 
 		{
 			var self = this;
@@ -326,8 +348,8 @@ var editor =
 
 			for(var n = 0; n < num; n++)
 			{
-				path = "packages/" + module.data.name + "/" + includes[n];
-				this._includeScript(path, module.data.name, includeLoadedFunc)
+				path = "packages/" + module.info.name + "/" + includes[n];
+				this._includeScript(path, module.info.name, includeLoadedFunc)
 			}
 		}
 		else {
@@ -339,9 +361,9 @@ var editor =
 	{
 		module.exports.install();
 
-		this.data.packages.push(module.data.name);
+		this.data.packages.push(module.info.name);
 
-		console.log("Package installed: \"" + module.data.name + "\"");
+		console.log("Package installed: \"" + module.info.name + "\"");
 
 		this.packagesToInstall--;
 		if(this.packagesToInstall === 0) {
@@ -365,6 +387,10 @@ var editor =
 		return module;
 	},
 
+	Flag: {
+		UPDATE_JSON: 1
+	},
+
 	//
 	projectName: null,
 	data: null,
@@ -373,6 +399,7 @@ var editor =
 
 	screen: null,
 	loadingScreen: null,
+	loadingText: null,
 
 	header: null,
 	widget: null,
@@ -384,7 +411,10 @@ var editor =
 
 	packages: {},
 	packagesToRegister: 0,
-	packagesToInstall: 0
+	packagesToInstall: 0,
+
+	flags: 0,
+	desktop: false
 };
 
 meta.onInit = function() {

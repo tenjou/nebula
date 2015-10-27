@@ -18,7 +18,7 @@ meta.class("Editor.Room",
 
 	load: function(data) 
 	{
-		this.data = data;
+		this.data = module.data;
 
 		editor.screen.appendChild(this.element);
 
