@@ -55,19 +55,26 @@ var editor =
 		this.state = "loading-workspace";
 		this.loadingText.innerHTML = "LOADING WORKSPACE";
 
+		this.data = {
+			name: name,
+			verison: this.version,
+			packages: {}
+		};		
+
 		if(!this.desktop)
 		{
-			this.fileSystem.checkDir(this.projectName, 
-				function(result) 
+			this.fileSystem.checkDir(name, 
+				function(dirPath) 
 				{
 					window.location.hash = name;
 					editor.projectName = name;
 					editor.fileSystem.rootDir = name + "/";
 
-					if(!result) {
+					if(!dirPath) {
 						editor.createProject(name);
 					}
 					else {
+						editor.dirPath = dirPath;
 						editor.loadProject(name);
 					}
 				});	
@@ -78,22 +85,28 @@ var editor =
 		}
 	},
 
+	createData: function()
+	{
+		this.data = {
+			name: name,
+			verison: this.version,
+			packages: {}
+		};			
+	},	
+
 	createProject: function(name)
 	{
 		this.state = "creating-project";
 
-		this.data = {
-			name: name,
-			packages: []
-		};	
-
+		this.createData();
 		this.createProject_Folder();
 	},
 
 	createProject_Folder: function()
 	{
 		editor.fileSystem.createDir("../" + this.projectName,
-			function() {
+			function(dirPath) {
+				editor.dirPath = dirPath;
 				editor.createProject_InstallPackages();
 			});	
 	},
@@ -106,17 +119,22 @@ var editor =
 
 	loadProject: function(name)
 	{
+		this.createData();
+
 		this.fileSystem.read("editor.json",
 			function(result) 
 			{
 				if(result) {
-					editor.parseCfg(result);
+					editor.prevData = JSON.parse(result);
+					editor.installPackages(result);
 				}
 			});
 	},
 
 	finishLoading: function()
 	{
+		this.state = "finish-loading";
+		
 		this.handleConfig();
 		this.loadingScreen.style.display = "none";
 	},
@@ -128,23 +146,6 @@ var editor =
 		if(this.flags & this.Flag.UPDATE_JSON) {
 			this.saveJSON();
 		}
-	},
-
-	createCfg: function()
-	{
-		this.data = {};
-
-		this.fileSystem.create("editor.json", 
-			function() {
-				editor.continueLoad();
-			});
-	},
-
-	parseCfg: function(contents)
-	{
-		this.data = JSON.parse(contents);
-
-		editor.continueLoad();
 	},
 
 	saveJSON: function()
@@ -159,16 +160,6 @@ var editor =
 			});
 	},
 
-	continueLoad: function()
-	{
-		this.rooms = {};
-		editor.registerRoom(Assets.Room);
-
-		this.onResize();
-
-		this.saveJSON();
-	},
-
 	registerRoom: function(room) 
 	{
 		room.load();
@@ -180,34 +171,6 @@ var editor =
 		this.screen = document.createElement("div");
 		this.screen.setAttribute("class", "screen");
 		document.body.appendChild(this.screen);
-
-		// var margin = 5;
-
-		// this.headerPlate = new EditorUI.Plate();
-		// this.screen.appendChild(this.headerPlate.element);
-
-		// this.leftPlate = new EditorUI.Plate();
-		// this.leftPlate.margin(margin, 0, margin, 0);
-		// this.screen.appendChild(this.leftPlate.element);
-
-		// this.rightPlate = new EditorUI.Plate();
-		// this.rightPlate.margin(margin, 0, margin, 0);
-		// this.screen.appendChild(this.rightPlate.element);	
-
-		// this.viewportPlate = new EditorUI.Plate();
-		// this.viewportPlate.margin(margin, margin, margin, margin);
-		// this.screen.appendChild(this.viewportPlate.element);
-
-		// meta.engine.container = this.viewportPlate.element;	
-
-		// this.header = new EditorUI.Header();
-		// this.screen.appendChild(this.header.element);
-
-		// //
-		// var widgetFlags = EditorUI.WidgetFlag;
-
-		// this.widget = new EditorUI.Widget(widgetFlags.HEADER | widgetFlags.FOOTER);
-		//this.screen.appendChild(this.widget.element);
 	},
 
 	createLoadingScreen: function()
@@ -234,25 +197,6 @@ var editor =
 		for(var key in this.rooms) {
 			this.rooms[key].handleResize();
 		}
-
-		// console.log(this.screenWidth, this.screenHeight);
-
-		// this.headerPlate.width = this.screenWidth;
-		// this.headerPlate.height = 30;
-
-		// this.leftPlate.width = 210;
-		// this.leftPlate.height = this.screenHeight - this.headerPlate.height;
-		// this.leftPlate.y = this.headerPlate.height;
-
-		// this.rightPlate.width = 210;
-		// this.rightPlate.height = this.screenHeight - this.headerPlate.height;
-		// this.rightPlate.x = this.screenWidth - this.rightPlate.width;
-		// this.rightPlate.y = this.headerPlate.height;
-
-		// this.viewportPlate.width = this.screenWidth - 420;
-		// this.viewportPlate.height = this.screenHeight - 30;
-		// this.viewportPlate.x = this.rightPlate.width;
-		// this.viewportPlate.y = this.headerPlate.height;
 	},
 
 	set state(name) {
@@ -283,7 +227,6 @@ var editor =
 	{
 		var module = new Editor.Module();
 		module.info = info;
-		module.data = {};
 		this.packages[info.name] = module;
 
 		console.log("Package registered: \"" + info.name + "\"");
@@ -314,6 +257,16 @@ var editor =
 		});
 	},
 
+	installPackages: function()
+	{
+		this.state = "install-packages";
+
+		var packages = this.prevData.packages;
+		for(var key in packages) {
+			this.installPackage(key);
+		}
+	},	
+
 	installPackage: function(name)
 	{
 		this.packagesToInstall++;
@@ -321,6 +274,8 @@ var editor =
 		var self = this;
 		var module = this.package(name);
 		var path = "packages/" + name + "/" + module.info.main;
+
+		module.data = {};
 
 		this._includeScript(path, name, 
 			function() {
@@ -359,9 +314,11 @@ var editor =
 
 	handlePackageInstall: function(module) 
 	{
-		module.exports.install();
+		var data = {};
+		module.data = data;
+		this.data.packages[module.info.name] = data;
 
-		this.data.packages.push(module.info.name);
+		module.exports.install();
 
 		console.log("Package installed: \"" + module.info.name + "\"");
 
@@ -393,7 +350,10 @@ var editor =
 
 	//
 	projectName: null,
+	dirPath: null,
 	data: null,
+	prevData: null,
+	version: "0.0.1",
 
 	_state: "",
 

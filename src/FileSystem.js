@@ -195,7 +195,7 @@ meta.class("Editor.FileSystem",
 			function(dirEntry) 
 			{
 				if(cb) {
-					cb(true);
+					cb(dirEntry.toURL());
 				}
 			},
 			function(fileError) {
@@ -242,7 +242,7 @@ meta.class("Editor.FileSystem",
 			function(dirEntry) 
 			{
 				if(cb) {
-					cb(true);
+					cb(dirEntry.toURL());
 				}
 			},
 			function(fileError) {
@@ -268,7 +268,7 @@ meta.class("Editor.FileSystem",
 		}
 
 		if(cb) {
-			cb(false);
+			cb(null);
 		}		
 	},
 
