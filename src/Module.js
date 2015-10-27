@@ -9,5 +9,6 @@ meta.class("Editor.Module",
 	//
 	info: null,
 	data: null,
+	loading: false,
 	includesToLoad: 0
 });

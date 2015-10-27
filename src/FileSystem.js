@@ -160,7 +160,7 @@ meta.class("Editor.FileSystem",
 					fileWritter.onwriteend = function() 
 					{
 						if(cb) {
-							cb(true);
+							cb(fileEntry.toURL());
 						}						
 					}
 
@@ -171,7 +171,7 @@ meta.class("Editor.FileSystem",
 				{
 					console.error("(FileSystem::writeBlob) Could not write blob in " + fileEntry.name);
 					if(cb) {
-						cb(false);
+						cb(null);
 					}
 				};
 

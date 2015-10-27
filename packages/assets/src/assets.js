@@ -2,6 +2,15 @@
 
 module.exports =
 {
+	createData: function()
+	{
+		var data = {
+			files: []
+		};
+
+		return data;
+	},
+
 	install: function()
 	{
 		this.load();
@@ -16,13 +25,6 @@ module.exports =
 	{
 		this.room = new this.Room();
 		editor.registerRoom(this.room);
-
-		this.loadAssets();
-	},
-
-	loadAssets: function()
-	{
-		console.log("load-assets");
 	},
 
 	//

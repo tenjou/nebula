@@ -1,6 +1,6 @@
 {
-	"name": "assets",
-	"main": "src/assets.js",
+	"name": "Assets",
+	"main": "src/Assets.js",
 	"include": [
 		"src/Room.js",
 		"src/Holder.js",

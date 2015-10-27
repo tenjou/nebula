@@ -2,21 +2,14 @@
 
 module.class("Room", "Editor.Room", 
 {
-	onInit: function() 
+	onInit: function() {
+		this.createHolder();
+	},
+
+	createHolder: function()
 	{
-		this.holder = new module.exports.Holder();
+		this.holder = new module.exports.Holder(module.data.files);
 		this.element.appendChild(this.holder.element);
-	},
-
-	onLoad: function() 
-	{
-
-
-		this.holder.data = this.data;
-	},
-
-	onUnload: function() {
-
 	},
 
 	onResize: function() 
@@ -27,5 +20,6 @@ module.class("Room", "Editor.Room",
 	},
 
 	//
-	name: "assets"
+	name: "assets",
+	holder: null
 });

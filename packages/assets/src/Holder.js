@@ -2,13 +2,38 @@
 
 module.class("Holder",
 {
-	init: function() 
+	init: function(data) 
 	{
 		var self = this;
 		this.element = document.createElement("div");
 		this.element.setAttribute("class", "holder");
 		this.element.addEventListener("dragover", function(event) { self.handleDragOver(event); }, false);
-		this.element.addEventListener("drop", function(event) { self.handleFileSelect(event); }, false);	
+		this.element.addEventListener("drop", function(event) { self.handleFileSelect(event); }, false);
+
+		this.data = data;
+		this.loadAssets();
+	},
+
+	loadAssets: function()
+	{
+		var item, itemInfo;
+		var num = this.data.length;
+		for(var n = 0; n < num; n++)
+		{
+			itemInfo = this.data[n];
+			item = this.createItem();
+			item.name = itemInfo.name;
+			item.img = editor.dirPath + itemInfo.name + "." + 
+				itemInfo.type.substr(itemInfo.type.indexOf("/") + 1);
+		}
+	},
+
+	createItem: function()
+	{
+		var item = new module.exports.Item(self);
+		this.element.appendChild(item.element);
+
+		return item;
 	},
 
 	handleDragOver: function(event) 
@@ -25,9 +50,15 @@ module.class("Holder",
 
 		var self = this;
 
-		var file, reader;
+		var file, reader, item;
 		var files = event.dataTransfer.files;
 		var numFiles = files.length;
+		this.numItemsLoading += numFiles;
+
+		function createCb(path) {
+			return function() { console.log(path); }
+		}
+
 		for(var n = 0; n < numFiles; n++) 
 		{
 			file = files[n];
@@ -43,25 +74,28 @@ module.class("Holder",
 					var wildcardIndex = name.indexOf(".");
 					var idName = name.substr(0, wildcardIndex);
 					var ext = name.substr(wildcardIndex);
-					console.log(ext);
-
-					var item = new module.exports.Item(self);
-					item.name = idName;
-					item.img = fileResult.target.result;
-					self.element.appendChild(item.element);
 
 					var blob = dataURItoBlob(fileResult.target.result, file.type);
 
-					self.data[idName] = {
+					item = self.createItem();
+					item.name = name;
+
+					// TODO: Check if there is such name in the folder already.
+
+					self.data.push({
 						name: idName,
 						path: "",
-						ext: file.type,
+						type: file.type,
 						lastModified: file.lastModified
-					};
+					});
 
-					console.log("assets/" + idName + ext);
+					var cb = (function(item) {
+						return function(path) {
+							item.img = path;
+						}
+					}(item));
 
-					editor.fileSystem.writeBlob("assets/" + idName + ext, blob)
+					editor.fileSystem.writeBlob(idName + ext, blob, cb);
 					editor.saveJSON();
 				}
 			})(file);
@@ -70,21 +104,10 @@ module.class("Holder",
 	},
 
 	//
+	data: null,
 	element: null,
-	
-	activeItem: null
+	activeItem: null,
+
+	numItemsLoading: 0
 });
-
-function dataURItoBlob(dataURI, type) 
-{
-	var binary = atob(dataURI.split(",")[1]);
-	var length = binary.length;
-	var array = new Uint8Array(length);
-
-	for(var n = 0; n < length; n++) {
-	    array[n] = binary.charCodeAt(n);
-	}
-
-	return new Blob([ array ], { type: type });
-}
 

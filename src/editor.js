@@ -34,7 +34,7 @@ var editor =
 	{
 		this.state = "register-packages";
 
-		this.registerPackage("assets");
+		this.registerPackage("Assets");
 	},
 
 	loadProjectExplorer: function()
@@ -74,7 +74,7 @@ var editor =
 						editor.createProject(name);
 					}
 					else {
-						editor.dirPath = dirPath;
+						editor.dirPath = dirPath + "/";
 						editor.loadProject(name);
 					}
 				});	
@@ -106,7 +106,7 @@ var editor =
 	{
 		editor.fileSystem.createDir("../" + this.projectName,
 			function(dirPath) {
-				editor.dirPath = dirPath;
+				editor.dirPath = dirPath + "/";
 				editor.createProject_InstallPackages();
 			});	
 	},
@@ -114,7 +114,7 @@ var editor =
 	createProject_InstallPackages: function()
 	{
 		this.flags |= this.Flag.UPDATE_JSON;
-		this.installPackage("assets");
+		this.installPackage("Assets");
 	},
 
 	loadProject: function(name)
@@ -134,7 +134,8 @@ var editor =
 	finishLoading: function()
 	{
 		this.state = "finish-loading";
-		
+		this.prevData = null;
+
 		this.handleConfig();
 		this.loadingScreen.style.display = "none";
 	},
@@ -275,8 +276,6 @@ var editor =
 		var module = this.package(name);
 		var path = "packages/" + name + "/" + module.info.main;
 
-		module.data = {};
-
 		this._includeScript(path, name, 
 			function() {
 				self.handlePackageIncludes(module);
@@ -314,17 +313,22 @@ var editor =
 
 	handlePackageInstall: function(module) 
 	{
-		var data = {};
+		var data = null;
+
+		if(this.prevData) {
+			data = this.prevData.packages[module.info.name];
+		}
+		if(!data) {
+			data = module.exports.createData();
+		}			
+
 		module.data = data;
-		this.data.packages[module.info.name] = data;
+		this.data.packages[module.info.name] = data;	
 
 		module.exports.install();
 
-		console.log("Package installed: \"" + module.info.name + "\"");
-
-		this.packagesToInstall--;
-		if(this.packagesToInstall === 0) {
-			this.finishLoading();
+		if(!module.loading) {
+			this.packageLoaded(module);
 		}
 	},
 
@@ -332,6 +336,16 @@ var editor =
 	{
 
 	},	
+
+	packageLoaded: function(module)
+	{
+		console.log("Package installed: \"" + module.info.name + "\"");
+
+		this.packagesToInstall--;
+		if(this.packagesToInstall === 0) {
+			this.finishLoading();
+		}		
+	},
 
 	package: function(name) 
 	{
