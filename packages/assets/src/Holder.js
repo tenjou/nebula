@@ -29,6 +29,7 @@ module.class("Holder",
 			itemInfo = this.data[n];
 			item = this.createItem();
 			item.name = itemInfo.name;
+			item.info = itemInfo;
 			item.img = editor.dirPath + itemInfo.name + "." + 
 				itemInfo.type.substr(itemInfo.type.indexOf("/") + 1);
 		}
@@ -75,6 +76,24 @@ module.class("Holder",
 				break;
 			}
 		}
+
+		// Remove from the json data.
+		num = this.data.length;
+		for(n = 0; n < num; n++) 
+		{
+			if(this.data[n] === item.info) {
+				this.data.splice(n, 1);
+				break;
+			}
+		}
+
+		// Remove from the file system:
+		var path = item.info.name + "." + 
+			item.info.type.substr(item.info.type.indexOf("/") + 1);
+		editor.fileSystem.remove(path);
+		editor.saveJSON();
+
+		item.info = null;
 	},
 
 	handleDragOver: function(event) 
@@ -118,17 +137,20 @@ module.class("Holder",
 
 					var blob = dataURItoBlob(fileResult.target.result, file.type);
 
-					item = self.createItem();
-					item.name = name;
-
 					// TODO: Check if there is such name in the folder already.
 
-					self.data.push({
+					// Info:
+					var info = {
 						name: idName,
 						path: "",
 						type: file.type,
 						lastModified: file.lastModified
-					});
+					};
+					self.data.push(info);					
+
+					item = self.createItem();
+					item.name = idName;
+					item.info = info;
 
 					var cb = (function(item) {
 						return function(path) {

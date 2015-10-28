@@ -73,5 +73,6 @@ module.class("Item",
 
 	//
 	element: null,
-	holder: null
+	holder: null,
+	info: null
 });

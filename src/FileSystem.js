@@ -184,7 +184,25 @@ meta.class("Editor.FileSystem",
 
 	remove: function(filename, cb)
 	{
+		var self = this;
 
+		this.fs.getFile(this.rootDir + filename, { create: false },
+			function(fileEntry) 
+			{
+				fileEntry.remove(
+					function() 
+					{
+						if(cb) {
+							cb(fileEntry.toURL());
+						}
+					},
+					function(fileError) {
+						self.handleError(fileError, cb, "remove", filename);
+					});
+			},
+			function(fileError) {
+				self.handleError(fileError, cb, "remove", filename);
+			});
 	},
 
 	checkDir: function(name, cb)
