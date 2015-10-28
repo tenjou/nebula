@@ -13,18 +13,13 @@ module.exports =
 
 	install: function()
 	{
-		this.load();
+		this.room = new this.Room();
+		editor.registerRoom(this.room);
 	},
 
 	uninstall: function()
 	{
 
-	},
-
-	load: function() 
-	{
-		this.room = new this.Room();
-		editor.registerRoom(this.room);
 	},
 
 	//

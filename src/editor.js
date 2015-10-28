@@ -7,6 +7,7 @@ var editor =
 		this.rooms = [];
 
 		this.createScreen();
+		
 		this.createLoadingScreen();
 
 		var self = this;

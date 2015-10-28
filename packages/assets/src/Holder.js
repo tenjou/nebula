@@ -10,7 +10,13 @@ module.class("Holder",
 		this.element.addEventListener("dragover", function(event) { self.handleDragOver(event); }, false);
 		this.element.addEventListener("drop", function(event) { self.handleFileSelect(event); }, false);
 
+		this.removeItemFunc = function(data) {
+			console.log(data);
+		};
+
 		this.data = data;
+		this.items = [];
+		this.freeItems = [];
 		this.loadAssets();
 	},
 
@@ -30,10 +36,45 @@ module.class("Holder",
 
 	createItem: function()
 	{
-		var item = new module.exports.Item(self);
+		var item;
+
+		if(this.freeItems.length > 0) {
+			item = this.freeItems.pop();
+		}
+		else
+		{
+			var self = this;
+
+			item = new module.exports.Item(self);
+			item.element.setAttribute("data-id", this._uniqueItemId++);
+		
+			var removeButton = item.element.querySelector(".close");
+			removeButton.addEventListener("click", function() {
+				self.removeItem(item);
+			});			
+		}
+
+		this.items.push(item);
 		this.element.appendChild(item.element);
 
 		return item;
+	},
+
+	removeItem: function(item)
+	{
+		var num = this.items.length;
+		for(var n = 0; n < num; n++) 
+		{
+			if(this.items[n] === item) 
+			{
+				this.freeItems.push(item);
+				this.items[n] = this.items[num - 1];
+				this.items.pop();
+
+				this.element.removeChild(item.element);
+				break;
+			}
+		}
 	},
 
 	handleDragOver: function(event) 
@@ -108,6 +149,11 @@ module.class("Holder",
 	element: null,
 	activeItem: null,
 
-	numItemsLoading: 0
+	items: null,
+	freeItems: null,
+
+	numItemsLoading: 0,
+
+	_uniqueItemId: 0,
 });
 

@@ -11,7 +11,7 @@ module.class("Item",
 		this.element = template.children[0].cloneNode(true);
 		this.element.addEventListener("click", function(event) { self.activate(); }, false);
 		this.element.addEventListener("dragover", function(event) { self.handleDragOver(event); }, false);
-		this.element.addEventListener("drop", function(event) { self.handleFileSelect(event); }, false);	
+		this.element.addEventListener("drop", function(event) { self.handleFileSelect(event); }, false);
 	},
 
 	activate: function()
