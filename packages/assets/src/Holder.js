@@ -153,13 +153,17 @@ module.class("Holder",
 					item.info = info;
 
 					var cb = (function(item) {
-						return function(path) {
+						return function(path) 
+						{
 							item.img = path;
+							self.numItemsLoading--;
+							if(self.numItemsLoading === 0) {
+								editor.saveJSON();
+							}
 						}
 					}(item));
 
 					editor.fileSystem.writeBlob(idName + ext, blob, cb);
-					editor.saveJSON();
 				}
 			})(file);
 			reader.readAsDataURL(file);
