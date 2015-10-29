@@ -41,7 +41,7 @@ module.class("Holder",
 						self.cancelRename();
 						break;
 					case Input.Key.ENTER:
-						self.rename(event);
+						self.rename();
 						break;
 				}
 			});	
@@ -57,8 +57,7 @@ module.class("Holder",
 			item = this.createItem();
 			item.name = itemInfo.name;
 			item.info = itemInfo;
-			item.img = editor.dirPath + itemInfo.name + "." + 
-				itemInfo.type.substr(itemInfo.type.indexOf("/") + 1);
+			item.img = editor.dirPath + itemInfo.name + "." + itemInfo.ext;
 		}
 	},
 
@@ -122,8 +121,7 @@ module.class("Holder",
 		}
 
 		// Remove from the file system:
-		var path = item.info.name + "." + 
-			item.info.type.substr(item.info.type.indexOf("/") + 1);
+		var path = item.info.name + "." + item.info.ext;
 		editor.fileSystem.remove(path);
 		editor.save();
 
@@ -158,7 +156,7 @@ module.class("Holder",
 		this.prevSpanValue = "";
 	},
 
-	rename: function(item)
+	rename: function()
 	{
 		var parentNode = this.spanEditElement.parentNode;
 		if(parentNode) 
@@ -166,10 +164,12 @@ module.class("Holder",
 			var itemElement = findAncestor(this.spanEditElement, "item");
 			var item = this.items[itemElement.dataset.id];
 			
-			var oldPath = editor.createPath(item.info);
+			var oldPath = item.info.name + "." + item.info.ext;
 
 			item.info.name = this.spanEditElement.value;
-			var newPath = editor.createPath(item.info);
+			var newPath = item.info.name + "." + item.info.ext;
+
+			console.log(oldPath, newPath);
 
 			editor.fileSystem.moveTo(oldPath, newPath, 
 				function(result) {
@@ -229,7 +229,7 @@ module.class("Holder",
 					var name = encodeURIComponent(file.name);
 					var wildcardIndex = name.indexOf(".");
 					var idName = name.substr(0, wildcardIndex);
-					var ext = name.substr(wildcardIndex);
+					var ext = name.substr(wildcardIndex) + 1;
 
 					var blob = dataURItoBlob(fileResult.target.result, file.type);
 
@@ -238,8 +238,7 @@ module.class("Holder",
 					// Info:
 					var info = {
 						name: idName,
-						path: "",
-						type: file.type,
+						ext: ext,
 						lastModified: file.lastModified
 					};
 					self.data.push(info);					
@@ -259,7 +258,7 @@ module.class("Holder",
 						}
 					}(item));
 
-					editor.fileSystem.writeBlob(idName + ext, blob, cb);
+					editor.fileSystem.writeBlob(idName + "." + ext, blob, cb);
 				}
 			})(file);
 			reader.readAsDataURL(file);

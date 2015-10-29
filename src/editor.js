@@ -366,12 +366,6 @@ var editor =
 		return module;
 	},
 
-	createPath: function(info)
-	{
-		var path = info.name + "." + info.type.substr(info.type.indexOf("/") + 1);
-		return path;
-	},
-
 	Flag: {
 		UPDATE_JSON: 1
 	},
