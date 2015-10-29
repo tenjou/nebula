@@ -32,6 +32,7 @@ table {
 }
 
 span {
+	display: block;
 	-webkit-touch-callout: initial;
 	-webkit-user-select: initial;
 	-khtml-user-select: initial;
@@ -44,6 +45,15 @@ span {
 
 .template {
 	display: none;
+}
+
+.editable {
+	width: 100%;
+	background: rgba(0, 0, 0, 0);
+	border: 0;
+    font-size: 12px;
+    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;	
+    color: white;
 }
 
 .screen {
@@ -109,7 +119,7 @@ span {
 	width: 160px; 
 	height: 160px;
 	margin: 6px;
-	background: #ccc url(../gradient.jpg); 
+	background: #ccc url(../gradient2.jpg); 
 	background-size: cover;  
 	box-shadow: 0 0 16px rgba(0, 0, 0, 0.72);
 	color: white;
@@ -122,14 +132,17 @@ span {
 	flex: 0 1 auto;
 	background: rgba(0, 0, 0, 0.4);
 }
-#room-assets .holder .header .content {
+#room-assets .header-holder {
+	display: flex;
+	flex-flow: row;
+}
+#room-assets .header-holder .content {
+	width: 100%;
+	flex: 0 1 auto;
 	padding: 6px;
 }
-#room-assets .holder .content {
+#room-assets .header-holder .close {
 	flex: 1 1 auto;
-}
-#room-assets .holder .close {
-    float: right;
     background-color: rgba(0, 0, 0, 0.2);
     width: 11px;
     padding: 6px;
@@ -137,6 +150,9 @@ span {
 }
 #room-assets .holder .close:hover {
 	background-color: #43a6e2;
+}
+#room-assets .item > .content {
+	flex: 1 1 auto;
 }
 #room-assets .img-holder {
 	position: absolute;

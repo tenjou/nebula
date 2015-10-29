@@ -145,11 +145,11 @@ var editor =
 		this.onResize();
 
 		if(this.flags & this.Flag.UPDATE_JSON) {
-			this.saveJSON();
+			this.save();
 		}
 	},
 
-	saveJSON: function()
+	save: function()
 	{
 		var contents = JSON.stringify(this.data);
 		var self = this;
@@ -364,6 +364,12 @@ var editor =
 		}
 
 		return module;
+	},
+
+	createPath: function(info)
+	{
+		var path = info.name + "." + info.type.substr(info.type.indexOf("/") + 1);
+		return path;
 	},
 
 	Flag: {

@@ -205,6 +205,38 @@ meta.class("Editor.FileSystem",
 			});
 	},
 
+	moveTo: function(path, targetPath, cb)
+	{
+		var self = this;
+
+		var targetPathIndex = targetPath.lastIndexOf("/") + 1;
+
+		this.fs.getFile(this.rootDir + path, {},
+			function(fileEntry) 
+			{
+				self.fs.getDirectory(self.rootDir + targetPath.substr(0, targetPathIndex), {},
+					function(dirEntry)
+					{
+						fileEntry.moveTo(dirEntry, targetPath.substr(targetPathIndex),
+							function(fileEntry) 
+							{
+								if(cb) {
+									cb(fileEntry.toURL());
+								}
+							},
+						function(fileError) {
+							self.handleError(fileError, cb, "rename", path);
+						});
+					},
+					function(fileError) {
+						self.handleError(fileError, cb, "rename-getDir", path);
+					});
+			},
+			function(fileError) {
+				self.handleError(fileError, cb, "rename-getFile", path);
+			});
+	},
+
 	checkDir: function(name, cb)
 	{
 		var self = this;

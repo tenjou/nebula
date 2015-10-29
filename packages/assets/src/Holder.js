@@ -9,15 +9,42 @@ module.class("Holder",
 		this.element.setAttribute("class", "holder");
 		this.element.addEventListener("dragover", function(event) { self.handleDragOver(event); }, false);
 		this.element.addEventListener("drop", function(event) { self.handleFileSelect(event); }, false);
+		this.element.addEventListener("click", 
+			function(event) {
+				self.deselect();
+			});
 
-		this.removeItemFunc = function(data) {
-			console.log(data);
-		};
+		this.createSpanEditElement();	
 
 		this.data = data;
 		this.items = [];
 		this.freeItems = [];
 		this.loadAssets();
+	},
+
+	createSpanEditElement: function()
+	{
+		var self = this;
+
+		this.spanEditElement = document.createElement("input");
+		this.spanEditElement.setAttribute("class", "editable");
+		this.spanEditElement.addEventListener("dblclick",
+			function(event) {
+				event.stopPropagation();
+			});		
+		this.spanEditElement.addEventListener("keydown",
+			function(event) 
+			{
+				switch(event.keyCode)
+				{
+					case Input.Key.ESC:
+						self.cancelRename();
+						break;
+					case Input.Key.ENTER:
+						self.rename(event);
+						break;
+				}
+			});	
 	},
 
 	loadAssets: function()
@@ -50,9 +77,16 @@ module.class("Holder",
 			item.element.setAttribute("data-id", this._uniqueItemId++);
 		
 			var removeButton = item.element.querySelector(".close");
-			removeButton.addEventListener("click", function() {
-				self.removeItem(item);
-			});			
+			removeButton.addEventListener("click", 
+				function(event) {
+					self.removeItem(item);
+				});
+
+			var spanEdit = item.element.querySelector("span");
+			spanEdit.addEventListener("dblclick",
+				function(event) {
+					self.startRenameItem(event);
+				});
 		}
 
 		this.items.push(item);
@@ -91,9 +125,71 @@ module.class("Holder",
 		var path = item.info.name + "." + 
 			item.info.type.substr(item.info.type.indexOf("/") + 1);
 		editor.fileSystem.remove(path);
-		editor.saveJSON();
+		editor.save();
 
 		item.info = null;
+	},
+
+	startRenameItem: function(item)
+	{
+		var parentNode = this.spanEditElement.parentNode;
+		if(parentNode) {
+			parentNode.removeChild(this.spanEditElement);
+			parentNode.innerHTML = this.spanEditElement.value;
+		}
+
+		var span = item.srcElement;
+		this.prevSpanValue = span.innerHTML;
+		this.spanEditElement.value = span.innerHTML;
+
+		span.innerHTML = "";
+		span.appendChild(this.spanEditElement);
+		this.spanEditElement.select();
+	},
+
+	cancelRename: function()
+	{
+		var parentNode = this.spanEditElement.parentNode;
+		if(parentNode) {
+			parentNode.removeChild(this.spanEditElement);
+			parentNode.innerHTML = this.prevSpanValue;
+		}
+
+		this.prevSpanValue = "";
+	},
+
+	rename: function(item)
+	{
+		var parentNode = this.spanEditElement.parentNode;
+		if(parentNode) 
+		{
+			var itemElement = findAncestor(this.spanEditElement, "item");
+			var item = this.items[itemElement.dataset.id];
+			
+			var oldPath = editor.createPath(item.info);
+
+			item.info.name = this.spanEditElement.value;
+			var newPath = editor.createPath(item.info);
+
+			editor.fileSystem.moveTo(oldPath, newPath, 
+				function(result) {
+					if(result) {
+						editor.save();
+					}
+				});
+
+			parentNode.removeChild(this.spanEditElement);
+			parentNode.innerHTML = this.spanEditElement.value;
+		}
+	},
+
+	deselect: function()
+	{
+		if(this.activeItem) {
+			this.activeItem.element.setAttribute("class", "item");
+		}
+
+		this.cancelRename();
 	},
 
 	handleDragOver: function(event) 
@@ -158,7 +254,7 @@ module.class("Holder",
 							item.img = path;
 							self.numItemsLoading--;
 							if(self.numItemsLoading === 0) {
-								editor.saveJSON();
+								editor.save();
 							}
 						}
 					}(item));
@@ -177,6 +273,9 @@ module.class("Holder",
 
 	items: null,
 	freeItems: null,
+
+	spanEditElement: null,
+	prevSpanValue: "",
 
 	numItemsLoading: 0,
 

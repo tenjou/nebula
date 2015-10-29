@@ -9,7 +9,16 @@ module.class("Item",
 		var self = this;
 		var template = document.getElementById("template-assets-item");
 		this.element = template.children[0].cloneNode(true);
-		this.element.addEventListener("click", function(event) { self.activate(); }, false);
+		this.element.addEventListener("click", 
+			function(event) { 
+				event.stopPropagation();
+				self.activate(); 
+			}, false);
+		this.element.addEventListener("dblclick", 
+			function(event) { 
+				event.stopPropagation();
+				self.activate(); 
+			}, false);		
 		this.element.addEventListener("dragover", function(event) { self.handleDragOver(event); }, false);
 		this.element.addEventListener("drop", function(event) { self.handleFileSelect(event); }, false);
 	},

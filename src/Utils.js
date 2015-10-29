@@ -12,3 +12,9 @@ function dataURItoBlob(dataURI, type)
 
 	return new Blob([ array ], { type: type });
 }
+
+function findAncestor(childNode, cls) 
+{
+    while((childNode = childNode.parentElement) && !childNode.classList.contains(cls));
+    return childNode;
+}
