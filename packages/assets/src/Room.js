@@ -12,13 +12,6 @@ module.class("Room", "Editor.Room",
 		this.element.appendChild(this.holder.element);
 	},
 
-	onResize: function() 
-	{
-		var style = this.element.style;
-		style.width = editor.screenWidth + "px";
-		style.height = editor.screenHeight + "px";
-	},
-
 	//
 	name: "assets",
 	holder: null

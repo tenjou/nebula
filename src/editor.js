@@ -7,7 +7,6 @@ var editor =
 		this.rooms = [];
 
 		this.createScreen();
-		
 		this.createLoadingScreen();
 
 		var self = this;
@@ -173,6 +172,24 @@ var editor =
 		this.screen = document.createElement("div");
 		this.screen.setAttribute("class", "screen");
 		document.body.appendChild(this.screen);
+
+		this.createMenu();
+
+		this.innerScreen = document.createElement("div");
+		this.innerScreen.setAttribute("class", "inner");
+		this.screen.appendChild(this.innerScreen);
+	},
+
+	createMenu: function()
+	{
+		this.menu = document.createElement("div");
+		this.menu.setAttribute("class", "menu");
+		this.screen.appendChild(this.menu);		
+
+		var homeButton = document.createElement("div");
+		homeButton.setAttribute("class", "home-button");
+		homeButton.innerHTML = "meta";
+		this.menu.appendChild(homeButton);
 	},
 
 	createLoadingScreen: function()
@@ -189,16 +206,6 @@ var editor =
 
 	onResize: function()
 	{
-		this.screenWidth = window.innerWidth;
-		this.screenHeight = window.innerHeight;
-
-		var style = this.screen.style;
-		style.width = this.screenWidth + "px";
-		style.height = this.screenHeight + "px";
-
-		for(var key in this.rooms) {
-			this.rooms[key].handleResize();
-		}
 	},
 
 	set state(name) {
@@ -373,6 +380,8 @@ var editor =
 	_state: "",
 
 	screen: null,
+	innerScreen: null,
+	menu: null,
 	loadingScreen: null,
 	loadingText: null,
 

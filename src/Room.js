@@ -20,7 +20,7 @@ meta.class("Editor.Room",
 	{
 		this.data = module.data;
 
-		editor.screen.appendChild(this.element);
+		editor.innerScreen.appendChild(this.element);
 
 		if(this.onLoad) {
 			this.onLoad();
@@ -29,7 +29,7 @@ meta.class("Editor.Room",
 
 	unload: function() 
 	{
-		editor.screen.removeChild(this.element);
+		editor.innerScreen.removeChild(this.element);
 
 		if(this.onUnload) {
 			this.onUnload();

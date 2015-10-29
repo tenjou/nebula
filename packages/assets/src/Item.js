@@ -54,8 +54,7 @@ module.class("Item",
 				{
 					var name = encodeURIComponent(file.name);
 					var wildcardIndex = name.indexOf(".");
-
-					self.name = name.substr(0, wildcardIndex);
+					
 					self.img = fileResult.target.result;
 				}
 			})(file);
