@@ -179,3 +179,34 @@ span {
 	font-size: 9px;
     color: white;
 }
+
+
+.panel-holder {
+	background: black;
+	width: 100%;
+	height: 500px;
+}
+
+.panel {
+	padding: 10px;
+	background: white;
+	color: black;
+}
+
+.Aligner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Aligner-item {
+  max-width: 50%;
+}
+
+.Aligner-item--top {
+  align-self: flex-start;
+}
+
+.Aligner-item--bottom {
+  align-self: flex-end;
+}

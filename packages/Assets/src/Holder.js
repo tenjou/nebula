@@ -164,9 +164,8 @@ module.class("Holder",
 			var itemElement = findAncestor(this.spanEditElement, "item");
 			var item = this.items[itemElement.dataset.id];
 
-			var spanName = this.createUniqueName(this.spanEditElement.value);
-
 			// if name is not unique:
+			var spanName = this.createUniqueName(this.spanEditElement.value);
 			if(spanName === this.spanEditElement.value) 
 			{
 				var oldPath = item.info.name + "." + item.info.ext;
@@ -213,66 +212,117 @@ module.class("Holder",
 		event.stopPropagation();
 		event.preventDefault();
 
+		if(meta.device.name === "Chrome") {
+			this.handleFileSelect_Chrome(event);
+		}
+		else {
+			this.handleFileSelect_All(event);
+		}
+	},
+
+	handleFileSelect_Chrome: function(event)
+	{
+		var entry;
+		var dataItems = event.dataTransfer.items;
+		var numDataItems = dataItems.length;
+		for(var n = 0; n < numDataItems; n++)
+		{
+			entry = dataItems[n].webkitGetAsEntry();
+			if(entry) {
+				this.handleFileSelect_Chrome_traverseDir(entry);
+			}
+		}		
+	},
+
+	handleFileSelect_Chrome_traverseDir: function(entry)
+	{
+		var self = this;
+
+		if(entry.isFile)
+		{
+			entry.file(
+				function(file) {
+					self.readFile(file);
+				});
+		}
+		else if(entry.isDirectory)
+		{
+			var dirReader = entry.createReader();
+			dirReader.readEntries(
+				function(entries) 
+				{
+					var num = entries.length;
+					for(var n = 0; n < num; n++) {
+						self.handleFileSelect_Chrome_traverseDir(entries[n]);
+					}
+				});
+		}
+	},
+
+	handleFileSelect_All: function(event)
+	{
 		var self = this;
 
 		var file, reader, item;
 		var files = event.dataTransfer.files;
 		var numFiles = files.length;
-		this.numItemsLoading += numFiles;
 
-		function createCb(path) {
-			return function() { console.log(path); }
+		for(var n = 0; n < numFiles; n++) {
+			this.readFile(files[n]);
+		}
+	},
+
+	readFile: function(file)
+	{
+		if(!file.type.match("image.*")) {
+			return;
 		}
 
-		for(var n = 0; n < numFiles; n++) 
-		{
-			file = files[n];
-			if(!file.type.match("image.*")) {
-				continue;
-			}
+		this.numItemsLoading++;
 
-			reader = new FileReader();
-			reader.onload = (function(file) {
-				return function(fileResult) 
-				{
-					var name = encodeURIComponent(file.name);
-					var wildcardIndex = name.indexOf(".");
-					var idName = name.substr(0, wildcardIndex);
-					var ext = name.substr(wildcardIndex + 1);
+		var self = this;
 
-					var blob = dataURItoBlob(fileResult.target.result, file.type);
+		var reader = new FileReader();
+		reader.onload = (function(file) {
+			return function(fileResult) 
+			{
+				var name = encodeURIComponent(file.name);
+				var wildcardIndex = name.indexOf(".");
+				var idName = name.substr(0, wildcardIndex);
+				var ext = name.substr(wildcardIndex + 1);
 
-					// Check if there is such name in the folder already:
-					idName = self.createUniqueName(idName);
+				var blob = dataURItoBlob(fileResult.target.result, file.type);
 
-					// Info:
-					var info = {
-						name: idName,
-						ext: ext,
-						lastModified: file.lastModified
-					};
-					self.data.push(info);					
+				// Check if there is such name in the folder already:
+				idName = self.createUniqueName(idName);
 
-					item = self.createItem();
-					item.name = idName;
-					item.info = info;
+				// Info:
+				var info = {
+					name: idName,
+					ext: ext,
+					lastModified: file.lastModified
+				};
+				self.data.push(info);					
 
-					var cb = (function(item) {
-						return function(path) 
-						{
-							item.img = path;
-							self.numItemsLoading--;
-							if(self.numItemsLoading === 0) {
-								editor.save();
-							}
+				var item = self.createItem();
+				item.name = idName;
+				item.info = info;
+
+				var cb = (function(item) {
+					return function(path) 
+					{
+						item.img = path;
+						self.numItemsLoading--;
+						if(self.numItemsLoading === 0) {
+							editor.save();
 						}
-					}(item));
+					}
+				}(item));
 
-					editor.fileSystem.writeBlob(idName + "." + ext, blob, cb);
-				}
-			})(file);
-			reader.readAsDataURL(file);
-		}
+				editor.fileSystem.writeBlob(idName + "." + ext, blob, cb);
+			}
+		})(file);
+		reader.readAsDataURL(file);
 	},
 
 	createUniqueName: function(name)
