@@ -163,23 +163,32 @@ module.class("Holder",
 		{
 			var itemElement = findAncestor(this.spanEditElement, "item");
 			var item = this.items[itemElement.dataset.id];
-			
-			var oldPath = item.info.name + "." + item.info.ext;
 
-			item.info.name = this.spanEditElement.value;
-			var newPath = item.info.name + "." + item.info.ext;
+			var spanName = this.createUniqueName(this.spanEditElement.value, item.info.ext);
 
-			console.log(oldPath, newPath);
+			// if name is not unique:
+			if(spanName === this.spanEditElement.value) 
+			{
+				var oldPath = item.info.name + "." + item.info.ext;
 
-			editor.fileSystem.moveTo(oldPath, newPath, 
-				function(result) {
-					if(result) {
-						editor.save();
-					}
-				});
+				item.info.name = this.spanEditElement.value;
+				var newPath = item.info.name + "." + item.info.ext;
 
-			parentNode.removeChild(this.spanEditElement);
-			parentNode.innerHTML = this.spanEditElement.value;
+				editor.fileSystem.moveTo(oldPath, newPath, 
+					function(result) {
+						if(result) {
+							editor.save();
+						}
+					});
+
+				parentNode.removeChild(this.spanEditElement);
+				parentNode.innerHTML = this.spanEditElement.value;
+			}
+			else {
+				parentNode.removeChild(this.spanEditElement);
+				parentNode.innerHTML = this.prevSpanValue;
+				this.prevSpanValue = "";			
+			}
 		}
 	},
 
@@ -229,11 +238,12 @@ module.class("Holder",
 					var name = encodeURIComponent(file.name);
 					var wildcardIndex = name.indexOf(".");
 					var idName = name.substr(0, wildcardIndex);
-					var ext = name.substr(wildcardIndex) + 1;
+					var ext = name.substr(wildcardIndex + 1);
 
 					var blob = dataURItoBlob(fileResult.target.result, file.type);
 
-					// TODO: Check if there is such name in the folder already.
+					// Check if there is such name in the folder already:
+					idName = self.createUniqueName(idName, ext);
 
 					// Info:
 					var info = {
@@ -264,6 +274,30 @@ module.class("Holder",
 			reader.readAsDataURL(file);
 		}
 	},
+
+	createUniqueName: function(name, ext)
+	{
+		var info;
+		var uniqueName = name;
+		var inc = 2;		
+		var num = this.items.length;
+
+		uniqName:
+		for(;;)
+		{
+			for(var n = 0; n < num; n++) 
+			{
+				info = this.items[n].info;
+				if(info.name === uniqueName && info.ext === ext) {
+					uniqueName = name + "-" + inc;
+					inc++;
+					continue uniqName;
+				}
+			}
+
+			return uniqueName;
+		}
+	},	
 
 	//
 	data: null,
