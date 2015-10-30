@@ -164,7 +164,7 @@ module.class("Holder",
 			var itemElement = findAncestor(this.spanEditElement, "item");
 			var item = this.items[itemElement.dataset.id];
 
-			var spanName = this.createUniqueName(this.spanEditElement.value, item.info.ext);
+			var spanName = this.createUniqueName(this.spanEditElement.value);
 
 			// if name is not unique:
 			if(spanName === this.spanEditElement.value) 
@@ -243,7 +243,7 @@ module.class("Holder",
 					var blob = dataURItoBlob(fileResult.target.result, file.type);
 
 					// Check if there is such name in the folder already:
-					idName = self.createUniqueName(idName, ext);
+					idName = self.createUniqueName(idName);
 
 					// Info:
 					var info = {
@@ -275,7 +275,7 @@ module.class("Holder",
 		}
 	},
 
-	createUniqueName: function(name, ext)
+	createUniqueName: function(name)
 	{
 		var info;
 		var uniqueName = name;
@@ -288,7 +288,7 @@ module.class("Holder",
 			for(var n = 0; n < num; n++) 
 			{
 				info = this.items[n].info;
-				if(info.name === uniqueName && info.ext === ext) {
+				if(info.name === uniqueName) {
 					uniqueName = name + "-" + inc;
 					inc++;
 					continue uniqName;
