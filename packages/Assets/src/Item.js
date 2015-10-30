@@ -61,10 +61,13 @@ module.class("Item",
 			reader.onload = (function(file) {
 				return function(fileResult) 
 				{
-					var name = encodeURIComponent(file.name);
-					var wildcardIndex = name.indexOf(".");
-					
-					self.img = fileResult.target.result;
+					var blob = dataURItoBlob(fileResult.target.result, file.type);
+
+					editor.fileSystem.writeBlob(self.info.name + "." + self.info.ext, blob,
+						function(path) {
+							self.img = path + "?" + Date.now();
+							editor.save();							
+						});
 				}
 			})(file);
 			reader.readAsDataURL(file);
