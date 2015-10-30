@@ -5,6 +5,7 @@ module.class("Holder",
 	init: function(data) 
 	{
 		var self = this;
+
 		this.element = document.createElement("div");
 		this.element.setAttribute("class", "holder");
 		this.element.addEventListener("dragover", function(event) { self.handleDragOver(event); }, false);
@@ -13,6 +14,16 @@ module.class("Holder",
 			function(event) {
 				self.deselect();
 			});
+		window.addEventListener("keydown",
+			function(event) 
+			{
+				switch(event.keyCode)
+				{
+					case Input.Key.DELETE:
+						self.tryRemoveItems();
+						break;
+				}
+			});	
 
 		this.createSpanEditElement();	
 
@@ -126,6 +137,14 @@ module.class("Holder",
 		editor.save();
 
 		item.info = null;
+	},
+
+	tryRemoveItems: function()
+	{
+		if(this.activeItem) {
+			this.removeItem(this.activeItem);
+			this.activeItem = null;
+		}
 	},
 
 	startRenameItem: function(item)
