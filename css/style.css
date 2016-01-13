@@ -8,7 +8,7 @@
 	-ms-user-select: none;
 	user-select: none;
 	user-drag: none; 
-	-webkit-user-drag: none;	
+	-webkit-user-drag: none;
 }
 
 body {
@@ -86,6 +86,27 @@ span {
 	position: relative;
     overflow: overlay;
 }
+.screen .inner .layout-holder {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	display: flex;
+	flex-flow: row;	
+}
+.screen .inner .layout-holder .content {
+	width: 100%;
+	height: 100%;
+}
+.screen .inner .layout-holder .left-menu {
+	width: 300px;
+	height: 100%;
+	background: #434047;
+}
+.screen .inner .layout-holder .right-menu {
+	width: 300px;
+	height: 100%;
+	background: #434047;
+}
 
 #loading-screen {
 	display: table;
@@ -105,7 +126,6 @@ span {
 #room-assets {
 	width: 100%;
 	height: 100%;
-	position: absolute;
 }
 #room-assets .holder {
     height: 100%;
@@ -187,19 +207,6 @@ span {
     color: white;
 }
 
-
-.panel-holder {
-	background: black;
-	width: 100%;
-	height: 500px;
-}
-
-.panel {
-	padding: 10px;
-	background: white;
-	color: black;
-}
-
 .Aligner {
   display: flex;
   align-items: center;
@@ -217,3 +224,120 @@ span {
 .Aligner-item--bottom {
   align-self: flex-end;
 }
+
+.panel {
+	position: absolute;
+	left: 300px;
+	top: 300px;
+	min-width: 400px;
+	z-index: 10000;
+	background: #434047;
+	border-radius: 2px 2px 2px 2px;	
+    box-shadow: 0 0 8px #111;
+    font-family: "Lucida Sans", "Lucida Grande", sans-serif; 
+    font-size: 10px;
+    padding-bottom: 10px;
+    resize: both;
+    overflow: auto;
+}
+.panel > .header {
+	display: flex;
+	background: #000;
+	text-align: center;
+	text-transform: uppercase;
+	font-weight: bold;
+	color: white;
+	border-radius: 2px 2px 2px 2px;	
+	cursor: pointer;
+}
+.panel > .header div {
+    width: 100%;
+    padding: 8px;	
+}
+.panel > .header i {
+	padding: 8px;
+	font-size: 12px;
+}
+.panel > .header i:hover {
+	background: #43a6e2;
+}
+.panel .content {
+	background: #434047;
+	color: white;
+}
+.panel .content .menu {
+	width: 100%;
+	background: #2a282d;
+	text-transform: uppercase;
+	font-weight: bold;
+	color: #ebebeb;
+}
+.panel .content .menu li {
+	display: inline-block;
+	padding: 8px;
+	cursor: pointer;
+	border-right: 1px solid #2a282d;
+	border-bottom: 1px solid #2a282d;
+}
+.panel .content .menu li.active, 
+.panel .content .menu li:hover {
+	background: #434047;
+}
+.panel .content .tab .header {
+	padding: 6px;
+	text-transform: uppercase;
+	font-weight: bold;
+	color: #999;
+	cursor: pointer;
+}
+.panel .content .tab .content {
+    font-size: 12px;
+    font-family: 'Open Sans', 'Helvetica Neue',;
+    padding: 9px;
+}
+.panel .content .chooser {
+	margin: 10px;
+}
+.panel .content .chooser li {
+	margin: 10px;
+}
+
+/*
+.panel .content {
+	padding: 4px;
+	color: #ddd;
+}
+.panel .content ul {
+	width: 100%;
+	background: #000;
+}
+.panel .content li {
+	padding: 6px;
+	text-transform: uppercase;
+}
+.panel .content li:hover {
+	background: #3d3d3d
+}
+.panel .h-line {
+	display: flex;
+	flex-flow: row;
+}
+.panel .holder {
+	width: 100%;
+	margin-left: 2px;
+	margin-right: 2px;
+}
+.panel .button {
+    padding: 8px;
+    background-color: #5f5c63;
+    text-align: center;
+    border-radius: 3px;
+    font-size: 11px;
+    color: #eeee;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(45, 38, 38, 0.48);
+}
+.panel .button:hover {
+	 background: #00acac; 
+}*/

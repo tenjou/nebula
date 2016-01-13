@@ -178,6 +178,24 @@ var editor =
 		this.innerScreen = document.createElement("div");
 		this.innerScreen.setAttribute("class", "inner");
 		this.screen.appendChild(this.innerScreen);
+
+		var layoutHolder = document.createElement("div");
+		layoutHolder.setAttribute("class", "layout-holder");
+		this.innerScreen.appendChild(layoutHolder);
+
+		var leftMenu = document.createElement("div");
+		leftMenu.setAttribute("class", "left-menu")
+		layoutHolder.appendChild(leftMenu);
+
+		var content = document.createElement("div");
+		content.setAttribute("class", "content");
+		layoutHolder.appendChild(content);
+
+		var rightMenu = document.createElement("div");
+		rightMenu.setAttribute("class", "right-menu")
+		layoutHolder.appendChild(rightMenu);
+
+		this.innerScreen = content;		
 	},
 
 	createMenu: function()
