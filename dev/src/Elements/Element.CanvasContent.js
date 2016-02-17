@@ -4,8 +4,8 @@ meta.class("Editor.Element.CanvasContent", "Editor.Element",
 {
 	onCreate: function()
 	{
-		this.canvas = document.createElement("canvas");
-		this.element.appendChild(this.canvas);
+		// this.canvas = document.createElement("canvas");
+		// this.element.appendChild(this.canvas);
 	},
 
 	set hidden(value) 

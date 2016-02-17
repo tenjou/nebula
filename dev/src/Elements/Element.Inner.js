@@ -10,9 +10,7 @@ meta.class("Editor.Element.Inner", "Editor.Element",
 		}
 
 		var assetsData = {
-			TODO: {
-				TODO: ""
-			}
+
 		};
 
 		var toolsData = {
@@ -22,31 +20,41 @@ meta.class("Editor.Element.Inner", "Editor.Element",
 		};		
 
 		this.leftToolbar = new Editor.Element.Toolbar(this);
-		this.leftToolbar.loadTab("Assets", assetsData);
-		this.leftToolbar.loadTab("Tools", toolsData);
+		// this.leftToolbar.createTab("Assets", Element.AssetsTab);
+		// this.leftToolbar.loadTab("Assets", assetsData);
+		// this.leftToolbar.loadTab("Tools", toolsData);
 
 		this.roomToolbar = new Editor.Element.ToolbarRoom(this);
 
 		var inspectData = {
-			Basic: {
-				Name: "",
-				Type: 0,
-				StuffXXX: 0
+			Properties: {
+				type: "section",
+				content: {
+					Name: "",
+					Type: 0,
+					StuffXXX: 0
+				}
 			},
 			"Some Stuff": {
-				Yeah: ""
+				type: "section",
+				content: {
+					Yeah: ""
+				}
 			}
 		};
 
 		var paletteData = {
 			Texture: {
-				Name: ""
+				type: "section",
+				content: {
+					Name: ""
+				}
 			}
 		};		
 
 		this.rightToolbar = new Editor.Element.Toolbar(this);
-		this.rightToolbar.loadTab("Inspect", inspectData);
-		this.rightToolbar.loadTab("Palette", paletteData);
+		this.rightToolbar.createTab("Inspect", inspectData);
+		this.rightToolbar.createTab("Palette", paletteData);
 	},
 
 	onCreateParticles: function()
@@ -55,12 +63,18 @@ meta.class("Editor.Element.Inner", "Editor.Element",
 
 		var inspectData = {
 			Properties: {
-				Name: "",
-				Type: 0,
-				StuffXXX: 0
+				type: "section",
+				content: {
+					Name: "",
+					Type: 0,
+					StuffXXX: 0
+				}
 			},
 			"Some Stuff": {
-				Yeah: ""
+				type: "section",
+				content: {
+					Yeah: ""
+				}
 			}
 		};
 

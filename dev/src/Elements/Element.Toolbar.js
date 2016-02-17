@@ -14,17 +14,10 @@ meta.class("Editor.Element.Toolbar", "Editor.Element",
 
 	},
 
-	loadTab: function(name, inputData)
+	createTab: function(name, inputData)
 	{
-		var tab = this.tabs.getTab(name);
-		if(!tab) {
-			tab = this.tabs.createTab(name);
-		}
-		else {
-			tab.clear();
-		}
-
-		editor.inputParser.parse(inputData, tab.content);
+		var tab = this.tabs.createTab(name);
+		editor.inputParser.parse(tab.content, inputData);
 	},
 
 	//

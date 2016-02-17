@@ -11,9 +11,8 @@
 		<link href="../css/font-awesome.min.css" rel="stylesheet">
 		<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,600" rel="stylesheet" type="text/css">
 
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r73/three.js"></script>
-
-		<script src="lib/meta/Class.js"></script>
+		<script src="lib/meta.dev.js"></script>
+		
 		<script src="src/InputParser.js"></script>
 		<script src="src/Elements/Element.js"></script>
 		<script src="src/Elements/Element.Wrapper.js"></script>
@@ -29,10 +28,33 @@
 		<script src="src/Elements/Element.Room.js"></script>
 		<script src="src/Elements/Element.ToolbarRoom.js"></script>
 		<script src="src/Elements/Element.Section.js"></script>
+		<script src="src/Elements/Element.Property.js"></script>
+		<script src="src/Elements/Element.Number.js"></script>
+		<script src="src/Elements/Element.String.js"></script>
+		<script src="src/Elements/Element.H2.js"></script>
 		<script src="src/Editor.js"></script>
 		<script src="src/main.js"></script>		
+
+		<script src="src/plugins/AssetsBrowser/AssetsBrowser.js"></script>	
+		<script src="src/plugins/AssetsBrowser/Element.AssetsProperty.js"></script>	
+		<script src="src/plugins/Hierarchy/Hierarchy.js"></script>	
+
+		<style>
+		#parent {
+			display: flex;
+			color: white;
+		}
+		#a {
+			flex: 0 0 100px;
+			background: green;
+		}
+		#b {
+			flex: 100%;
+			background: red;
+		}
+		</style>
 	</head>
 
-	<body onload="main();">
+	<body>
 	</body>
 </html>
