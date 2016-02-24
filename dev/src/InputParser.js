@@ -111,6 +111,21 @@ meta.class("Editor.InputParser",
 		{
 			var container = new Element.Container(parent);
 			return container;
-		},		
+		},	
+
+		containerNamed: function(parent, name, data) 
+		{
+			var container = new Element.Container(parent);
+			var h2 = new Element.H2(container);
+			h2.value = name;			
+			return container;
+		},			
+
+		button: function(parent, name, data)
+		{
+			var button = new Element.Button(parent);
+			button.value = name;
+			return button;
+		}
 	}
 });

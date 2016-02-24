@@ -5,48 +5,41 @@ meta.class("Element.Name", "Editor.Element",
 	onCreate: function()
 	{
 		this.element.spellcheck = "false";
-		this.element.ondblclick = this._handleDbClick;
-		this.element.onfocus = this._handleFocus;
-		this.element.onblur = this._handleBlur;
+		this.element.setAttribute("tabindex", "0");
+		this.element.ondblclick = this._handleDbClick.bind(this);
+		this.element.onfocus = this._handleFocus.bind(this);
+		this.element.onblur = this._handleBlur.bind(this);
 	},
 
 	_handleDbClick: function(event) 
 	{
-		var element = event.currentTarget;
-		element.contentEditable = "true";
-		element.focus();
-		meta.selectElementContents(element);
+		this.element.contentEditable = "true";
+		this.element.focus();
+		meta.selectElementContents(this.element);
 	},
 
 	_handleFocus: function(event)
 	{
-		var element = event.target;
-		var holder = element.holder;
-		holder._value = element.innerHTML;
-		element.onkeydown = holder._handleOnKeyDown;
+		this._value = this.element.innerHTML;
+		this.element.onkeydown = this._handleOnKeyDown.bind(this);
 	},
 
 	_handleBlur: function(event)
 	{
-		var element = event.target;
-		var holder = element.holder;
-		element.contentEditable = "false";
-		element.onkeydown = null;
+		this.element.contentEditable = "false";
+		this.element.onkeydown = null;
 
-		if(!element.innerHTML) {
-			element.innerHTML = holder._value;
+		if(!this.element.innerHTML) {
+			this.element.innerHTML = this._value;
 		}
-		else if(element.innerHTML !== holder._value) {
-			holder.emit("update");
+		else if(this.element.innerHTML !== this._value) {
+			this.emit("update");
 		}
 	},
 
 	_handleOnKeyDown: function(event)
 	{
 		var keyCode = event.keyCode;
-		var element = event.target;
-
-		console.log(keyCode)
 
 		// only 0..9, a..z, A..Z, -, _, ., space
 		if((keyCode > 47 && keyCode < 58) || 
@@ -66,15 +59,22 @@ meta.class("Element.Name", "Editor.Element",
 		}
 		// Esc
 		else if(keyCode === 27) {
-			element.innerHTML = element.holder._value;
-			element.blur();
+			this.element.innerHTML = this._value;
+			this.element.blur();
 		}
 		// Enter
 		else if(keyCode === 13) {
-			element.blur();
+			this.element.blur();
 		}
 
 		event.preventDefault();
+	},
+
+	focus: function()
+	{
+		this.element.contentEditable = "true";
+		this.element.focus();
+		meta.selectElementContents(this.element);
 	},
 
 	set value(str) {

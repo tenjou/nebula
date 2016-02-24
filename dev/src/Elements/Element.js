@@ -60,6 +60,21 @@ meta.class("Editor.Element",
 		this.parent._emit(id, event, element);
 	},
 
+	query: function(str)
+	{
+		var buffer = str.split("/");
+		var num = buffer.length - 1;
+
+		var bufferStr = "";
+		for(var n = 0; n < num; n++) {
+			bufferStr += buffer[n] + " ";
+		}
+		bufferStr += buffer[n];
+
+		var element = this.element.querySelector(bufferStr)
+		return element.holder;
+	},
+
 	handleEvent: null,
 
 	//

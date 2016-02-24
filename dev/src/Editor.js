@@ -15,11 +15,11 @@ meta.class("Editor",
 		this.wrapper = new Editor.Element.Wrapper();
 
 		//this.createTop();
-		this.createInner();
+		//this.createInner();
 		//this.createBottom();
 		this.createOverlay();
 
-		//this.loadPlugins();
+		this.loadPlugins();
 	},
 
 	createTop: function()

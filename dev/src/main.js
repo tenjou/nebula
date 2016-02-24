@@ -6,17 +6,18 @@ meta.onCreate = function()
 {
 	editor = new Editor();
 	editor.loadLayout();	
-	meta.engine.container = editor.inner.roomToolbar.tabs.tabs[0].content.element;
+	// meta.engine.container = editor.inner.roomToolbar.tabs.tabs[0].content.element;
 
-	var assetsBrowser = new AssetsBrowser();
-	assetsBrowser.load();
+	// var assetsBrowser = new AssetsBrowser();
+	// assetsBrowser.load();
 
-	var hierarchy = new Hierarchy();
-	hierarchy.load();	
+	// var hierarchy = new Hierarchy();
+	// hierarchy.load();	
 };
 
 meta.onLoad = function()
 {
+	document.querySelector("canvas").style.display = "none";
 	meta.renderer.bgColor = "#aaa";
 }
 

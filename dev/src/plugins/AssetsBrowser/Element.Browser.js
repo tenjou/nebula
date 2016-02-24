@@ -6,6 +6,9 @@ meta.class("Element.Browser", "Editor.Element",
 	{
 		this.element.ondragover = this._handleOnDragOver;
 		this.element.ondrop = this._handleOnDrop;
+		this.element.onclick = function() {
+			this.emit("click");
+		}.bind(this);
 	},
 
 	_handleOnDragOver: function(event)
@@ -149,77 +152,39 @@ meta.class("Element.Browser", "Editor.Element",
 		//editor.fileSystem.writeBlob(idName + "." + ext, blob, cb);		
 	},
 
+	createItem: function(name) 
+	{
+		if(!this.itemCls) {
+			throw "(Element.Browser.createItem): 'itemCls' is not defined";
+		}
+
+		var item = new this.itemCls(this);
+		item.name = name;
+
+		if(this._info) {
+			this._info.setAttribute("class", "hidden");
+		}
+
+		return item;
+	},
+
+	set info(str) 
+	{
+		if(!this._info) {
+			this._info = document.createElement("info");
+			this.element.appendChild(this._info);			
+		}
+
+		this._info.innerHTML = str;
+	},
+
+	get info() {
+		return this._info.innerHTML;
+	},
+
 	//
 	elementTag: "browser",
-});
 
-// <item style="
-//     display: block;
-//     padding: 4px;
-//     /* background: #6D6D6D; */
-//     color: #FFFFFF;
-//     cursor: pointer;
-// "><i class="fa fa-caret-down" style="
-//     padding: 4px;
-//     margin-left: 2px;
-// "></i> <i class="fa fa-cube" style="
-//     padding: 1px;
-//     margin-left: 5px;
-//   "></i> iso_image<span style="
-//     background-color: #333;
-//     padding: 1px;
-//     padding-left: 4px;
-//     padding-right: 4px;
-//     margin-left: 5px;
-//     border-radius: 3px;
-//     text-transform: uppercase;
-//     font-size: 9px;
-// ">png</span><i class="fa fa-close" style="
-//     padding: 4px;
-//     float: right;
-//     background-color: #888888;
-//     /* padding: 1px; */
-//     padding-left: 4px;
-//     padding-right: 4px;
-//     margin-left: 5px;
-//     border-radius: 3px;
-//     text-transform: uppercase;
-//     /* font-size: 9px; */
-//     line-height: 51x;
-//     line-height: 11px;
-//     margin-top: 2px;
-// "></i></item><item style="
-//     display: block;
-//     padding: 4px;
-//     background: #6D6D6D;
-//     color: #FFFFFF;
-//     cursor: pointer;
-// "><i class="fa fa-caret-down" style="
-//     padding: 4px;
-// "></i> <i class="fa fa-cube" style="
-//     padding: 1px;
-//     margin-left: 5px;
-//   "></i> iso_image<span style="
-//     background-color: #333;
-//     padding: 1px;
-//     padding-left: 4px;
-//     padding-right: 4px;
-//     margin-left: 5px;
-//     border-radius: 3px;
-//     text-transform: uppercase;
-//     font-size: 9px;
-// ">png</span><i class="fa fa-close" style="
-//     padding: 4px;
-//     float: right;
-//     background-color: #888888;
-//     /* padding: 1px; */
-//     padding-left: 4px;
-//     padding-right: 4px;
-//     margin-left: 5px;
-//     border-radius: 3px;
-//     text-transform: uppercase;
-//     /* font-size: 9px; */
-//     line-height: 51x;
-//     line-height: 11px;
-//     margin-top: 2px;
-// "></i></item>
+	itemCls: null,
+	_info: null
+});
