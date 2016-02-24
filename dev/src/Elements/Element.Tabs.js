@@ -4,13 +4,18 @@ meta.class("Editor.Element.Tabs", "Editor.Element",
 {
 	onCreate: function()
 	{
+		this.inner = new Element.WrappedElement("tabs-inner", this);
+
+		var tabCtrl = document.createElement("tabs-ctrl");
+		this.element.appendChild(tabCtrl);
+
 		this.tabs = [];
 		this.tabsMap = {};
 	},
 
 	createTab: function(name)
 	{
-		var tab = new Editor.Element.Tab(this);
+		var tab = new Editor.Element.Tab(this.inner);
 		tab.name = name;
 
 		this.tabs.push(tab);
@@ -51,6 +56,7 @@ meta.class("Editor.Element.Tabs", "Editor.Element",
 	//
 	elementTag: "tabs",
 	
+	inner: null,
 	tabs: null,
 	_activeTab: null
 });

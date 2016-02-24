@@ -55,6 +55,7 @@ meta.class("Editor.Element.Inner", "Editor.Element",
 		this.rightToolbar = new Editor.Element.Toolbar(this);
 		this.rightToolbar.createTab("Inspect", inspectData);
 		this.rightToolbar.createTab("Palette", paletteData);
+		this.rightToolbar.createTab("Test", {});
 	},
 
 	onCreateParticles: function()

@@ -17,7 +17,7 @@ meta.onCreate = function()
 
 meta.onLoad = function()
 {
-	//meta.engine.updateResolution();
+	meta.renderer.bgColor = "#aaa";
 }
 
 // var scene = null;

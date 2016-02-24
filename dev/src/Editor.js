@@ -5,6 +5,7 @@ meta.class("Editor",
 	init: function()
 	{
 		this.inputParser = new Editor.InputParser();
+		this.resourceMgr = new Editor.ResourceManager();
 	},
 
 	loadLayout: function(layout)
@@ -13,9 +14,12 @@ meta.class("Editor",
 
 		this.wrapper = new Editor.Element.Wrapper();
 
-		this.createTop();
+		//this.createTop();
 		this.createInner();
-		this.createBottom();
+		//this.createBottom();
+		this.createOverlay();
+
+		//this.loadPlugins();
 	},
 
 	createTop: function()
@@ -33,13 +37,26 @@ meta.class("Editor",
 		this.bottom = new Editor.Element.Bottom(this.wrapper);
 	},
 
+	createOverlay: function()
+	{
+		this.overlay = new Element.Overlay();
+	},
+
+	loadPlugins: function()
+	{
+		var plugin = new Plugin.ProjectWindow();
+	},
+
 	//
 	layout: "",
 	
+	fileSystem: null,
 	inputParser: null,
+	resourceMgr: null,
 
 	wrapper: null,
 	top: null,
 	inner: null,
-	bottom: null
+	bottom: null,
+	overlay: null
 });

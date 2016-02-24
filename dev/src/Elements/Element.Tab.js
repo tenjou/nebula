@@ -4,16 +4,23 @@ meta.class("Editor.Element.Tab", "Editor.Element",
 {
 	onCreate: function()
 	{
-		this._name = document.createElement("span");
-		this.element.appendChild(this._name);
+		var inner = document.createElement("tab-inner");
+		this.element.appendChild(inner);
 
-		this.content = new Editor.Element.Content(this.parent.parent);
+		this._name = document.createElement("tab-content");
+		inner.appendChild(this._name);
+
+		var hidder = document.createElement("hidder");
+		inner.appendChild(hidder);
+
+		this.content = new Element.Content(this.parent.parent.parent);
 		this.content.hidden = true;
 
-		var self = this;
-		this.element.addEventListener("click", function() {
-			self.activate();
-		});
+		this.element.onclick = this._handleClick.bind(this);
+	},
+
+	_handleClick: function(event) {
+		this.activate();
 	},
 
 	activate: function() 
@@ -21,7 +28,7 @@ meta.class("Editor.Element.Tab", "Editor.Element",
 		this.element.setAttribute("class", "active");
 		this.content.hidden = false;
 
-		this.parent.activeTab = this;
+		this.parent.parent.activeTab = this;
 	},
 
 	deactivate: function()
