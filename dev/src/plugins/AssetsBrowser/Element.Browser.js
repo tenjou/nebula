@@ -107,9 +107,9 @@ meta.class("Element.Browser", "Editor.Element",
 	handleFileOnLoad: function(file, fileResult)
 	{
 		var name = encodeURIComponent(file.name);
-		var wildcardIndex = name.indexOf(".");
+		var wildcardIndex = name.lastIndexOf(".");
 		var idName = name.substr(0, wildcardIndex);
-		var ext = name.substr(wildcardIndex + 1);
+		var ext = name.substr(wildcardIndex + 1).toLowerCase();
 
 		var blob = dataURItoBlob(fileResult.target.result, file.type);
 
