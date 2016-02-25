@@ -15,9 +15,9 @@ meta.class("Editor",
 
 	prepareUI: function()
 	{
-		this.wrapper = new Element.Wrapper();
+		this.wrapper = new Element.WrappedElement("wrapper");
 
-		this.overlay = new Element.Overlay();		
+		this.overlay = new Element.WrappedElement("overlay");		
 		this.info = new Element.Info(this.overlay);
 		this.info.value = "Initializing";
 	},
@@ -59,13 +59,41 @@ meta.class("Editor",
 		this.info.active = true;
 		this.info.value = "Loading Project";
 
+		this.fileSystem.rootDir = name + "/";
+		this.fileSystem.read("db.json", this._handleReadDb.bind(this));	
+	},
+
+	_handleReadDb: function(data)
+	{
+		if(!data) {
+			this.fileSystem.create("db.json", this._handleCreateDb.bind(this));
+		}
+		else {
+			this._handleLoadDb(data);
+		}
+	},
+
+	_handleCreateDb: function()
+	{
+		var db = {
+			version: this.version
+		};
+		this.fileSystem.write("db.json", JSON.stringify(db), this._handleLoadDb.bind(this));
+	},
+
+	_handleLoadDb: function(json)
+	{
+		this.db = JSON.parse(json);
+
+		this.info.active = false;
 		//this.createTop();
 		this.createInner();
-		//this.createBottom();		
+		//this.createBottom();	
 	},
 
 	//
-	layout: "",
+	db: null,
+	version: "0.1v",
 	
 	fileSystem: null,
 	inputParser: null,

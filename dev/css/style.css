@@ -242,10 +242,9 @@ toolbar-room content {
 }
 
 content section {
-	display: flex;
 	padding-top: 3px;
-	padding-bottom: 6px;
-	border-bottom: 2px solid #373737;
+	padding-bottom: 7px;
+	border-bottom: 1px solid #373737;
 }
 content section:last-child {
 	border-bottom: none;
@@ -379,7 +378,10 @@ overlay {
 	width: 100%;
 	height: 100%;
 	z-index: 10000;
-	/*pointer-events: none;*/
+	pointer-events: none;
+}
+overlay > * {
+	pointer-events: all;
 }
 
 overlay > info {

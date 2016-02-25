@@ -26,6 +26,9 @@ meta.class("Element.Name", "Editor.Element",
 
 	_handleDbClick: function(event) 
 	{
+		event.stopPropagation();
+		event.preventDefault();
+
 		this.element.contentEditable = "true";
 		this.element.focus();
 		meta.selectElementContents(this.element);

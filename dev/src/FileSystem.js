@@ -46,7 +46,7 @@ meta.class("Editor.FileSystem",
 				}				
 			},
 			function(fileError) {
-				self.handleError(fileError, "create", filename);
+				self.handleError(fileError, cb, "create", filename);
 			});
 	},
 
@@ -61,7 +61,7 @@ meta.class("Editor.FileSystem",
 				self.handleReadDone(fileEntry, cb);
 			},
 			function(fileError) {
-				self.handleError(fileError, cb, "create", filename);
+				self.handleError(fileError, cb, "read", filename);
 			});
 	},
 
@@ -112,7 +112,7 @@ meta.class("Editor.FileSystem",
 					fileWritter.onwriteend = function() 
 					{
 						if(cb) {
-							cb(true);
+							cb(contents);
 						}						
 					}
 
@@ -124,7 +124,7 @@ meta.class("Editor.FileSystem",
 				{
 					console.error("(FileSystem::write) Could not write in " + fileEntry.name);
 					if(cb) {
-						cb(false);
+						cb(null);
 					}
 				};
 
