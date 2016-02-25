@@ -350,6 +350,10 @@ content browser item icon {
 }
 content browser item name {
 	cursor: pointer;
+	outline: none;
+}
+content browser item name:focus {
+	outline: 2px solid #68A7CC;
 }
 content close {
 	padding: 4px;

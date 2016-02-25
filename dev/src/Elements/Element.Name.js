@@ -4,11 +4,24 @@ meta.class("Element.Name", "Editor.Element",
 {
 	onCreate: function()
 	{
-		this.element.spellcheck = "false";
+		this.element.setAttribute("spellcheck", "false");
 		this.element.setAttribute("tabindex", "0");
 		this.element.ondblclick = this._handleDbClick.bind(this);
 		this.element.onfocus = this._handleFocus.bind(this);
 		this.element.onblur = this._handleBlur.bind(this);
+	},
+
+	focus: function()
+	{
+		this.element.contentEditable = "true";
+		this.element.focus();
+		meta.selectElementContents(this.element);
+	},
+
+	revert: function()
+	{
+		this._value = this.prevValue;
+		this.element.innerHTML = this._value;
 	},
 
 	_handleDbClick: function(event) 
@@ -29,11 +42,11 @@ meta.class("Element.Name", "Editor.Element",
 		this.element.contentEditable = "false";
 		this.element.onkeydown = null;
 
-		if(!this.element.innerHTML) {
+		if(!this.element.innerHTML && this._value) {
 			this.element.innerHTML = this._value;
 		}
 		else if(this.element.innerHTML !== this._value) {
-			this.emit("update");
+			this.value = this.element.innerHTML;
 		}
 	},
 
@@ -70,22 +83,29 @@ meta.class("Element.Name", "Editor.Element",
 		event.preventDefault();
 	},
 
-	focus: function()
+	set value(str) 
 	{
-		this.element.contentEditable = "true";
-		this.element.focus();
-		meta.selectElementContents(this.element);
-	},
+		if(str === this._value) { return; }
 
-	set value(str) {
-		this.element.innerHTML = str;
+		if(this.prevValue === null) {
+			this.prevValue = str;
+			this._value = str;
+			this.element.innerHTML = str;			
+		}
+		else {
+			this.prevValue = this._value;
+			this._value = str;
+			this.element.innerHTML = str;			
+			this.emit("update");
+		}
 	},
 
 	get value() {
-		return this.element.innerHTML;
+		return this._value;
 	},
 
 	//
 	elementTag: "name",
-	_value: ""
+	_value: "",
+	prevValue: null
 });

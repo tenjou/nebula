@@ -305,6 +305,38 @@ meta.class("Editor.FileSystem",
 
 	},
 
+	moveToDir: function(path, targetPath, cb)
+	{
+		var self = this;
+
+		var targetPathIndex = targetPath.lastIndexOf("/") + 1;
+
+		this.fs.getDirectory(this.rootDir + path, {},
+			function(parentDirEntry) 
+			{
+				self.fs.getDirectory(self.rootDir + targetPath.substr(0, targetPathIndex), {},
+					function(dirEntry)
+					{
+						parentDirEntry.moveTo(dirEntry, targetPath.substr(targetPathIndex),
+							function(newDirEntry) 
+							{
+								if(cb) {
+									cb(newDirEntry.toURL());
+								}
+							},
+						function(fileError) {
+							self.handleError(fileError, cb, "rename", path);
+						});
+					},
+					function(fileError) {
+						self.handleError(fileError, cb, "rename-getDir", path);
+					});
+			},
+			function(fileError) {
+				self.handleError(fileError, cb, "rename-getParentDir", path);
+			});
+	},
+
 	handleError: function(fileError, cb, type, filename) 
 	{
 		if(type === "read" && fileError.name !== "NotFoundError")

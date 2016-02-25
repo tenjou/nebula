@@ -5,7 +5,6 @@ var editor = null;
 meta.onCreate = function()
 {
 	editor = new Editor();
-	editor.loadLayout();	
 	// meta.engine.container = editor.inner.roomToolbar.tabs.tabs[0].content.element;
 
 	// var assetsBrowser = new AssetsBrowser();

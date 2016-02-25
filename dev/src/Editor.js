@@ -6,6 +6,14 @@ meta.class("Editor",
 	{
 		this.inputParser = new Editor.InputParser();
 		this.resourceMgr = new Editor.ResourceManager();
+
+		this.fileSystem = new Editor.FileSystem();
+		this.fileSystem.onReady.add(this.handleFileSystemReady, this);
+	},
+
+	handleFileSystemReady: function(data, event)
+	{
+		this.loadLayout();
 	},
 
 	loadLayout: function(layout)
