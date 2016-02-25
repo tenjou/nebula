@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Editor.Element.Wrapper", "Editor.Element",
+meta.class("Element.Wrapper", "Editor.Element",
 {
 	//
 	elementTag: "wrapper"

@@ -382,6 +382,12 @@ overlay {
 	/*pointer-events: none;*/
 }
 
+overlay > info {
+	font-size: 13px;
+	color: white;
+	z-index: 100000;
+}
+
 window {
 	display: flex;
 	width: 300px;

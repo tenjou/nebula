@@ -77,12 +77,51 @@ meta.class("Editor.Element",
 
 	handleEvent: null,
 
+	set active(value) 
+	{
+		if(value === this._active) { return; }
+
+		this._active = value;
+
+		if(value) {
+			this.parent.element.appendChild(this.element);
+		}
+		else {
+			this.parent.element.removeChild(this.element);
+		}
+	},
+
+	get active() {
+		return this._active;
+	},
+
+	set visible(value) 
+	{
+		if(value === this._visible) { return; }
+
+		this._visible = value;
+
+		if(value) {
+			this.element.setAttribute("class", "");
+		}
+		else {
+			this.element.setAttribute("class", "hidden");
+		}
+	},
+
+	get visible() {
+		return this._visible;
+	},
+
 	//
 	parent: null,
 	ctrl: null,
 
 	element: null,
-	elementTag: "div"
+	elementTag: "div",
+
+	_visible: true,
+	_active: true
 });
 
 Element.prototype.holder = null;

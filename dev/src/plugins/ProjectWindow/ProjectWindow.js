@@ -7,10 +7,10 @@ meta.class("Plugin.ProjectWindow",
 		this.projects = {};
 
 		var inputParser = editor.inputParser;
-		inputParser.types.projectBrowser = function(parent, name, data) 
+		inputParser.types.projectList = function(parent, name, data) 
 		{
-			var browser = new Element.Browser(parent);
-			browser.itemCls = Element.Browser_ProjectItem;
+			var browser = new Element.List(parent);
+			browser.itemCls = Element.ListItem_Project;
 			browser.info = "No projects found";
 		};
 
@@ -21,7 +21,7 @@ meta.class("Plugin.ProjectWindow",
 					BrowserContainer: {
 						type: "container",
 						content: {
-							Browser: "@projectBrowser"
+							Browser: "@projectList"
 						}
 					},
 					Create: "@button"
@@ -29,11 +29,11 @@ meta.class("Plugin.ProjectWindow",
 			}				
 		};
 
-		var wnd = new Element.Window(editor.overlay);
-		wnd.content.ctrl = this;
-		editor.inputParser.parse(wnd.content, contentData);
+		this.wnd = new Element.Window(editor.overlay);
+		this.wnd.content.ctrl = this;
+		editor.inputParser.parse(this.wnd.content, contentData);
 
-		this.browser = wnd.query("content/container/container/browser");
+		this.browser = this.wnd.query("content/container/container/browser");
 
 		editor.fileSystem.readDir("", this.handleReadDir.bind(this));
 	},
@@ -42,7 +42,7 @@ meta.class("Plugin.ProjectWindow",
 	{
 		var dir;
 		var num = dirs.length;
-		for(var n = 0; n < num; n++) 
+		for(var n = num - 1; n >= 0; n--) 
 		{
 			dir = dirs[n];
 			this.projects[dir.name] = {};
@@ -62,19 +62,11 @@ meta.class("Plugin.ProjectWindow",
 		}
 		else if(id === "content/container/container/browser/item")
 		{
-			if(event === "click")
-			{
-				if(element === this.activeItem) { return; }
-				
-				element.active = true;
-
-				if(!this.activeItem) {
-					this.activeItem = element;
-				}
-				else {
-					this.activeItem.active = false;
-					this.activeItem = element;
-				}				
+			if(event === "click") {
+				this.selectItem(element);			
+			}
+			else if(event === "dbClick") {
+				this.openProject(element.name.value);
 			}
 		}
 		else if(id === "content/container/container/browser/item/name")
@@ -93,21 +85,47 @@ meta.class("Plugin.ProjectWindow",
 		}
 	},
 
+	selectItem: function(element)
+	{
+		if(element === this.selectedItem) { return; }
+		
+		element.select = true;
+
+		if(!this.selectedItem) {
+			this.selectedItem = element;
+		}
+		else {
+			this.selectedItem.select = false;
+			this.selectedItem = element;
+		}			
+	},
+
 	createProject: function(name)
 	{
-		if(this.activeItem) {
-			this.activeItem.active = false;
+		if(this.selectedItem) {
+			this.selectedItem.select = false;
 		}
 
 		var name = this.getUniqueProjectName();
 		var item = this.browser.createItem(name);
 		item.focus();
-		item.active = true;
-		this.activeItem = item;
+		item.select = true;
+		this.selectedItem = item;
 
 		this.projects[name] = {};
 
 		editor.fileSystem.createDir(name);
+	},
+
+	openProject: function(name)
+	{
+		if(!this.projects[name]) {
+			console.error("(Plugin.ProjectWindow.openProject) No such project found: " + name);
+			return;
+		}
+
+		this.wnd.active = false;
+		editor.loadProject(name);
 	},
 
 	getUniqueProjectName: function()
@@ -135,7 +153,8 @@ meta.class("Plugin.ProjectWindow",
 	},
 
 	//
+	wnd: null,
 	browser: null,
 	projects: null,
-	activeItem: null
+	selectedItem: null
 });
