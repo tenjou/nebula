@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Element.Window", "Editor.Element",
+meta.class("Element.Window", "Element.Basic",
 {
 	onCreate: function()
 	{

@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Editor.Element.CanvasContent", "Editor.Element",
+meta.class("Editor.Element.CanvasContent", "Element.Basic",
 {
 	onCreate: function()
 	{

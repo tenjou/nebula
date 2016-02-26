@@ -36,17 +36,17 @@ meta.class("Editor",
 
 	createTop: function()
 	{
-		this.top = new Editor.Element.Top(this.wrapper);
+		this.top = new Element.Top(this.wrapper);
 	},
 
 	createInner: function()
 	{
-		this.inner = new Editor.Element.Inner(this.wrapper);
+		this.inner = new Element.Inner(this.wrapper);
 	},
 
 	createBottom: function()
 	{
-		this.bottom = new Editor.Element.Bottom(this.wrapper);
+		this.bottom = new Element.Bottom(this.wrapper);
 	},
 
 	loadPlugins: function()
@@ -59,8 +59,13 @@ meta.class("Editor",
 		this.info.active = true;
 		this.info.value = "Loading Project";
 
+		this.projectName = name;
 		this.fileSystem.rootDir = name + "/";
 		this.fileSystem.read("db.json", this._handleReadDb.bind(this));	
+	},
+
+	saveCfg: function() {
+		this.fileSystem.write("db.json", JSON.stringify(this.db), this._handleSavedDb.bind(this));
 	},
 
 	_handleReadDb: function(data)
@@ -76,6 +81,7 @@ meta.class("Editor",
 	_handleCreateDb: function()
 	{
 		var db = {
+			name: this.projectName,
 			version: this.version
 		};
 		this.fileSystem.write("db.json", JSON.stringify(db), this._handleLoadDb.bind(this));
@@ -84,16 +90,23 @@ meta.class("Editor",
 	_handleLoadDb: function(json)
 	{
 		this.db = JSON.parse(json);
+		this.projectName = this.db.name;
 
 		this.info.active = false;
+
 		//this.createTop();
 		this.createInner();
 		//this.createBottom();	
 	},
 
+	_handleSavedDb: function(json)
+	{
+		console.log("db-saved");
+	},
+
 	//
 	db: null,
-	version: "0.1v",
+	version: "0.1",
 	
 	fileSystem: null,
 	inputParser: null,

@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Element.Container", "Editor.Element",
+meta.class("Element.Container", "Element.Basic",
 {
 	//
 	elementTag: "container",

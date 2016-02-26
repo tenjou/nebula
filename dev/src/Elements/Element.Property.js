@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Element.Property", "Editor.Element",
+meta.class("Element.Property", "Element.Basic",
 {
 	addTag: function(name) 
 	{

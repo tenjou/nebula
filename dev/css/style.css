@@ -73,64 +73,6 @@ button:hover button-content {
     border-bottom: 2px solid #404040;
 }
 
-tabs {
-	display: flex;
-	flex: 0 0;
-	flex-direction: row;
-	text-transform: uppercase;
-	border-bottom: 2px solid #6a6a6a;
-}
-tabs-inner {
-	flex: 0 0;
-	display: flex;
-}
-tabs-ctrl {
-	display: block;
-	flex: 0 1 100%;	
-	border-bottom: 2px solid #282828;
-	border-top: 2px solid #4a4a4a;
-}
-tab {
-	display: inline-block;
-    position: relative;
-    border-right: 2px solid #282828;
-    border-bottom: 2px solid #282828;
-}
-tab:hover {
-	color: white;
-}
-tab.active {
-	background: #535353;
-	border-bottom: none;
-	color: white;
-}
-tab tab-content {
-	display: block;
-	min-width: 25%;
-	height: 18px;
-	z-index: 2;
-	padding-top: 3px;
-	padding-left: 10px;
-	padding-right: 10px;
-	border-top: 2px solid #4a4a4a;
-	text-align: center;
-	color: #aaa;
-	cursor: pointer;
-}
-tab.active tab-content {
-	border-top: 2px solid #6a6a6a;
-}
-tab.hover tab-content,
-tab.active tab-content {
-	color: white;
-}
-tab.active hidder {
-	display: block;
-	width: 100%;
-	position: absolute;
-	height: 4px;
-	background: #535353;	
-}
 
 rooms {
 	flex: 0 0 29px;
@@ -150,37 +92,7 @@ room {
 	border-right: 1px solid #2B2B2B;
 }
 
-room .fa {
-	margin-left: 5px;
-	padding: 3px; 
-	padding-left: 5px;
-	padding-right: 5px; 
-}
-
-room .fa:hover {
-	background: white;
-	color: black;
-}
-
-room.active .fa:hover {
-	background: white;
-	color: #348fe2;
-		
-}
-
-room:hover {
-	color: white;
-
-}
-
-room.active {
-	background: #348fe2;
-	color: white;
-	border-right: 1px solid #348fe2;
-}
-
 content {
-	background: #535353;
 	flex: 1 1 100%;
 	display: flex;
 	flex-direction: column;
@@ -220,25 +132,81 @@ toolbar {
 	display: flex;
 	flex-direction: column;
 	align-items: stretch;
-	flex: 1 0 270px;
+	flex: 1 1 100%;
 	z-index: 1;
 	border: 2px solid #292929;
+	margin-left: 1px;
+	margin-right: 1px;
+}
+toolbar:first-child {
+	margin-left: 0;
+}
+toolbar:last-child {
+	margin-right: 0;
 }
 
-toolbar-room {
+toolbar > container {
+	flex: 1 1 100%;
+	background: #535353;
+}
+
+tabs {
 	display: flex;
-	flex-direction: column;
-	align-items: stretch;
+	flex: 0 0 27px;
+	flex-direction: row;
+	text-transform: uppercase;
+	border-bottom: 2px solid #6a6a6a;
+}
+tabs-inner {
+	flex: 0 0;
+	display: flex;
+}
+tabs-ctrl {
+	display: block;
 	flex: 0 1 100%;	
-	border: 2px solid #292929;
-	margin-left: 2px;
-	margin-right: 2px;
+	border-bottom: 2px solid #282828;
+	border-top: 2px solid #4a4a4a;
 }
-
-toolbar-room content {
-	display: flex;
-/*    margin-left: 3px;
-	margin-right: 3px;*/
+tab {
+	display: inline-block;
+    position: relative;
+    border-right: 2px solid #282828;
+    border-bottom: 2px solid #282828;
+}
+tab:hover {
+	color: white;
+}
+tab.active {
+	background: #535353;
+	border-bottom: none;
+	color: white;
+}
+tab tab-content {
+	display: block;
+	min-width: 25%;
+	height: 18px;
+	z-index: 2;
+	padding-top: 5px;
+	padding-left: 10px;
+	padding-right: 10px;
+	border-top: 2px solid #4a4a4a;
+	text-align: center;
+	color: #aaa;
+	cursor: pointer;
+}
+tab.active tab-content {
+	border-top: 2px solid #6a6a6a;
+}
+tab.hover tab-content,
+tab.active tab-content {
+	color: white;
+}
+tab.active hidder {
+	display: block;
+	width: 100%;
+	position: absolute;
+	height: 6px;
+	background: #535353;	
 }
 
 content section {
@@ -252,7 +220,6 @@ content section:last-child {
 
 content container {
 	flex: 100%;
-	max-height: 100%;
 	display: flex;
 	flex-direction: column;
     overflow-y: auto;	

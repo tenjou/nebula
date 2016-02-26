@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Editor.Element.Tab", "Editor.Element",
+meta.class("Editor.Element.Tab", "Element.Basic",
 {
 	onCreate: function()
 	{

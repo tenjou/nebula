@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Element.Content", "Editor.Element",
+meta.class("Element.Content", "Element.Basic",
 {
 	createSection: function(name)
 	{

@@ -1,12 +1,13 @@
 "use strict";
 
-meta.class("Editor.Element.Toolbar", "Editor.Element",
+meta.class("Element.Toolbar", "Element.Basic",
 {
 	onCreate: function()
 	{
 		this.tabData = {};
 
 		this.tabs = new Editor.Element.Tabs(this);
+		this.container = new Element.Container(this);
 	},
 
 	onTabChange: function(tabName)
@@ -20,8 +21,21 @@ meta.class("Editor.Element.Toolbar", "Editor.Element",
 		editor.inputParser.parse(tab.content, inputData);
 	},
 
+	set width(value) 
+	{
+		if(this._width === value) { return; }
+
+		this._width = value;
+		this.element.style.flex = "0 0 " + value + "px";
+	},
+
+	get width() {
+		return this._width;
+	},
+
 	//
 	elementTag: "toolbar",
 
-	tabs: null
+	tabs: null,
+	_width: 0
 });

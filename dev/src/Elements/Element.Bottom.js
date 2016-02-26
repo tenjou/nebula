@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Editor.Element.Bottom", "Editor.Element",
+meta.class("Element.Bottom", "Element.Basic",
 {
 	//
 	elementTag: "bottom"

@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Element.List", "Editor.Element",
+meta.class("Element.List", "Element.Basic",
 {
 	onCreate: function()
 	{

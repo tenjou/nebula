@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Element.WrappedElement", "Editor.Element",
+meta.class("Element.WrappedElement", "Element.Basic",
 {
 	init: function(tagName, parent) {
 		this.elementTag = tagName;

@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Element.Icon", "Editor.Element",
+meta.class("Element.Icon", "Element.Basic",
 {
 	set type(type) {
 		this.element.setAttribute("class", "fa " + type);

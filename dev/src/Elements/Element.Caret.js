@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Element.Caret", "Editor.Element",
+meta.class("Element.Caret", "Element.Basic",
 {
 	onCreate: function() {
 		this.element.onclick = this._handleOnClick;

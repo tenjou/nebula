@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Element.Section", "Editor.Element",
+meta.class("Element.Section", "Element.Basic",
 {
 	//
 	elementTag: "section"

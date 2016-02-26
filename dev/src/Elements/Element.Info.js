@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Element.Info", "Editor.Element",
+meta.class("Element.Info", "Element.Basic",
 {
 	set value(str) {
 		this.element.innerHTML = str;

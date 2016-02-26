@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Element.Number", "Editor.Element",
+meta.class("Element.Number", "Element.Basic",
 {
 	onCreate: function() {
 		this.element.setAttribute("type", "text");

@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Editor.Element",
+meta.class("Element.Basic",
 {
 	init: function(parent)
 	{

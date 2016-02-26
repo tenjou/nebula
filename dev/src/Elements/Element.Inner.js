@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Editor.Element.Inner", "Editor.Element",
+meta.class("Element.Inner", "Element.Basic",
 {
 	onCreate: function()
 	{
@@ -19,12 +19,16 @@ meta.class("Editor.Element.Inner", "Editor.Element",
 			}
 		};		
 
-		this.leftToolbar = new Editor.Element.Toolbar(this);
+		this.leftToolbar = new Element.Toolbar(this);
+		this.leftToolbar.width = 270;
 		// this.leftToolbar.createTab("Assets", Element.AssetsTab);
 		// this.leftToolbar.loadTab("Assets", assetsData);
 		// this.leftToolbar.loadTab("Tools", toolsData);
 
-		this.roomToolbar = new Editor.Element.ToolbarRoom(this);
+		this.roomToolbar = new Element.ToolbarRoom(this);
+		// this.roomToolbar.createTab("Inspect", {});
+		// this.roomToolbar.createTab("Palette", {});
+		// this.roomToolbar.createTab("Test", {});		
 
 		var inspectData = {
 			Properties: {
@@ -52,10 +56,11 @@ meta.class("Editor.Element.Inner", "Editor.Element",
 			}
 		};		
 
-		this.rightToolbar = new Editor.Element.Toolbar(this);
-		this.rightToolbar.createTab("Inspect", inspectData);
-		this.rightToolbar.createTab("Palette", paletteData);
-		this.rightToolbar.createTab("Test", {});
+		this.rightToolbar = new Element.Toolbar(this);
+		this.rightToolbar.width = 270;
+		// this.rightToolbar.createTab("Inspect", inspectData);
+		// this.rightToolbar.createTab("Palette", paletteData);
+		// this.rightToolbar.createTab("Test", {});
 	},
 
 	onCreateParticles: function()
