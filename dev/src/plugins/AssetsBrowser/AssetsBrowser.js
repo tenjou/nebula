@@ -21,7 +21,8 @@ meta.class("Editor.Plugin.AssetsBrowser", "Editor.Plugin",
 	onDbLoad: function(db)
 	{
 		if(!db.assets) {
-			db.assets = {};
+			this.db = {};
+			db.assets = this.db;
 			editor.needSave = true;
 			return;
 		}
