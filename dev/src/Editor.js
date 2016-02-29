@@ -4,11 +4,12 @@ meta.class("Editor",
 {
 	init: function()
 	{
-		this.prepareUI();
-
 		this.inputParser = new Editor.InputParser();
 		this.resourceMgr = new Editor.ResourceManager();
+	},
 
+	prepare: function()
+	{
 		this.fileSystem = new Editor.FileSystem();
 		this.fileSystem.onReady.add(this.handleFileSystemReady, this);
 	},
@@ -20,53 +21,107 @@ meta.class("Editor",
 		this.overlay = new Element.WrappedElement("overlay");		
 		this.info = new Element.Info(this.overlay);
 		this.info.value = "Initializing";
+
+		this.loadPlugins();
+
+		this.info.active = false;
 	},
 
 	handleFileSystemReady: function(data, event)
 	{
-		this.loadLayout();
-	},
-
-	loadLayout: function()
-	{
-		this.info.active = false;
-
-		this.loadPlugins();
-	},
-
-	createTop: function()
-	{
-		this.top = new Element.Top(this.wrapper);
-	},
-
-	createInner: function()
-	{
-		this.inner = new Element.Inner(this.wrapper);
-	},
-
-	createBottom: function()
-	{
-		this.bottom = new Element.Bottom(this.wrapper);
+		this.prepareUI();
+		this.onSplashStart();
 	},
 
 	loadPlugins: function()
 	{
-		var plugin = new Plugin.ProjectWindow();
+		this.plugins = {};
+
+		for(var key in Editor.Plugin) {
+			this.installPlugin(key);
+		}
+	},
+
+	installPlugin: function(name)
+	{
+		if(this.plugins[name]) {
+			console.error("(Editor.installPlugin) There is already installed plugin '" + name + "'");
+			return;
+		}
+
+		var plugin = new Editor.Plugin[name]();
+
+		if(plugin.install) {
+			plugin.install();
+		}
+		
+		this.plugins[name] = plugin;
 	},
 
 	loadProject: function(name)
 	{
+		this.onSplashEnd();
+
 		this.info.active = true;
 		this.info.value = "Loading Project";
 
 		this.projectName = name;
 		this.fileSystem.rootDir = name + "/";
+		this.fileSystem.fullPath = "filesystem:http://" + window.location.hostname + "/persistent/" + editor.fileSystem.rootDir;
 		this.fileSystem.read("db.json", this._handleReadDb.bind(this));	
 	},
 
 	saveCfg: function() {
 		this.fileSystem.write("db.json", JSON.stringify(this.db), this._handleSavedDb.bind(this));
 	},
+
+	onSplashStart: function()
+	{
+		var plugin;
+		for(var key in this.plugins) 
+		{
+			plugin = this.plugins[key];
+			if(plugin.onSplashStart) {
+				plugin.onSplashStart();
+			}
+		}
+	},
+
+	onSplashEnd: function()
+	{
+		var plugin;
+		for(var key in this.plugins) 
+		{
+			plugin = this.plugins[key];
+			if(plugin.onSplashEnd) {
+				plugin.onSplashEnd();
+			}
+		}
+	},	
+
+	onStart: function()
+	{
+		var plugin;
+		for(var key in this.plugins) 
+		{
+			plugin = this.plugins[key];
+			if(plugin.onStart) {
+				plugin.onStart();
+			}
+		}
+	},
+
+	onDbLoad: function()
+	{
+		var plugin;
+		for(var key in this.plugins) 
+		{
+			plugin = this.plugins[key];
+			if(plugin.onDbLoad) {
+				plugin.onDbLoad(this.db);
+			}
+		}
+	},	
 
 	_handleReadDb: function(data)
 	{
@@ -94,9 +149,21 @@ meta.class("Editor",
 
 		this.info.active = false;
 
-		//this.createTop();
-		this.createInner();
-		//this.createBottom();	
+		//this.top = new Element.Top(this.wrapper);
+		this.inner = new Element.Inner(this.wrapper);
+		//this.bottom = new Element.Bottom(this.wrapper);
+
+		this.onStart();
+		this.onDbLoad();
+
+		if(this.needSave) {
+			this.saveDb();
+		}
+	},
+
+	saveDb: function() {
+		this.fileSystem.write("db.json", JSON.stringify(this.db), this._handleSavedDb.bind(this));
+		this.needSave = false;
 	},
 
 	_handleSavedDb: function(json)
@@ -111,6 +178,8 @@ meta.class("Editor",
 	fileSystem: null,
 	inputParser: null,
 	resourceMgr: null,
+
+	plugins: null,
 
 	wrapper: null,
 	top: null,

@@ -4,7 +4,7 @@ meta.class("Element.ListItem_Asset", "Element.ListItem",
 {
 	onCreate: function()
 	{
-		var caret = new Element.Caret(this);
+		// var caret = new Element.Caret(this);
 		this._icon = new Element.Icon(this);
 		
 		this._super();
@@ -41,5 +41,6 @@ meta.class("Element.ListItem_Asset", "Element.ListItem",
 	//
 	_caret: false,
 	_icon: null,
-	_tag: null
+	_tag: null,
+	info: null
 });

@@ -1,8 +1,8 @@
 "use strict";
 
-meta.class("Plugin.ProjectWindow", 
+meta.class("Editor.Plugin.ProjectWindow", "Editor.Plugin",
 {
-	init: function()
+	install: function()
 	{
 		this.projects = {};
 
@@ -13,7 +13,10 @@ meta.class("Plugin.ProjectWindow",
 			browser.itemCls = Element.ListItem_Project;
 			browser.info = "No projects found";
 		};
+	},
 
+	onSplashStart: function()
+	{
 		var contentData = {
 			Projects: {
 				type: "containerNamed",
@@ -33,9 +36,13 @@ meta.class("Plugin.ProjectWindow",
 		this.wnd.content.ctrl = this;
 		editor.inputParser.parse(this.wnd.content, contentData);
 
-		this.browser = this.wnd.query("content/container/container/browser");
+		this.browser = this.wnd.query("content/container/container/list");
 
 		editor.fileSystem.readDir("", this.handleReadDir.bind(this));
+	},
+
+	onSplashEnd: function() {
+		this.wnd.active = false;
 	},
 
 	handleReadDir: function(dirs)
@@ -60,7 +67,7 @@ meta.class("Plugin.ProjectWindow",
 				this.createProject();
 			}
 		}
-		else if(id === "content/container/container/browser/item")
+		else if(id === "content/container/container/list/item")
 		{
 			if(event === "click") {
 				this.selectItem(element);			
@@ -69,7 +76,7 @@ meta.class("Plugin.ProjectWindow",
 				this.openProject(element.name.value);
 			}
 		}
-		else if(id === "content/container/container/browser/item/name")
+		else if(id === "content/container/container/list/item/name")
 		{
 			if(event === "update")
 			{
@@ -124,7 +131,6 @@ meta.class("Plugin.ProjectWindow",
 			return;
 		}
 
-		this.wnd.active = false;
 		editor.loadProject(name);
 	},
 

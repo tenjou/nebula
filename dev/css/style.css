@@ -73,7 +73,6 @@ button:hover button-content {
     border-bottom: 2px solid #404040;
 }
 
-
 rooms {
 	flex: 0 0 29px;
 	display: flex;
@@ -146,6 +145,7 @@ toolbar:last-child {
 }
 
 toolbar > container {
+	display: flex;
 	flex: 1 1 100%;
 	background: #535353;
 }
@@ -187,7 +187,7 @@ tab tab-content {
 	height: 18px;
 	z-index: 2;
 	padding-top: 5px;
-	padding-left: 10px;
+	padding-left: 9px;
 	padding-right: 10px;
 	border-top: 2px solid #4a4a4a;
 	text-align: center;
@@ -282,7 +282,7 @@ content tag {
     line-height: 11px;
 }
 
-content browser {
+content list {
 	display: flex;
 	flex: 100%;
 	flex-direction: column;
@@ -290,7 +290,7 @@ content browser {
 	padding-left: 2px;
 	padding-right: 2px;
 }
-content browser info {
+content list info {
 	width: 100%;	
 	display: flex;
 	align-items: center;
@@ -299,26 +299,26 @@ content browser info {
 	font-size: 11px;
 }
 
-content browser item {
+content list item {
 	display: block;
 	padding: 1px;
 	color: #fff;
 	font-size: 11px;
 	cursor: pointer;
 }
-content browser item.active,
-content browser item:hover {
+content list item.active,
+content list item:hover {
 	background: #6e7d92;
 }
-content browser item icon {
+content list item icon {
 	padding: 4px;
 	font-size: 14px !important;
 }
-content browser item name {
+content list item name {
 	cursor: pointer;
 	outline: none;
 }
-content browser item name:focus {
+content list item name:focus {
 	outline: 2px solid #68A7CC;
 }
 content close {

@@ -71,7 +71,11 @@ meta.class("Element.Basic",
 		}
 		bufferStr += buffer[n];
 
-		var element = this.element.querySelector(bufferStr)
+		var element = this.element.querySelector(bufferStr);
+		if(!element) {
+			return null;
+		}
+
 		return element.holder;
 	},
 

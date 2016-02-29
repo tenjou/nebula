@@ -2,6 +2,23 @@
 
 meta.class("Editor.ResourceManager",
 {
+	getTypeFromExt: function(ext)
+	{
+		var extInfo = this.ext[ext];
+		if(!extInfo) {
+			console.warn("(Editor.ResourceManager.getTypeFromExt): There is no such extensions defined: " + ext);
+			return null;
+		}
+
+		var typeInfo = this.types[extInfo];
+		if(!typeInfo) {
+			console.warn("(Editor.ResourceManager.getTypeFromExt): There is no such types defined: " + ext);
+			return null;
+		}
+
+		return extInfo;
+	},
+
 	getIconFromExt: function(ext)
 	{
 		var extInfo = this.ext[ext];

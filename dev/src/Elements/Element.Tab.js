@@ -13,7 +13,7 @@ meta.class("Editor.Element.Tab", "Element.Basic",
 		var hidder = document.createElement("hidder");
 		inner.appendChild(hidder);
 
-		this.content = new Element.Content(this.parent.parent.parent);
+		this.content = new Element.Content(this.parent.parent.parent.container);
 		this.content.hidden = true;
 
 		this.element.onclick = this._handleClick.bind(this);

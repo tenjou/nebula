@@ -360,5 +360,6 @@ meta.class("Editor.FileSystem",
 	fs: null,
 	onReady: null,
 
-	rootDir: ""
+	rootDir: "",
+	fullPath: ""
 });

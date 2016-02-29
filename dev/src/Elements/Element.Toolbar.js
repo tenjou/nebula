@@ -19,6 +19,7 @@ meta.class("Element.Toolbar", "Element.Basic",
 	{
 		var tab = this.tabs.createTab(name);
 		editor.inputParser.parse(tab.content, inputData);
+		return tab;
 	},
 
 	set width(value) 
@@ -37,5 +38,7 @@ meta.class("Element.Toolbar", "Element.Basic",
 	elementTag: "toolbar",
 
 	tabs: null,
+	tabCls: Element.Tab,
+
 	_width: 0
 });
