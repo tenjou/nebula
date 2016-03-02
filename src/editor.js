@@ -1,425 +1,189 @@
 "use strict";
 
-var editor =
+meta.class("Editor", 
 {
-	start: function()
+	init: function()
 	{
-		this.rooms = [];
+		this.inputParser = new Editor.InputParser();
+		this.resourceMgr = new Editor.ResourceManager();
+	},
 
-		this.createScreen();
-		this.createLoadingScreen();
-
-		var self = this;
-		window.addEventListener("resize", 
-			function() {
-				self.onResize();
-			}, false);
-
-		this.onResize();
-
-		// fileSystem:
+	prepare: function()
+	{
 		this.fileSystem = new Editor.FileSystem();
-		this.fileSystem.onReady.add(
-			function() {
-				editor.startEditor();
-			});
+		this.fileSystem.onReady.add(this.handleFileSystemReady, this);
 	},
 
-	startEditor: function()
+	prepareUI: function()
 	{
-		this.registerAllPackages();
+		this.wrapper = new Element.WrappedElement("wrapper", document.body);
+
+		this.overlay = new Element.WrappedElement("overlay", document.body);		
+		this.info = new Element.Info(this.overlay);
+		this.info.value = "Initializing";
+
+		this.loadPlugins();
+
+		this.info.enable = false;
 	},
 
-	registerAllPackages: function()
+	handleFileSystemReady: function(data, event)
 	{
-		this.state = "register-packages";
-
-		this.registerPackage("Assets");
+		this.prepareUI();
+		this.onSplashStart();
 	},
 
-	loadProjectExplorer: function()
+	loadPlugins: function()
 	{
-		var name = window.location.hash;
-		if(!name) {
-			name = "test";
-		}
-		else {
-			name = name.substr(1);
-		}
+		this.plugins = {};
 
-		this.loadWorkspace(name);
-	},
-
-	loadWorkspace: function(name)
-	{
-		this.state = "loading-workspace";
-		this.loadingText.innerHTML = "LOADING WORKSPACE";
-
-		this.data = {
-			name: name,
-			verison: this.version,
-			packages: {}
-		};		
-
-		if(!this.desktop)
-		{
-			this.fileSystem.checkDir(name, 
-				function(dirPath) 
-				{
-					window.location.hash = name;
-					editor.projectName = name;
-					editor.fileSystem.rootDir = name + "/";
-
-					if(!dirPath) {
-						editor.createProject(name);
-					}
-					else {
-						editor.dirPath = dirPath + "/";
-						editor.loadProject(name);
-					}
-				});	
-		}
-		else
-		{
-			
+		for(var key in Editor.Plugin) {
+			this.installPlugin(key);
 		}
 	},
 
-	createData: function()
+	installPlugin: function(name)
 	{
-		this.data = {
-			name: name,
-			verison: this.version,
-			packages: {}
-		};			
-	},	
+		if(this.plugins[name]) {
+			console.error("(Editor.installPlugin) There is already installed plugin '" + name + "'");
+			return;
+		}
 
-	createProject: function(name)
-	{
-		this.state = "creating-project";
+		var plugin = new Editor.Plugin[name]();
 
-		this.createData();
-		this.createProject_Folder();
-	},
-
-	createProject_Folder: function()
-	{
-		editor.fileSystem.createDir("../" + this.projectName,
-			function(dirPath) {
-				editor.dirPath = dirPath + "/";
-				editor.createProject_InstallPackages();
-			});	
-	},
-
-	createProject_InstallPackages: function()
-	{
-		this.flags |= this.Flag.UPDATE_JSON;
-		this.installPackage("Assets");
+		if(plugin.install) {
+			plugin.install();
+		}
+		
+		this.plugins[name] = plugin;
 	},
 
 	loadProject: function(name)
 	{
-		this.createData();
+		this.onSplashEnd();
 
-		this.fileSystem.read("editor.json",
-			function(result) 
-			{
-				if(result) {
-					editor.prevData = JSON.parse(result);
-					editor.installPackages(result);
-				}
-			});
+		this.info.enable = true;
+		this.info.value = "Loading Project";
+
+		this.projectName = name;
+		this.fileSystem.rootDir = name + "/";
+		this.fileSystem.fullPath = "filesystem:http://" + window.location.hostname + "/persistent/" + editor.fileSystem.rootDir;
+		this.fileSystem.read("db.json", this._handleReadDb.bind(this));	
 	},
 
-	finishLoading: function()
+	saveCfg: function() {
+		this.fileSystem.write("db.json", JSON.stringify(this.db), this._handleSavedDb.bind(this));
+	},
+
+	onSplashStart: function()
 	{
-		this.state = "finish-loading";
-		this.prevData = null;
-
-		this.handleConfig();
-		this.loadingScreen.style.display = "none";
-	},
-
-	handleConfig: function()
-	{
-		this.onResize();
-
-		if(this.flags & this.Flag.UPDATE_JSON) {
-			this.save();
-		}
-	},
-
-	save: function()
-	{
-		var contents = JSON.stringify(this.data);
-		var self = this;
-
-		this.fileSystem.write("editor.json", contents,
-			function() {
-				self.flags &= ~self.Flag.UPDATE_JSON;
-				console.log("(JSON Updated)");
-			});
-	},
-
-	registerRoom: function(room) 
-	{
-		room.load();
-		this.rooms.push(room);
-	},
-
-	createScreen: function()
-	{
-		this.screen = document.createElement("div");
-		this.screen.setAttribute("class", "screen");
-		document.body.appendChild(this.screen);
-
-		this.createMenu();
-
-		this.innerScreen = document.createElement("div");
-		this.innerScreen.setAttribute("class", "inner");
-		this.screen.appendChild(this.innerScreen);
-
-		var layoutHolder = document.createElement("div");
-		layoutHolder.setAttribute("class", "layout-holder");
-		this.innerScreen.appendChild(layoutHolder);
-
-		var leftMenu = document.createElement("div");
-		leftMenu.setAttribute("class", "left-menu")
-		layoutHolder.appendChild(leftMenu);
-
-		var content = document.createElement("div");
-		content.setAttribute("class", "content");
-		layoutHolder.appendChild(content);
-
-		var rightMenu = document.createElement("div");
-		rightMenu.setAttribute("class", "right-menu")
-		layoutHolder.appendChild(rightMenu);
-
-		this.innerScreen = content;		
-	},
-
-	createMenu: function()
-	{
-		this.menu = document.createElement("div");
-		this.menu.setAttribute("class", "menu");
-		this.screen.appendChild(this.menu);		
-
-		var homeButton = document.createElement("div");
-		homeButton.setAttribute("class", "home-button");
-		homeButton.innerHTML = "meta";
-		this.menu.appendChild(homeButton);
-	},
-
-	createLoadingScreen: function()
-	{
-		this.loadingScreen = document.createElement("div");
-		this.loadingScreen.setAttribute("id", "loading-screen");
-		
-		this.loadingText = document.createElement("span");
-		this.loadingText.innerHTML = "LOADING";
-		this.loadingScreen.appendChild(this.loadingText);
-
-		this.screen.appendChild(this.loadingScreen);
-	},
-
-	onResize: function()
-	{
-	},
-
-	set state(name) {
-		this._state = name;
-		console.log("(State)", name);
-	},
-
-	registerPackage: function(name)
-	{
-		this.packagesToRegister++;
-
-		var self = this;
-		meta.ajax({
-			url: "packages/" + name + "/package.json",
-			dataType: "json",
-			success: 
-				function(data) { 
-					self._handleRegisterPackage(data);
-				},
-			error: 
-				function() { 
-					console.error("(editor.registerPackage) Could not load \"" + name + "/package.json\"");
-				}
-		});
-	},
-
-	_handleRegisterPackage: function(info)
-	{
-		var module = new Editor.Module();
-		module.info = info;
-		this.packages[info.name] = module;
-
-		console.log("Package registered: \"" + info.name + "\"");
-
-		this.packagesToRegister--;
-		if(this.packagesToRegister === 0) {
-			this.loadProjectExplorer();
-		}
-	},
-	
-	_includeScript: function(path, moduleName, cb)
-	{
-		var self = this;
-
-		meta.ajax
-		({
-			url: path,
-			success: function(data) 
-			{
-				var text = "var module = editor.package(\"" + moduleName + "\");\n(function(module)\n{\n" + 
-					data + "\n})(module);\n\n//# sourceURL=http://" + path;
-				var script = document.createElement("script");
-				script.text = text;
-				document.head.appendChild(script);
-
-				cb();
+		var plugin;
+		for(var key in this.plugins) 
+		{
+			plugin = this.plugins[key];
+			if(plugin.onSplashStart) {
+				plugin.onSplashStart();
 			}
-		});
+		}
 	},
 
-	installPackages: function()
+	onSplashEnd: function()
 	{
-		this.state = "install-packages";
-
-		var packages = this.prevData.packages;
-		for(var key in packages) {
-			this.installPackage(key);
+		var plugin;
+		for(var key in this.plugins) 
+		{
+			plugin = this.plugins[key];
+			if(plugin.onSplashEnd) {
+				plugin.onSplashEnd();
+			}
 		}
 	},	
 
-	installPackage: function(name)
+	onStart: function()
 	{
-		this.packagesToInstall++;
-
-		var self = this;
-		var module = this.package(name);
-		var path = "packages/" + name + "/" + module.info.main;
-
-		this._includeScript(path, name, 
-			function() {
-				self.handlePackageIncludes(module);
-			});
+		var plugin;
+		for(var key in this.plugins) 
+		{
+			plugin = this.plugins[key];
+			if(plugin.onStart) {
+				plugin.onStart();
+			}
+		}
 	},
 
-	handlePackageIncludes: function(module)
+	onDbLoad: function()
 	{
-		var includes = module.info.include;
-		if(includes) 
+		var plugin;
+		for(var key in this.plugins) 
 		{
-			var self = this;
-			var includeLoadedFunc = function() {
-				module.includesToLoad--;
-				if(module.includesToLoad === 0) {
-					self.handlePackageInstall(module);
-				} 
-			};
-
-			var path;
-			var num = includes.length;
-
-			module.includesToLoad = num;
-
-			for(var n = 0; n < num; n++)
-			{
-				path = "packages/" + module.info.name + "/" + includes[n];
-				this._includeScript(path, module.info.name, includeLoadedFunc)
+			plugin = this.plugins[key];
+			if(plugin.onDbLoad) {
+				plugin.onDbLoad(this.db);
 			}
+		}
+	},	
+
+	_handleReadDb: function(data)
+	{
+		if(!data) {
+			this.fileSystem.create("db.json", this._handleCreateDb.bind(this));
 		}
 		else {
-			this.handlePackageInstall(module);
+			this._handleLoadDb(data);
 		}
 	},
 
-	handlePackageInstall: function(module) 
+	_handleCreateDb: function()
 	{
-		var data = null;
+		var db = {
+			name: this.projectName,
+			version: this.version
+		};
+		this.fileSystem.write("db.json", JSON.stringify(db), this._handleLoadDb.bind(this));
+	},
 
-		if(this.prevData) {
-			data = this.prevData.packages[module.info.name];
-		}
-		if(!data) {
-			data = module.exports.createData();
-		}			
+	_handleLoadDb: function(json)
+	{
+		this.db = JSON.parse(json);
+		this.projectName = this.db.name;
 
-		module.data = data;
-		this.data.packages[module.info.name] = data;	
+		this.info.enable = false;
 
-		module.exports.install();
+		//this.top = new Element.Top(this.wrapper);
+		this.inner = new Element.Inner(this.wrapper);
+		//this.bottom = new Element.Bottom(this.wrapper);
 
-		if(!module.loading) {
-			this.packageLoaded(module);
+		this.onStart();
+		this.onDbLoad();
+
+		if(this.needSave) {
+			this.saveDb();
 		}
 	},
 
-	uninstallPackage: function(name)
-	{
-
-	},	
-
-	packageLoaded: function(module)
-	{
-		console.log("Package installed: \"" + module.info.name + "\"");
-
-		this.packagesToInstall--;
-		if(this.packagesToInstall === 0) {
-			this.finishLoading();
-		}		
+	saveDb: function() {
+		this.fileSystem.write("db.json", JSON.stringify(this.db), this._handleSavedDb.bind(this));
+		this.needSave = false;
 	},
 
-	package: function(name) 
+	_handleSavedDb: function(json)
 	{
-		var module = this.packages[name];
-		if(!module) {
-			console.warn("(editor.package) No such installed or registered: " + name);
-			return null;
-		}
-
-		return module;
-	},
-
-	Flag: {
-		UPDATE_JSON: 1
+		console.log("db-saved");
 	},
 
 	//
-	projectName: null,
-	dirPath: null,
-	data: null,
-	prevData: null,
-	version: "0.0.1",
+	db: null,
+	version: "0.1",
+	
+	fileSystem: null,
+	inputParser: null,
+	resourceMgr: null,
 
-	_state: "",
+	plugins: null,
 
-	screen: null,
-	innerScreen: null,
-	menu: null,
-	loadingScreen: null,
-	loadingText: null,
-
-	header: null,
-	widget: null,
-
-	screenWidth: 0,
-	screenHeight: 0,
-
-	rooms: null,
-
-	packages: {},
-	packagesToRegister: 0,
-	packagesToInstall: 0,
-
-	flags: 0,
-	desktop: false
-};
-
-meta.onInit = function() {
-	meta.engine.container = document.getElementById("stuff");
-	editor.start();
-};
+	wrapper: null,
+	top: null,
+	inner: null,
+	bottom: null,
+	overlay: null
+});

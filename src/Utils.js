@@ -13,8 +13,12 @@ function dataURItoBlob(dataURI, type)
 	return new Blob([ array ], { type: type });
 }
 
-function findAncestor(childNode, cls) 
+meta.selectElementContents = function(element) 
 {
-    while((childNode = childNode.parentElement) && !childNode.classList.contains(cls));
-    return childNode;
-}
+	var range = document.createRange();
+	range.selectNodeContents(element);
+
+	var selection = window.getSelection();
+	selection.removeAllRanges();
+	selection.addRange(range);
+};

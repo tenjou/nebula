@@ -46,7 +46,7 @@ meta.class("Editor.FileSystem",
 				}				
 			},
 			function(fileError) {
-				self.handleError(fileError, "create", filename);
+				self.handleError(fileError, cb, "create", filename);
 			});
 	},
 
@@ -61,7 +61,7 @@ meta.class("Editor.FileSystem",
 				self.handleReadDone(fileEntry, cb);
 			},
 			function(fileError) {
-				self.handleError(fileError, cb, "create", filename);
+				self.handleError(fileError, cb, "read", filename);
 			});
 	},
 
@@ -112,7 +112,7 @@ meta.class("Editor.FileSystem",
 					fileWritter.onwriteend = function() 
 					{
 						if(cb) {
-							cb(true);
+							cb(contents);
 						}						
 					}
 
@@ -124,7 +124,7 @@ meta.class("Editor.FileSystem",
 				{
 					console.error("(FileSystem::write) Could not write in " + fileEntry.name);
 					if(cb) {
-						cb(false);
+						cb(null);
 					}
 				};
 
@@ -305,6 +305,38 @@ meta.class("Editor.FileSystem",
 
 	},
 
+	moveToDir: function(path, targetPath, cb)
+	{
+		var self = this;
+
+		var targetPathIndex = targetPath.lastIndexOf("/") + 1;
+
+		this.fs.getDirectory(this.rootDir + path, {},
+			function(parentDirEntry) 
+			{
+				self.fs.getDirectory(self.rootDir + targetPath.substr(0, targetPathIndex), {},
+					function(dirEntry)
+					{
+						parentDirEntry.moveTo(dirEntry, targetPath.substr(targetPathIndex),
+							function(newDirEntry) 
+							{
+								if(cb) {
+									cb(newDirEntry.toURL());
+								}
+							},
+						function(fileError) {
+							self.handleError(fileError, cb, "rename", path);
+						});
+					},
+					function(fileError) {
+						self.handleError(fileError, cb, "rename-getDir", path);
+					});
+			},
+			function(fileError) {
+				self.handleError(fileError, cb, "rename-getParentDir", path);
+			});
+	},
+
 	handleError: function(fileError, cb, type, filename) 
 	{
 		if(type === "read" && fileError.name !== "NotFoundError")
@@ -328,5 +360,6 @@ meta.class("Editor.FileSystem",
 	fs: null,
 	onReady: null,
 
-	rootDir: ""
+	rootDir: "",
+	fullPath: ""
 });
