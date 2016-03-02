@@ -21,8 +21,6 @@ meta.class("Editor.Plugin.AssetsBrowser", "Editor.Plugin",
 		var leftToolbar = editor.inner.leftToolbar;
 		var tab = leftToolbar.createTab("Assets");
 		tab.content = this.content;
-
-		var tab = leftToolbar.createTab("Hierarchy");
 	},
 
 	onDbLoad: function(db)
