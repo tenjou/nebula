@@ -1,8 +1,8 @@
 "use strict";
 
-meta.class("Hierarchy", 
+Editor.Plugin("Hierarchy", 
 {
-	load: function()
+	onStart: function()
 	{
 		var leftToolbar = editor.inner.leftToolbar;
 		var tab = leftToolbar.createTab("Hierarchy");
