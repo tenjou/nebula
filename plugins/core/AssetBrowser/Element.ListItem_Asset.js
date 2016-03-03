@@ -10,6 +10,18 @@ meta.class("Element.ListItem_Asset", "Element.ListItem",
 		this._super();
 
 		this._tag = new Element.Tag(this);
+
+		this.on("menu", "*", this.openMenu.bind(this));
+	},
+
+	openMenu: function(event)
+	{
+		var contextMenu = editor.plugins.ContextMenu;
+		contextMenu.show([ "Delete" ], event.x, event.y, this.handleMenuChoice.bind(this));
+	},
+
+	handleMenuChoice: function(event) {
+
 	},
 
 	set caret(value) 

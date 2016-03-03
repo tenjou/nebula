@@ -3,11 +3,11 @@
 meta.class("Element.H2", "Element.Basic",
 {
 	set value(str) {
-		this.element.innerHTML = str;
+		this.domElement.innerHTML = str;
 	},
 
 	get value() {
-		return this.element.innerHTML;
+		return this.domElement.innerHTML;
 	},
 
 	//

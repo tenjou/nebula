@@ -5,13 +5,13 @@ meta.class("Element.Button", "Element.Basic",
 	onCreate: function()
 	{
 		this._value = document.createElement("button-content");
-		this.element.appendChild(this._value);
+		this.domElement.appendChild(this._value);
 
-		this.element.onmouseup = this._handleClick.bind(this);
+		this.domElement.onmouseup = this.handleClick.bind(this);
 	},
 
-	_handleClick: function(event) {
-		this.emit("click");
+	handleClick: function(domEvent) {
+		this.emit("click", domEvent);
 	},
 
 	set value(str) {

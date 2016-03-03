@@ -3,18 +3,18 @@
 meta.class("Element.Number", "Element.Basic",
 {
 	onCreate: function() {
-		this.element.setAttribute("type", "text");
-		this.element.value = "0";
-		this.element.onkeydown = this._handleOnKeyDown;
-		this.element.onchange = this._handleOnChange;
+		this.domElement.setAttribute("type", "text");
+		this.domElement.value = "0";
+		this.domElement.onkeydown = this.handleOnKeyDown;
+		this.domElement.onchange = this.handleOnChange;
 	},
 
-	_handleOnKeyDown: function(event) 
+	handleOnKeyDown: function(domEvent) 
 	{
-		if(event.ctrlKey) { return; }
+		if(domEvent.ctrlKey) { return; }
 
-		var keyCode = event.keyCode;
-		var value = event.target.value;
+		var keyCode = domEvent.keyCode;
+		var value = domEvent.target.value;
 
 		switch(keyCode)
 		{
@@ -22,14 +22,14 @@ meta.class("Element.Number", "Element.Basic",
 				return;
 
 			case 27: // Esc
-				event.target.value = "0";
+				domEvent.target.value = "0";
 				return;
 
 			case 187: // +
 			case 189: // -
 			{
 				if(value.length !== 0) {
-					event.preventDefault();
+					domEvent.preventDefault();
 				}
 			} return;
 
@@ -37,34 +37,34 @@ meta.class("Element.Number", "Element.Basic",
 			{
 				var firstIndex = value.indexOf(".");
 				if(firstIndex !== -1) {
-					event.preventDefault();
+					domEvent.preventDefault();
 				}
 			} return;
 		}
 
 		var key = String.fromCharCode(keyCode)
 		if(isNaN(key)) {
-			event.preventDefault();
+			domEvent.preventDefault();
 		}
 	},
 
-	_handleOnChange: function(event)
+	handleOnChange: function(domEvent)
 	{
-		var value = parseFloat(event.target.value);
+		var value = parseFloat(domEvent.target.value);
 		if(isNaN(value)) {
 			value = "0";
 		}
 		else {
-			event.target.value = value;
+			domEvent.target.value = value;
 		}
 	},
 
 	set value(value) {
-		this.element.value = value;
+		this.domElement.value = value;
 	},
 
 	get value() {
-		return this.element.value;
+		return this.domElement.value;
 	},
 
 	//

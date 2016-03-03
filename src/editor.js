@@ -3,7 +3,7 @@
 meta.class("Editor", 
 {
 	init: function()
-	{
+	{		
 		this.inputParser = new Editor.InputParser();
 		this.resourceMgr = new Editor.ResourceManager();
 	},
@@ -16,7 +16,7 @@ meta.class("Editor",
 
 	prepareUI: function()
 	{
-		this.wrapper = new Element.WrappedElement("wrapper", document.body);
+		this.wrapper = new Element.Wrapper(document.body);
 
 		this.overlay = new Element.WrappedElement("overlay", document.body);		
 		this.info = new Element.Info(this.overlay);

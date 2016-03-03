@@ -28,7 +28,7 @@ meta.class("Element.ProjectWindow", "Element.Window",
 		this.content.on("update", "Projects.Browser.list.item.name", this.renameProject.bind(this));
 	},
 
-	createProject: function(element)
+	createProject: function(event)
 	{
 		if(this.selectedItem) {
 			this.selectedItem.select = false;
@@ -44,9 +44,9 @@ meta.class("Element.ProjectWindow", "Element.Window",
 		editor.fileSystem.createDir(name);
 	},
 
-	openProject: function(element)
+	openProject: function(event)
 	{
-		var name = element.name;
+		var name = event.element.name;
 
 		if(!this.plugin.projects[name]) {
 			console.error("(Element.ProjectWindow.openProject) No such project found: " + name);
@@ -56,18 +56,22 @@ meta.class("Element.ProjectWindow", "Element.Window",
 		editor.loadProject(name);
 	},
 
-	renameProject: function(element)
+	renameProject: function(event)
 	{
 		var projects = this.plugin.projects;
+		
+		var element = event.element;
+		var newName = element.value;
+		var prevName = element.prevValue;
 
-		if(projects[element.value]) {
+		if(projects[newName]) {
 			element.revert();
 		}
 		else 
 		{
-			projects[element.value] = projects[element.prevValue];
-			delete projects[element.prevValue];
-			editor.fileSystem.moveToDir(element.prevValue, element.value);
+			projects[newName] = projects[prevName];
+			delete projects[prevName];
+			editor.fileSystem.moveToDir(prevName, newName);
 		}		
 	},
 

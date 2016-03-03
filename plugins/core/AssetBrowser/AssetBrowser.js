@@ -19,7 +19,7 @@ meta.class("Editor.Plugin.AssetsBrowser", "Editor.Plugin",
 		this.content = new Element.Content_Asset();
 
 		var leftToolbar = editor.inner.leftToolbar;
-		var tab = leftToolbar.createTab("Assets");
+		var tab = leftToolbar.createTab("Project");
 		tab.content = this.content;
 	},
 

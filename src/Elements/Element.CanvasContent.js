@@ -5,22 +5,22 @@ meta.class("Editor.Element.CanvasContent", "Element.Basic",
 	onCreate: function()
 	{
 		// this.canvas = document.createElement("canvas");
-		// this.element.appendChild(this.canvas);
+		// this.domElement.appendChild(this.canvas);
 	},
 
 	set hidden(value) 
 	{
 		if(value) {
-			this.element.setAttribute("class", "hidden");
+			this.domElement.setAttribute("class", "hidden");
 		}
 		else {
-			this.element.setAttribute("class", "");
+			this.domElement.setAttribute("class", "");
 		}
 	},
 
 	get hidden() 
 	{
-		var cls = this.element.getAttribute("class");
+		var cls = this.domElement.getAttribute("class");
 		if(cls === "hidden") {
 			return true;
 		}

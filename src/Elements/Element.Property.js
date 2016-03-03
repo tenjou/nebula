@@ -6,7 +6,7 @@ meta.class("Element.Property", "Element.Basic",
 	{
 		var nameElement = document.createElement("span");
 		nameElement.innerHTML = name;
-		this.element.appendChild(nameElement);
+		this.domElement.appendChild(nameElement);
 	},
 
 	addInput: function(data)
@@ -21,7 +21,7 @@ meta.class("Element.Property", "Element.Basic",
 			input.value = data;
 		}
 
-		this.element.appendChild(input);
+		this.domElement.appendChild(input);
 	},	
 
 	//

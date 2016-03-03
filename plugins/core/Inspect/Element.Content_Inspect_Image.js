@@ -22,7 +22,7 @@ meta.class("Element.Content_Inspect_Image", "Element.Content",
 			}
 		};
 
-		this.on("update", "*", this.updateName.bind(this));
+		this.on("update", "General.Name", this.updateName.bind(this));
 	},
 
 	fill: function(data)
@@ -31,9 +31,9 @@ meta.class("Element.Content_Inspect_Image", "Element.Content",
 		this.get("Image.Image").value = editor.fileSystem.fullPath + data.name + "." + data.ext;
 	},
 
-	updateName: function(element)
+	updateName: function(event)
 	{
-		if(!this.assetsPlugin.renameSelectedItem(element.value)) {
+		if(!this.assetsPlugin.renameSelectedItem(event.element.value)) {
 			element.revert();
 		}
 	},

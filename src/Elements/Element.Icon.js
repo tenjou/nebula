@@ -3,7 +3,7 @@
 meta.class("Element.Icon", "Element.Basic",
 {
 	set type(type) {
-		this.element.setAttribute("class", "fa " + type);
+		this.domElement.setAttribute("class", "fa " + type);
 	},
 
 	//

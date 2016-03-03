@@ -4,8 +4,7 @@ meta.class("Element.Close", "Element.Basic",
 {
 	onCreate: function()
 	{
-		this.element.setAttribute("class", "fa fa-close");
-
+		this.domElement.setAttribute("class", "fa fa-close");
 	},
 
 	//

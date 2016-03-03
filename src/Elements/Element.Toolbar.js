@@ -17,10 +17,6 @@ meta.class("Element.Toolbar", "Element.Basic",
 
 	createTab: function(name)
 	{
-		//this.append(content.element);
-		//content.append(this.element);
-		//content.hidden = true;
-
 		var tab = this.tabs.createTab(name);
 		tab.parentContainer = this.container;
 		return tab;
@@ -31,7 +27,7 @@ meta.class("Element.Toolbar", "Element.Basic",
 		if(this._width === value) { return; }
 
 		this._width = value;
-		this.element.style.flex = "0 0 " + value + "px";
+		this.domElement.style.flex = "0 0 " + value + "px";
 	},
 
 	get width() {

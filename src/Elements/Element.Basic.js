@@ -13,8 +13,8 @@ meta.class("Element.Basic",
 
 	_init: function(parent, id)
 	{
-		this.element = document.createElement(this.elementTag);
-		this.element.holder = this;
+		this.domElement = document.createElement(this.elementTag);
+		this.domElement.holder = this;
 
 		if(id) {
 			this.id = id;
@@ -23,11 +23,11 @@ meta.class("Element.Basic",
 		if(parent)
 		{
 			if(parent instanceof Element.Basic) {
-				parent.append(this.element);
+				parent.append(this.domElement);
 				this.parent = parent;
 			}
 			else if(parent instanceof Element) {
-				parent.appendChild(this.element);	
+				parent.appendChild(this.domElement);	
 			}
 		}		
 	},
@@ -37,34 +37,50 @@ meta.class("Element.Basic",
 	append: function(element) 
 	{
 		if(element instanceof Element.Basic) {
-			this.element.appendChild(element.element);
+			this.domElement.appendChild(element.domElement);
+			element.parent = this;
 		}
 		else {
-			this.element.appendChild(element);
+			this.domElement.appendChild(element);
 		}
 	},
 
 	remove: function(element)
 	{
 		if(element instanceof Element.Basic) {
-			this.element.removeChild(element.element);
+			this.domElement.removeChild(element.domElement);
+			element.parent = null;
 		}
 		else {
-			this.element.removeChild(element);
+			this.domElement.removeChild(element);
 		}
 	},
 
-	emit: function(event) {
-		this._emit("", event, this);
+	emit: function(eventName, domEvent) 
+	{
+		var event = new this.Event();
+		event.element = this;
+		event.name = eventName;
+		event.id = "";
+
+		if(domEvent) 
+		{
+			event.domEvent = domEvent;
+			event.x = domEvent.clientX;
+			event.y = domEvent.clientY;
+			this.updateEventElementOffset(event);
+		}
+
+		this._emit(event);
 	},
 
-	_emit: function(id, event, element) 
+	_emit: function(event) 
 	{
 		if(this.pickable && this.events) 
 		{
 			var eventBuffer;
-			if(this.events[event]) {
-				eventBuffer = this.events[event];
+			if(this.events[event.name]) {
+				eventBuffer = this.events[event.name];
 			}
 			else if(this.events["*"]) {
 				eventBuffer = this.events["*"];
@@ -72,11 +88,11 @@ meta.class("Element.Basic",
 
 			if(eventBuffer)
 			{
-				if(eventBuffer[id]) {
-					eventBuffer[id](element, id, event);
+				if(eventBuffer[event.id]) {
+					eventBuffer[event.id](event);
 				}
 				else if(eventBuffer["*"]) {
-					eventBuffer["*"](element, id, event);
+					eventBuffer["*"](event);
 				}
 			}
 		}
@@ -87,15 +103,15 @@ meta.class("Element.Basic",
 
 		if(this.pickable)
 		{
-			if(!id) {
-				id = this.id ? this.id : this.elementTag;
+			if(!event.id) {
+				event.id = this.id ? this.id : this.elementTag;
 			}
 			else {
-				id = (this.id ? this.id : this.elementTag) + "." + id;
+				event.id = (this.id ? this.id : this.elementTag) + "." + event.id;
 			}
 		}
 		
-		this.parent._emit(id, event, element);
+		this.parent._emit(event);
 	},
 
 	on: function(event, id, cb)
@@ -116,6 +132,31 @@ meta.class("Element.Basic",
 		eventBuffer[id] = cb;
 	},
 
+	updateEventElementOffset: function(event)
+	{
+		var offsetLeft = 0;
+		var offsetTop = 0;
+
+		var domElement = event.element.domElement;
+		if(domElement.offsetParent)
+		{
+			do 
+			{
+				if(domElement.tagName === "IFRAME") {
+					offsetLeft += domElement.offsetLeft;
+					offsetTop += domElement.offsetTop;
+				}
+
+			} while(domElement = domElement.offsetParent);
+		}
+
+		if(event.element.domElement.tagName === "IFRAME") {
+			var rect = event.element.domElement.getBoundingClientRect();
+			event.x += rect.left;
+			event.y += rect.top;
+		}
+	},
+
 	set enable(value) 
 	{
 		if(value === this._enabled) { return; }
@@ -123,10 +164,10 @@ meta.class("Element.Basic",
 		this._enabled = value;
 
 		if(value) {
-			this.parent.element.appendChild(this.element);
+			this.parent.domElement.appendChild(this.domElement);
 		}
 		else {
-			this.parent.element.removeChild(this.element);
+			this.parent.domElement.removeChild(this.domElement);
 		}
 	},
 
@@ -141,10 +182,10 @@ meta.class("Element.Basic",
 		this._visible = value;
 
 		if(value) {
-			this.element.setAttribute("class", "");
+			this.domElement.setAttribute("class", "");
 		}
 		else {
-			this.element.setAttribute("class", "hidden");
+			this.domElement.setAttribute("class", "hidden");
 		}
 	},
 
@@ -152,12 +193,22 @@ meta.class("Element.Basic",
 		return this._visible;
 	},
 
+	Event: function() 
+	{
+		this.element = null;
+		this.id = null;
+		this.name = null;
+		this.domEvent = null;
+		this.x = 0;
+		this.y = 0;
+	},
+
 	//
 	parent: null,
 	events: null,
 
 	id: null,
-	element: null,
+	domElement: null,
 	elementTag: "div",
 
 	pickable: true,

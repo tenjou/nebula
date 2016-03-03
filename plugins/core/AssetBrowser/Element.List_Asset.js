@@ -4,37 +4,37 @@ meta.class("Element.List_Asset", "Element.List",
 {
 	onCreate: function()
 	{
-		this.element.ondragover = this._handleOnDragOver.bind(this);
-		this.element.ondrop = this._handleOnDrop.bind(this);		
+		this.domElement.ondragover = this.handleOnDragOver.bind(this);
+		this.domElement.ondrop = this.handleOnDrop.bind(this);		
 		this._super();	
 	},
 
-	_handleOnDragOver: function(event)
+	handleOnDragOver: function(domEvent)
 	{
-		event.stopPropagation();
-		event.preventDefault();
-		event.dataTransfer.dropEffect = "copy";
+		domEvent.stopPropagation();
+		domEvent.preventDefault();
+		domEvent.dataTransfer.dropEffect = "copy";
 	},
 
-	_handleOnDrop: function(event)
+	handleOnDrop: function(domEvent)
 	{
-		event.stopPropagation();
-		event.preventDefault();
+		domEvent.stopPropagation();
+		domEvent.preventDefault();
 
 		if(meta.device.name === "Chrome") {
-			this.handleFileSelect_Chrome(event);
+			this.handleFileSelect_Chrome(domEvent);
 		}
 		else {
-			this.handleFileSelect_All(event);
+			this.handleFileSelect_All(domEvent);
 		}
 	},
 
-	handleFileSelect_All: function(event) 
+	handleFileSelect_All: function(domEvent) 
 	{
 		var self = this;
 
 		var file, reader, item;
-		var files = event.dataTransfer.files;
+		var files = domEvent.dataTransfer.files;
 		var numFiles = files.length;
 
 		for(var n = 0; n < numFiles; n++) {
@@ -42,10 +42,10 @@ meta.class("Element.List_Asset", "Element.List",
 		}
 	},	
 
-	handleFileSelect_Chrome: function(event)
+	handleFileSelect_Chrome: function(domEvent)
 	{
 		var entry;
-		var dataItems = event.dataTransfer.items;
+		var dataItems = domEvent.dataTransfer.items;
 		var numDataItems = dataItems.length;
 		for(var n = 0; n < numDataItems; n++)
 		{

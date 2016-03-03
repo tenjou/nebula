@@ -2,31 +2,31 @@
 
 meta.class("Element.List", "Element.Basic",
 {
-	onCreate: function() {
-		this.element.onclick = this.handleClick.bind(this);
+	onCreate: function() 
+	{
+		this.domElement.onclick = this.handleClick.bind(this);
 		this.on("click", "item", this.selectItem.bind(this));
 		this.on("select", "item", this.handleSelectedItem.bind(this));
 	},
 
-	handleClick: function(event) 
-	{
-		this.emit("click");
+	handleClick: function(domEvent) {
+		this.emit("click", domEvent);
 	},
 
-	selectItem: function(element)
+	selectItem: function(event)
 	{
-		if(element === this.selectedItem) { return; }
-		element.select = true;	
+		if(event.element === this.selectedItem) { return; }
+		event.element.select = true;	
 	},
 
-	handleSelectedItem: function(element)
+	handleSelectedItem: function(event)
 	{
 		if(!this.selectedItem) {
-			this.selectedItem = element;
+			this.selectedItem = event.element;
 		}
 		else {
 			this.selectedItem.select = false;
-			this.selectedItem = element;
+			this.selectedItem = event.element;
 		}
 	},
 
@@ -50,7 +50,7 @@ meta.class("Element.List", "Element.Basic",
 	{
 		if(!this._info) {
 			this._info = document.createElement("info");
-			this.element.appendChild(this._info);			
+			this.domElement.appendChild(this._info);			
 		}
 
 		this._info.innerHTML = str;

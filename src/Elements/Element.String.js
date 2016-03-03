@@ -4,19 +4,19 @@ meta.class("Element.String", "Element.Basic",
 {
 	onCreate: function() 
 	{
-		this.element.setAttribute("type", "text");
-		this.element.setAttribute("spellcheck", "false");
-		this.element.onkeydown = this._handleKeyDown.bind(this);
-		this.element.onchange = this._handleChange.bind(this);
+		this.domElement.setAttribute("type", "text");
+		this.domElement.setAttribute("spellcheck", "false");
+		this.domElement.onkeydown = this.handleKeyDown.bind(this);
+		this.domElement.onchange = this.handleChange.bind(this);
 	},
 
 	revert: function()
 	{
 		this._value = this.prevValue;
-		this.element.value = this._value;
+		this.domElement.value = this._value;
 	},	
 
-	_handleKeyDown: function(event) 
+	handleKeyDown: function(domEvent) 
 	{
 		if(event.ctrlKey) { return; }
 
@@ -25,21 +25,21 @@ meta.class("Element.String", "Element.Basic",
 		switch(keyCode)
 		{
 			case 27: // Esc
-				this.element.value = this._value;
+				this.domElement.value = this._value;
 				return;
 		}
 	},
 
-	_handleChange: function(event) {
+	handleChange: function(domEvent) {
 		this.prevValue = this._value;
-		this._value = this.element.value;
+		this._value = this.domElement.value;
 		this.emit("update");
 	},	
 
 	set value(value) {
 		this.prevValue = this._value;
 		this._value = value;
-		this.element.value = value;
+		this.domElement.value = value;
 	},
 
 	get value() {
@@ -48,6 +48,7 @@ meta.class("Element.String", "Element.Basic",
 
 	//
 	elementTag: "input",
+	pickable: false,
 
 	_value: null,
 	prevValue: null

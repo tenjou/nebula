@@ -16,6 +16,7 @@
 		<script src="src/InputParser.js"></script>
 		<script src="src/Elements/Element.Basic.js"></script>
 		<script src="src/Elements/Element.WrappedElement.js"></script>
+		<script src="src/Elements/Element.Wrapper.js"></script>
 		<script src="src/Elements/Element.Top.js"></script>
 		<script src="src/Elements/Element.Inner.js"></script>
 		<script src="src/Elements/Element.Bottom.js"></script>
@@ -42,18 +43,24 @@
 		<script src="src/Elements/Element.ListItem.js"></script>
 		<script src="src/Elements/Element.Info.js"></script>
 		<script src="src/Elements/Element.Image.js"></script>
+		<script src="src/Elements/Element.IFrame.js"></script>
 		<script src="src/FileSystem.js"></script>
 		<script src="src/ResourceManager.js"></script>
 		<script src="src/Editor.js"></script>
 		<script src="src/Plugin.js"></script>
 		<script src="src/Utils.js"></script>
-		<script src="src/main.js"></script>		
-
-		<script src="plugins/core/Inspect/Inspect.js"></script>
-		<script src="plugins/core/Inspect/Element.Content_Inspect_Image.js"></script>
+		<script src="src/main.js"></script>	
 
 		<script src="plugins/core/ProjectWindow/ProjectWindow.js"></script>
 		<script src="plugins/core/ProjectWindow/Element.ProjectWindow.js"></script>
+
+		<script src="plugins/core/ContextMenu/ContextMenu.js"></script>
+		<script src="plugins/core/ContextMenu/Element.ContextMenu.js"></script>
+		<script src="plugins/core/ContextMenu/Element.ContextMenuItem.js"></script>
+		<script src="plugins/core/ContextMenu/Element.ContextMenuCategory.js"></script>
+
+		<script src="plugins/core/Inspect/Inspect.js"></script>
+		<script src="plugins/core/Inspect/Element.Content_Inspect_Image.js"></script>
 
 		<script src="plugins/core/AssetBrowser/AssetBrowser.js"></script>
 		<script src="plugins/core/AssetBrowser/Element.Content_Asset.js"></script>	
@@ -61,8 +68,89 @@
 		<script src="plugins/core/AssetBrowser/Element.ListItem_Asset.js"></script>	
 		
 		<script src="plugins/core/Hierarchy/Hierarchy.js"></script>	
+
+		<script src="plugins/meta2d/Support/Support.js"></script>	
+		<script src="plugins/meta2d/Support/Element.Content_Scene.js"></script>	
 	</head>
 
 	<body>
+
+<menu class="menu">
+  <li class="menu-item">
+    <button type="button" class="menu-btn"> <i class="fa fa-folder-open"></i> <span class="menu-text">Open</span> </button>
+  </li>
+  <li class="menu-item disabled">
+    <button type="button" class="menu-btn"> <span class="menu-text">Open in New Window</span> </button>
+  </li>
+  <li class="menu-separator"></li>
+  <li class="menu-item">
+    <button type="button" class="menu-btn"> <i class="fa fa-reply"></i> <span class="menu-text">Reply</span> </button>
+  </li>
+  <li class="menu-item">
+    <button type="button" class="menu-btn"> <i class="fa fa-star"></i> <span class="menu-text">Favorite</span> </button>
+  </li>
+  <li class="menu-item submenu">
+    <button type="button" class="menu-btn"> <i class="fa fa-users"></i> <span class="menu-text">Social</span> </button>
+    <menu class="menu">
+      <li class="menu-item">
+        <button type="button" class="menu-btn"> <i class="fa fa-comment"></i> <span class="menu-text">Comment</span> </button>
+      </li>
+      <li class="menu-item submenu">
+        <button type="button" class="menu-btn"> <i class="fa fa-share"></i> <span class="menu-text">Share</span> </button>
+        <menu class="menu">
+          <li class="menu-item">
+            <button type="button" class="menu-btn"> <i class="fa fa-twitter"></i> <span class="menu-text">Twitter</span> </button>
+          </li>
+          <li class="menu-item">
+            <button type="button" class="menu-btn"> <i class="fa fa-facebook-official"></i> <span class="menu-text">Facebook</span> </button>
+          </li>
+          <li class="menu-item">
+            <button type="button" class="menu-btn"> <i class="fa fa-google-plus"></i> <span class="menu-text">Google Plus</span> </button>
+          </li>
+          <li class="menu-item">
+            <button type="button" class="menu-btn"> <i class="fa fa-envelope"></i> <span class="menu-text">Email</span> </button>
+          </li>
+        </menu>
+      </li>
+    </menu>
+  </li>
+  <li class="menu-separator"></li>
+  <li class="menu-item">
+    <button type="button" class="menu-btn"> <i class="fa fa-download"></i> <span class="menu-text">Save</span> </button>
+  </li>
+  <li class="menu-item">
+    <button type="button" class="menu-btn"> <i class="fa fa-edit"></i> <span class="menu-text">Rename</span> </button>
+  </li>
+  <li class="menu-item">
+    <button type="button" class="menu-btn"> <i class="fa fa-trash"></i> <span class="menu-text">Delete</span> </button>
+  </li>
+</menu>
+
+<script>
+// var menu = document.querySelector('.menu');
+
+// function showMenu(x, y){
+//     menu.style.left = x + 'px';
+//     menu.style.top = y + 'px';
+//     menu.classList.add('show-menu');
+// }
+
+// function hideMenu(){
+//     menu.classList.remove('show-menu');
+// }
+
+// function onContextMenu(e){
+//     e.preventDefault();
+//     showMenu(e.pageX, e.pageY);
+//     document.addEventListener('click', onClick, false);
+// }
+
+// function onClick(e){
+//     hideMenu();
+//     document.removeEventListener('click', onClick);
+// }
+
+// document.addEventListener('contextmenu', onContextMenu, false);
+</script>	
 	</body>
 </html>

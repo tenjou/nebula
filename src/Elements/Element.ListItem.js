@@ -6,23 +6,26 @@ meta.class("Element.ListItem", "Element.Basic",
 	{
 		this._name = new Element.Name(this);
 
-		this.element.onclick = this._handleClick.bind(this);
-		this.element.ondblclick = this._handleDbClick.bind(this);
+		this.domElement.onclick = this.handleClick.bind(this);
+		this.domElement.ondblclick = this.handleDbClick.bind(this);
+		this.domElement.oncontextmenu = this.handleContextMenu.bind(this);
 	},
 
-	_handleClick: function(event)
+	handleClick: function(domEvent)
 	{
-		event.stopPropagation();
-
-		this.emit("click");
+		domEvent.stopPropagation();
+		this.emit("click", domEvent);
 	},
 
-	_handleDbClick: function(event)
+	handleDbClick: function(domEvent)
 	{
-		event.stopPropagation();
+		domEvent.stopPropagation();
+		this.emit("dbClick", domEvent);
+	},	
 
-		var holder = event.currentTarget.holder;
-		this.emit("dbClick");
+	handleContextMenu: function(domEvent) {
+		this.emit("click", domEvent);
+		this.emit("menu", domEvent);
 	},	
 
 	focus: function() {
@@ -36,11 +39,11 @@ meta.class("Element.ListItem", "Element.Basic",
 		this._select = value;
 
 		if(value) {
-			this.element.setAttribute("class", "active");
+			this.domElement.setAttribute("class", "active");
 			this.emit("select");
 		}
 		else {
-			this.element.setAttribute("class", "");
+			this.domElement.setAttribute("class", "");
 			this.emit("unselect");
 		}
 	},

@@ -2,6 +2,21 @@
 
 meta.class("Element.Content", "Element.Basic",
 {
+	init: function(parent, id) 
+	{
+		this._init(parent, id);
+
+		this.domElement.oncontextmenu = this.handleContextMenu.bind(this);
+
+		if(this.onCreate) {
+			this.onCreate();
+		}
+	},
+
+	handleContextMenu: function(event) {
+		event.preventDefault();
+	},
+
 	get: function(id)
 	{
 		var node = this.tree;
@@ -31,16 +46,16 @@ meta.class("Element.Content", "Element.Basic",
 	set hidden(value) 
 	{
 		if(value) {
-			this.element.setAttribute("class", "hidden");
+			this.domElement.setAttribute("class", "hidden");
 		}
 		else {
-			this.element.setAttribute("class", "");
+			this.domElement.setAttribute("class", "");
 		}
 	},
 
 	get hidden() 
 	{
-		var cls = this.element.getAttribute("class");
+		var cls = this.domElement.getAttribute("class");
 		if(cls === "hidden") {
 			return true;
 		}

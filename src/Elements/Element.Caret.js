@@ -3,13 +3,13 @@
 meta.class("Element.Caret", "Element.Basic",
 {
 	onCreate: function() {
-		this.element.onclick = this._handleOnClick;
-		this.element.setAttribute("class", "fa fa-caret-right");
+		this.domElement.onclick = this.handleOnClick;
+		this.domElement.setAttribute("class", "fa fa-caret-right");
 	},
 
-	_handleOnClick: function(event) 
+	handleOnClick: function(domEvent) 
 	{
-		event.stopPropagation();
+		domEvent.stopPropagation();
 
 		var holder = event.currentTarget.holder;
 		holder.open = !holder._open;
@@ -21,11 +21,11 @@ meta.class("Element.Caret", "Element.Basic",
 		this._open = value;
 
 		if(value) {
-			this.element.setAttribute("class", "fa fa-caret-down");
+			this.domElement.setAttribute("class", "fa fa-caret-down");
 			this.emit("activated");
 		}
 		else {
-			this.element.setAttribute("class", "fa fa-caret-right");
+			this.domElement.setAttribute("class", "fa fa-caret-right");
 			this.emit("deactivated");
 		}
 	},

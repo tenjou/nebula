@@ -7,7 +7,7 @@ meta.class("Editor.Element.Tabs", "Element.Basic",
 		this.inner = new Element.WrappedElement("tabs-inner", this);
 
 		var tabCtrl = document.createElement("tabs-ctrl");
-		this.element.appendChild(tabCtrl);
+		this.domElement.appendChild(tabCtrl);
 
 		this.tabs = {};
 
@@ -16,23 +16,23 @@ meta.class("Editor.Element.Tabs", "Element.Basic",
 		this.on("inactive", "tab", this.handleDeactivatedTab.bind(this));
 	},
 
-	activateTab: function(element) {
-		element.active = true;
+	activateTab: function(event) {
+		event.element.active = true;
 	},
 
-	handleActivatedTab: function(element)
+	handleActivatedTab: function(event)
 	{
 		if(this._activeTab) {
 			this._activeTab.deactivate();
 		}
 
-		this._activeTab = element;
-		element.activate();
+		this._activeTab = event.element;
+		event.element.activate();
 	},
 
-	handleDeactivatedTab: function(element)
+	handleDeactivatedTab: function(event)
 	{
-		if(this._activeTab === element) {
+		if(this._activeTab === event.element) {
 			this._activeTab = null;
 		}
 	},	

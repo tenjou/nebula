@@ -21,13 +21,16 @@ meta.class("Element.Content_Asset", "Element.Content",
 		this.on("update", "Container.Browser.item.name", this.renameItem.bind(this));
 	},
 
-	inspectItem: function(element) {
+	inspectItem: function(event) {
+		var element = event.element;
 		editor.plugins.Inspect.show(element.info.type, element.info);		
 	},
 
-	renameItem: function(element)
+	renameItem: function(event)
 	{
+		var element = event.element;
 		var info = element.parent.info;
+		
 		if(this.db[info.type][info.ext][element.value]) {
 			element.revert();
 			return;

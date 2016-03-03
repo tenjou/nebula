@@ -4,7 +4,7 @@ meta.class("Element.Image", "Element.Basic",
 {
 	onCreate: function() {
 		this.img = document.createElement("img");
-		this.element.appendChild(this.img);
+		this.domElement.appendChild(this.img);
 	},
 
 	set value(value) {

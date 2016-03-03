@@ -5,25 +5,22 @@ meta.class("Editor.Element.Tab", "Element.Basic",
 	onCreate: function()
 	{
 		var inner = document.createElement("tab-inner");
-		this.element.appendChild(inner);
+		this.domElement.appendChild(inner);
 
 		this._name = document.createElement("tab-content");
 		inner.appendChild(this._name);
 
-		var hidder = document.createElement("hidder");
-		inner.appendChild(hidder);
-
-		this.element.onclick = this.handleClick.bind(this);
+		this.domElement.onclick = this.handleClick.bind(this);
 	},
 
-	handleClick: function(event) {
-		this.emit("click");
+	handleClick: function(domEvent) {
+		this.emit("click", domEvent);
 	},
 
 	activate: function()
 	{
 		this._active = true;
-		this.element.setAttribute("class", "active");
+		this.domElement.setAttribute("class", "active");
 
 		if(this.content) {
 			this.content.hidden = false;
@@ -33,7 +30,7 @@ meta.class("Editor.Element.Tab", "Element.Basic",
 	deactivate: function()
 	{
 		this._active = false;
-		this.element.setAttribute("class", "");
+		this.domElement.setAttribute("class", "");
 
 		if(this.content) {
 			this.content.hidden = true;
