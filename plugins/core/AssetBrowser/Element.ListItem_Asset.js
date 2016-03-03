@@ -20,8 +20,15 @@ meta.class("Element.ListItem_Asset", "Element.ListItem",
 		contextMenu.show([ "Delete" ], event.x, event.y, this.handleMenuChoice.bind(this));
 	},
 
-	handleMenuChoice: function(event) {
-
+	handleMenuChoice: function(event) 
+	{
+		var value = event.element.value;
+		switch(value) 
+		{
+			case "Delete":
+				this.parent.removeItem(this.parent.selectedItem);
+				break;
+		}
 	},
 
 	set caret(value) 

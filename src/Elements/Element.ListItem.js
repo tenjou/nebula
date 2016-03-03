@@ -39,7 +39,7 @@ meta.class("Element.ListItem", "Element.Basic",
 		this._select = value;
 
 		if(value) {
-			this.domElement.setAttribute("class", "active");
+			this.domElement.setAttribute("class", "selected");
 			this.emit("select");
 		}
 		else {

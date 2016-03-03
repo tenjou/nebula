@@ -33,6 +33,7 @@ Editor.Plugin("ContextMenu",
 		this.menu.fill(data);
 		this.menu.position(x, y);
 		this.menu.enable = true;
+		this.cb = cb;
 	},
 
 	//

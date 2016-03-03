@@ -40,31 +40,51 @@ meta.class("Element.List", "Element.Basic",
 		item.name = name;
 
 		if(this._info) {
-			this._info.setAttribute("class", "hidden");
+			this._info.enable = false;
 		}
 
 		return item;
 	},
 
-	set info(str) 
+	removeItem: function(item) 
 	{
-		if(!this._info) {
-			this._info = document.createElement("info");
-			this.domElement.appendChild(this._info);			
+		this.remove(item);
+
+		if(this.domElement.childNodes.length === 0) {
+			this.info = this.infoTxt;
 		}
 
-		this._info.innerHTML = str;
+		if(this.onItemRemove) {
+			this.onItemRemove(item);
+		}
+	},
+
+	onItemRemove: null,
+
+	set info(str) 
+	{
+		this.infoTxt = str;
+
+		if(!this._info) {
+			this._info = new Element.Info(this);	
+		}
+		else {
+			this._info.enable = true;
+		}
+
+		this._info.value = str;
 	},
 
 	get info() {
-		return this._info.innerHTML;
+		return this._info.value;
 	},
 
 	//
 	elementTag: "list",
 
 	itemCls: null,
-	_info: null,
+	selectedItem: null,
 
-	selectedItem: null
+	_info: null,
+	infoTxt: null
 });

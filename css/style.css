@@ -281,7 +281,7 @@ content list {
 	padding-right: 2px;
 }
 content list info {
-	width: 100%;	
+	flex: 100%;	
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -296,7 +296,7 @@ content list item {
 	font-size: 11px;
 	cursor: pointer;
 }
-content list item.active,
+content list item.selected,
 content list item:hover {
 	background: #6e7d92;
 }

@@ -4,10 +4,13 @@ meta.class("Editor.Plugin.AssetsBrowser", "Editor.Plugin",
 {
 	install: function()
 	{
+		var self = this;
+
 		var inputParserTypes = editor.inputParser.types;
 		inputParserTypes.assetList = function(parent, name, data) 
 		{
 			var list = new Element.List_Asset(parent, name);
+			list.onItemRemove = self.removeItem.bind(self);
 			list.itemCls = Element.ListItem_Asset;
 			list.info = "No assets found";
 			return list;
@@ -35,6 +38,20 @@ meta.class("Editor.Plugin.AssetsBrowser", "Editor.Plugin",
 		}
 		
 		this.content.fill(this.db);
+	},
+
+	removeItem: function(element) 
+	{
+		var info = element.info;
+		var fileName = info.name + "." + info.ext;
+		editor.fileSystem.remove(fileName);
+
+		delete this.db[info.type][info.ext][info.name];
+		editor.saveCfg();
+
+		if(element.select) {
+			editor.plugins.Inspect.show();
+		}
 	},
 
 	renameSelectedItem: function(value) 
