@@ -10,33 +10,52 @@ meta.class("Element.ContextMenu", "Element.Basic",
 
 	fill: function(data)
 	{
-		if(data instanceof Array) 
-		{
-			var num = data.length;
-			for(var n = 0; n < num; n++) {
-				this.addItem(data[n]);
-			}
-		}
-		else 
-		{
-			for(var category in data) {
-				this._loadCategory(category, data[category]);
-			}
+		var num = data.length;
+		for(var n = 0; n < num; n++) {
+			this._loadItem(data[n]);
 		}
 	},
 
-	_loadCategory: function(category, items)
+	_loadItem: function(item)
+	{
+		var strType = typeof(item);
+		if(strType === "object")
+		{
+			if(item.type === "category") {
+				this.createCategory(item);
+			}
+			else {
+				this.createItem(item);
+			}
+		}
+		else if(strType === "string") {
+			this.createItem(item);
+		}
+		else {
+			console.warn("(Element.ContextMenu.fill) Invalid item");
+		}
+	},
+
+	createCategory: function(data)
 	{
 		var categoryItem = new Element.ContextMenuCategory(this);
-		categoryItem.value = category;
+		categoryItem.value = data.name;
 
-		var num = items.length;
-		for(var n = 0; n < num; n++) {
-			this.addItem(items[n]);
-		} 
+		if(data.icon) {
+			categoryItem.icon = data.icon;
+		}
+
+		if(data.content)
+		{
+			var items = data.content;
+			var num = items.length;
+			for(var n = 0; n < num; n++) {
+				this._loadItem(items[n]);
+			} 
+		}
 	},
 
-	addItem: function(data) 
+	createItem: function(data) 
 	{
 		var item = new Element.ContextMenuItem(this);
 
@@ -47,6 +66,9 @@ meta.class("Element.ContextMenu", "Element.Basic",
 			}
 			if(data.name) {
 				item.value = data.name;
+			}
+			if(data.content) {
+				item.loadSubmenu(data.content);
 			}
 		}
 		else {

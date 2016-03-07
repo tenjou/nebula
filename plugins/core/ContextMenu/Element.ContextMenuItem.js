@@ -6,10 +6,17 @@ meta.class("Element.ContextMenuItem", "Element.Basic",
 	{
 		this._icon = new Element.Icon(this);
 
-		this.inner = document.createElement("inner");
-		this.domElement.appendChild(this.inner);	
+		this._name = document.createElement("name");
+		this.domElement.appendChild(this._name);
 
 		this.domElement.onclick = this.handleClick.bind(this);	
+	},
+
+	loadSubmenu: function(items)
+	{
+		this.caret = true;
+		this.menu = new Element.ContextMenu(this);
+		this.menu.fill(items);
 	},
 
 	handleClick: function(domEvent) {
@@ -17,19 +24,45 @@ meta.class("Element.ContextMenuItem", "Element.Basic",
 	},
 
 	set value(value) {
-		this.inner.innerHTML = value;
+		this._name.innerHTML = value;
 	},
 
 	get value() {
-		return this.inner.innerHTML;
+		return this._name.innerHTML;
 	},
 
 	set icon(value) {
 		this._icon.type = value;
 	},
 
+	set caret(value) 
+	{
+		if(value) 
+		{
+			if(!this._caret) {
+				this._caret = new Element.Icon(this);
+				this._caret.type = "fa-caret-right";
+				this._caret.addCls("float-right");
+			}
+			else {
+				this._caret.enable = true;
+			}
+		}
+		else 
+		{
+			if(this._caret) {
+				this._caret.enable = false;
+			}
+		}
+	},
+
+	get caret() {
+		return (this._caret) ? true : false;
+	},
+
 	//
 	elementTag: "item",
 	_icon: null,
-	inner: null
+	_name: null,
+	menu: null
 });

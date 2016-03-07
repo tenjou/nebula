@@ -157,6 +157,22 @@ meta.class("Element.Basic",
 		}
 	},
 
+	addCls: function(name)
+	{
+		var classes = this.domElement.classList;
+		if(!classes.contains(name)) {
+			classes.add(name);
+		}
+	},
+
+	removeCls: function(name) 
+	{
+		var classes = this.domElement.classList;
+		if(classes.contains(name)) {
+			classes.remove(name);
+		}
+	},
+
 	set enable(value) 
 	{
 		if(value === this._enabled) { return; }
@@ -182,10 +198,10 @@ meta.class("Element.Basic",
 		this._visible = value;
 
 		if(value) {
-			this.domElement.setAttribute("class", "");
+			this.removeCls("hidden");
 		}
 		else {
-			this.domElement.setAttribute("class", "hidden");
+			this.addCls("hidden");
 		}
 	},
 

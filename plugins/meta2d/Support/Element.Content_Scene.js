@@ -6,6 +6,9 @@ meta.class("Element.Content_Scene", "Element.Content",
 	{
 		this.domElement.onclick = this.handleClick.bind(this);
 		this.on("menu", "iframe", this.showContextMenu.bind(this));
+		this.on("*", "*", function(event) {
+			console.log(event.id, event.name)
+		});
 	},
 
 	handleClick: function(domEvent) {
@@ -15,10 +18,20 @@ meta.class("Element.Content_Scene", "Element.Content",
 	showContextMenu: function(event) 
 	{
 		editor.plugins.ContextMenu.show(
-			{ Create: [ 
-				{ icon: "fa-cube", name: "Sprite" },
-				{ icon: "fa-font", name: "Text" },
-				"Test"
-			] }, event.x, event.y);
+			[ 
+				{ name: "Create", type: "category" },
+				{ 
+					name: "Sprite", icon: "fa-cube", 
+					content: [
+						{ name: "Textures", type: "category", icon: "fa-delicious" },
+						"Tex1", "Tex2"
+					] 
+				}
+			], event.x, event.y, this.handleMenuChoice.bind(this));
 	},
+
+	handleMenuChoice: function(buffer)
+	{
+
+	}
 });

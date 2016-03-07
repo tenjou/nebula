@@ -20,9 +20,9 @@ meta.class("Element.ListItem_Asset", "Element.ListItem",
 		contextMenu.show([ "Delete" ], event.x, event.y, this.handleMenuChoice.bind(this));
 	},
 
-	handleMenuChoice: function(event) 
+	handleMenuChoice: function(buffer) 
 	{
-		var value = event.element.value;
+		var value = buffer[0];
 		switch(value) 
 		{
 			case "Delete":

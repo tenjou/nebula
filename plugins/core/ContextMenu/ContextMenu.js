@@ -13,8 +13,23 @@ Editor.Plugin("ContextMenu",
 
 	handleMenuChoice: function(event)
 	{
-		if(this.cb) {
-			this.cb(event);
+		if(this.cb) 
+		{
+			if(event.id !== "item") {
+				this.buffer = [ event.element.value ];
+			}
+			else 
+			{
+				if(this.buffer) {
+					this.buffer.unshift(event.element.value);
+				}
+				else {
+					this.buffer = [ event.element.value ];
+				}
+				
+				this.cb(this.buffer);
+				this.buffer = null;
+			}
 		}
 	},
 
@@ -38,5 +53,6 @@ Editor.Plugin("ContextMenu",
 
 	//
 	menu: null,
+	buffer: null,
 	cb: null
 });
