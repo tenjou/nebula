@@ -6,6 +6,7 @@ meta.class("Element.Name", "Element.Basic",
 	{
 		this.domElement.setAttribute("spellcheck", "false");
 		this.domElement.setAttribute("tabindex", "0");
+		this.domElement.onclick = this.handleClick.bind(this);
 		this.domElement.ondblclick = this.handleDbClick.bind(this);
 		this.domElement.onfocus = this.handleFocus.bind(this);
 		this.domElement.onblur = this.handleBlur.bind(this);
@@ -22,6 +23,10 @@ meta.class("Element.Name", "Element.Basic",
 	{
 		this._value = this.prevValue;
 		this.domElement.innerHTML = this._value;
+	},
+
+	handleClick: function(domEvent) {
+		domEvent.stopPropagation();
 	},
 
 	handleDbClick: function(domEvent) 

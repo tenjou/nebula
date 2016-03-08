@@ -278,6 +278,9 @@ content list {
 	padding-left: 2px;
 	padding-right: 2px;
 }
+content list list item {
+	padding-left: 10px;
+}
 content list info {
 	flex: 100%;	
 	display: flex;

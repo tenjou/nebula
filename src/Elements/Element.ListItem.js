@@ -39,17 +39,23 @@ meta.class("Element.ListItem", "Element.Basic",
 		this.emit("menu", domEvent);
 	},	
 
-	handleDragStart: function(domEvent) {
-		this.parent.dragItem = this;
+	handleDragStart: function(domEvent) 
+	{
+		domEvent.stopPropagation();
+
+		this.parent.cache.dragItem = this;
 	},
 
 	handleDragEnd: function(domEvent) {
-		this.parent.dragItem = null;
+		this.parent.cache.dragItem = null;
 	},
 
 	handleDragEnter: function(domEvent) 
 	{
-		var dragItem = this.parent.dragItem;
+		domEvent.stopPropagation();
+		domEvent.preventDefault();
+
+		var dragItem = this.parent.cache.dragItem;
 		if(dragItem === this) { return; }
 		
 		var nextSibling = this.domElement.nextElementSibling;

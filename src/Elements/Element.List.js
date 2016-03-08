@@ -5,8 +5,12 @@ meta.class("Element.List", "Element.Basic",
 	onCreate: function() 
 	{
 		this.domElement.onclick = this.handleClick.bind(this);
+		this.domElement.ondragenter = this.handleDragEnter.bind(this);
+
 		this.on("click", "item", this.selectItem.bind(this));
+		this.on("click", "folder", this.selectItem.bind(this));
 		this.on("select", "item", this.handleSelectedItem.bind(this));
+		this.on("select", "folder", this.handleSelectedItem.bind(this));
 	},
 
 	handleClick: function(domEvent) {
@@ -15,19 +19,28 @@ meta.class("Element.List", "Element.Basic",
 
 	selectItem: function(event)
 	{
-		if(event.element === this.selectedItem) { return; }
+		if(event.element === this.cache.selectedItem) { return; }
 		event.element.select = true;	
 	},
 
 	handleSelectedItem: function(event)
 	{
-		if(!this.selectedItem) {
-			this.selectedItem = event.element;
+		if(!this.cache.selectedItem) {
+			this.cache.selectedItem = event.element;
 		}
 		else {
-			this.selectedItem.select = false;
-			this.selectedItem = event.element;
+			this.cache.selectedItem.select = false;
+			this.cache.selectedItem = event.element;
 		}
+	},
+
+	handleDragEnter: function(domEvent) 
+	{
+		domEvent.stopPropagation();
+		domEvent.preventDefault();
+
+		var dragItem = this.cache.dragItem;
+		this.append(dragItem);
 	},
 
 	createItem: function(name) 
@@ -96,8 +109,10 @@ meta.class("Element.List", "Element.Basic",
 	itemCls: null,
 	folderCls: null, 
 
-	selectedItem: null,
-	dragItem: null,
+	cache: {
+		selectedItem: null,
+		dragItem: null,
+	},
 
 	_info: null,
 	infoTxt: null
