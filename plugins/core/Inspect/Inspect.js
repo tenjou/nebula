@@ -36,6 +36,10 @@ Editor.Plugin("Inspect",
 		this.tab.content = content;
 	},
 
+	empty: function() {
+
+	},
+
 	//
 	contents: null,
 	cachedContents: null,

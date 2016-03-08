@@ -4,9 +4,6 @@ meta.class("Element.ListItem_Asset", "Element.ListItem",
 {
 	onCreate: function()
 	{
-		// var caret = new Element.Caret(this);
-		this._icon = new Element.Icon(this);
-		
 		this._super();
 
 		this._tag = new Element.Tag(this);
@@ -17,7 +14,8 @@ meta.class("Element.ListItem_Asset", "Element.ListItem",
 	openMenu: function(event)
 	{
 		var contextMenu = editor.plugins.ContextMenu;
-		contextMenu.show([ "Delete" ], event.x, event.y, this.handleMenuChoice.bind(this));
+		contextMenu.show([ "Create Folder", "Delete" ], event.x, event.y, this.handleMenuChoice.bind(this));
+		return true;
 	},
 
 	handleMenuChoice: function(buffer) 
@@ -27,6 +25,10 @@ meta.class("Element.ListItem_Asset", "Element.ListItem",
 		{
 			case "Delete":
 				this.parent.removeItem(this.parent.selectedItem);
+				break;
+
+			case "Create Folder":
+				this.emit("create-folder");
 				break;
 		}
 	},
@@ -41,14 +43,6 @@ meta.class("Element.ListItem_Asset", "Element.ListItem",
 		return this._caret;
 	},	
 
-	set icon(type) {
-		this._icon.type = type;
-	},
-
-	get icon() {
-		return this._icon.type;
-	},
-
 	set tag(name) {
 		this._tag.value = name;
 	},
@@ -59,7 +53,6 @@ meta.class("Element.ListItem_Asset", "Element.ListItem",
 
 	//
 	_caret: false,
-	_icon: null,
 	_tag: null,
 	info: null
 });

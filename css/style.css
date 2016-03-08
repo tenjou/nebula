@@ -7,8 +7,6 @@
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
-	user-drag: none; 
-	-webkit-user-drag: none;
 }
 
 body {
@@ -288,8 +286,8 @@ content list info {
 	color: #C3C2C2;
 	font-size: 11px;
 }
-
-content list item {
+content list item,
+content list folder {
 	display: block;
 	padding: 1px;
 	color: #fff;
@@ -297,18 +295,22 @@ content list item {
 	cursor: pointer;
 }
 content list item.selected,
-content list item:hover {
+content list item:hover,
+content list folder.selected,
+content list folder:hover {
 	background: #6e7d92;
 }
-content list item icon {
+content list item icon,
+content list folder icon,
+content list caret {
 	padding: 4px;
-	font-size: 14px !important;
+	font-size: 14px;
 }
 content list item name {
 	cursor: pointer;
 	outline: none;
 }
-content list item name:focus {
+content name:focus {
 	outline: none;
 }
 
@@ -401,7 +403,7 @@ context-menu category {
 	font-weight: bold;
 	text-transform: uppercase;
 	padding: 4px 5px 0px 8px;
-	line-height: 19px;
+	line-height: 21px;
 	border-top: 1px solid #444444;
     margin-top: 3px;	
 }

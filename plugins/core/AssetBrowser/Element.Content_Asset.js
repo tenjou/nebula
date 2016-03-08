@@ -19,6 +19,8 @@ meta.class("Element.Content_Asset", "Element.Content",
 
 		this.on("click", "Container.Browser.item", this.inspectItem.bind(this));
 		this.on("update", "Container.Browser.item.name", this.renameItem.bind(this));
+		this.on("menu", "*", this.showContextMenu.bind(this));
+		this.on("create-folder", "*", this.createFolder.bind(this));
 	},
 
 	inspectItem: function(event) {
@@ -111,6 +113,23 @@ meta.class("Element.Content_Asset", "Element.Content",
 		item.tag = info.ext;
 		item.icon = editor.resourceMgr.getIconFromExt(info.ext);
 		item.info = info;
+	},
+
+	createFolder: function(event)
+	{
+		var parentList = event.element.parent;
+		var item = parentList.createFolder("testsss");
+	},
+
+	showContextMenu: function()
+	{
+		var contextMenu = editor.plugins.ContextMenu;
+		contextMenu.show([ "Create Folder" ], event.x, event.y, this.handleMenuChoice.bind(this));
+	},
+
+	handleMenuChoice: function(buffer)
+	{
+
 	},
 
 	makeNameUnique: function(info, ext)

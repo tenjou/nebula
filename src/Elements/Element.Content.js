@@ -15,6 +15,7 @@ meta.class("Element.Content", "Element.Basic",
 
 	handleContextMenu: function(event) {
 		event.preventDefault();
+		this.emit("menu");
 	},
 
 	get: function(id)

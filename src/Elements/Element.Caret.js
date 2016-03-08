@@ -22,12 +22,12 @@ meta.class("Element.Caret", "Element.Basic",
 
 		if(value) {
 			this.domElement.setAttribute("class", "fa fa-caret-down");
-			this.emit("activated");
 		}
 		else {
 			this.domElement.setAttribute("class", "fa fa-caret-right");
-			this.emit("deactivated");
 		}
+
+		this.emit("update");
 	},
 
 	get open() {

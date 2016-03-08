@@ -50,7 +50,7 @@ meta.class("Editor.Plugin.AssetsBrowser", "Editor.Plugin",
 		editor.saveCfg();
 
 		if(element.select) {
-			editor.plugins.Inspect.show();
+			editor.plugins.Inspect.show("default");
 		}
 	},
 

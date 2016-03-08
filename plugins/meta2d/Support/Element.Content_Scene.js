@@ -6,9 +6,6 @@ meta.class("Element.Content_Scene", "Element.Content",
 	{
 		this.domElement.onclick = this.handleClick.bind(this);
 		this.on("menu", "iframe", this.showContextMenu.bind(this));
-		this.on("*", "*", function(event) {
-			console.log(event.id, event.name)
-		});
 	},
 
 	handleClick: function(domEvent) {

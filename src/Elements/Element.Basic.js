@@ -22,12 +22,13 @@ meta.class("Element.Basic",
 
 		if(parent)
 		{
-			if(parent instanceof Element.Basic) {
+			if(parent instanceof Element.Basic) 
+			{
 				parent.append(this.domElement);
 				this.parent = parent;
 			}
 			else if(parent instanceof Element) {
-				parent.appendChild(this.domElement);	
+				parent.appendChild(this.domElement);
 			}
 		}		
 	},
@@ -53,6 +54,25 @@ meta.class("Element.Basic",
 		}
 		else {
 			this.domElement.removeChild(element);
+		}
+	},
+
+	insertBefore: function(element, insertBeforeElement) 
+	{
+		var insertDomElement;
+		if(insertBeforeElement instanceof Element.Basic) {
+			insertDomElement = insertBeforeElement.domElement;
+		}
+		else {
+			insertDomElement = insertBeforeElement;
+		}		
+
+		if(element instanceof Element.Basic) {
+			this.domElement.insertBefore(element.domElement, insertDomElement);
+			element.parent = this;
+		}
+		else {
+			this.domElement.insertBefore(element, insertDomElement);
 		}
 	},
 
@@ -88,11 +108,17 @@ meta.class("Element.Basic",
 
 			if(eventBuffer)
 			{
-				if(eventBuffer[event.id]) {
-					eventBuffer[event.id](event);
+				if(eventBuffer[event.id]) 
+				{
+					if(eventBuffer[event.id](event)) {
+						return;
+					}
 				}
-				else if(eventBuffer["*"]) {
-					eventBuffer["*"](event);
+				else if(eventBuffer["*"]) 
+				{
+					if(eventBuffer["*"](event)) {
+						return;
+					}
 				}
 			}
 		}

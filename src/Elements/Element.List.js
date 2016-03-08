@@ -61,6 +61,17 @@ meta.class("Element.List", "Element.Basic",
 
 	onItemRemove: null,
 
+	createFolder: function(name)
+	{
+		if(!this.folderCls) {
+			this.folderCls = Element.ListFolder;
+		}
+
+		var item = new this.folderCls(this);
+		item.name = name;
+		return item;
+	},
+
 	set info(str) 
 	{
 		this.infoTxt = str;
@@ -83,7 +94,10 @@ meta.class("Element.List", "Element.Basic",
 	elementTag: "list",
 
 	itemCls: null,
+	folderCls: null, 
+
 	selectedItem: null,
+	dragItem: null,
 
 	_info: null,
 	infoTxt: null
