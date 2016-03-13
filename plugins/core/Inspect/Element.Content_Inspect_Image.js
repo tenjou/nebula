@@ -4,7 +4,7 @@ meta.class("Element.Content_Inspect_Image", "Element.Content",
 {
 	onCreate: function()
 	{
-		this.assetsPlugin = editor.plugins.AssetsBrowser;
+		this.assetsPlugin = editor.plugins.AssetBrowser;
 
 		this.data = 
 		{

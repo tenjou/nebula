@@ -6,18 +6,18 @@ meta.class("Element.ListFolder", "Element.Basic",
 	{
 		this.domElement.setAttribute("draggable", "true");
 
-		this._caret = new Element.Caret(this);
+		this._inner = new Element.WrappedElement("inner", this);
+
+		this._caret = new Element.Caret(this._inner);
 		this._caret.on("update", "*", this.handleCaretUpdate.bind(this));
 
-		this._icon = new Element.Icon(this);
+		this._icon = new Element.Icon(this._inner);
 		this._icon.type = "fa-folder";
 
-		this._name = new Element.Name(this);
+		this._name = new Element.Name(this._inner);
 
 		this.list = new Element.List(this);
 		this.list.addCls("hidden");
-		// var item = this.list.createItem("test");
-		// item.icon = "fa-cube";
 
 		this.domElement.onclick = this.handleClick.bind(this);
 		this.domElement.ondragstart = this.handleDragStart.bind(this);
@@ -31,11 +31,14 @@ meta.class("Element.ListFolder", "Element.Basic",
 
 	handleClick: function(domEvent) 
 	{
-		if(this.select) {
+		domEvent.stopPropagation();
+
+		if(domEvent.detail % 2 === 0) {
 			this.open = !this.open;
 		}
-
-		this.emit("click", domEvent);
+		else {
+			this.emit("click", domEvent);
+		}
 	},
 
 	handleDragStart: function(domEvent) 
@@ -95,6 +98,10 @@ meta.class("Element.ListFolder", "Element.Basic",
 			}
 		}
 	},	
+
+	focus: function() {
+		this._name.focus();
+	},
 
 	set name(name) {
 		this._name.value = name;

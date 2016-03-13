@@ -22,23 +22,40 @@ meta.class("Element.ContextMenu", "Element.Basic",
 		if(strType === "object")
 		{
 			if(item.type === "category") {
-				this.createCategory(item);
+				this.createCategory(this, item);
 			}
 			else {
-				this.createItem(item);
+				this.createItem(this, item);
 			}
 		}
 		else if(strType === "string") {
-			this.createItem(item);
+			this.createItem(this, item);
 		}
 		else {
-			console.warn("(Element.ContextMenu.fill) Invalid item");
+			console.warn("(Element.ContextMenu.fill) Invalid data");
 		}
 	},
 
-	createCategory: function(data)
+	_loadCategoryItem: function(category, data) 
 	{
-		var categoryItem = new Element.ContextMenuCategory(this);
+		var strType = typeof(data);
+		if(strType === "object")
+		{
+			if(data.type !== "category") {
+				this.createItem(category, data);
+			}
+		}
+		else if(strType === "string") {
+			this.createItem(category, data);
+		}
+		else {
+			console.warn("(Element.ContextMenu.fill) Invalid data");
+		}
+	},
+
+	createCategory: function(parent, data)
+	{
+		var categoryItem = new Element.ContextMenuCategory(parent);
 		categoryItem.value = data.name;
 
 		if(data.icon) {
@@ -50,14 +67,14 @@ meta.class("Element.ContextMenu", "Element.Basic",
 			var items = data.content;
 			var num = items.length;
 			for(var n = 0; n < num; n++) {
-				this._loadItem(items[n]);
+				this._loadCategoryItem(categoryItem.inner, items[n]);
 			} 
 		}
 	},
 
-	createItem: function(data) 
+	createItem: function(parent, data) 
 	{
-		var item = new Element.ContextMenuItem(this);
+		var item = new Element.ContextMenuItem(parent);
 
 		if(typeof(data) === "object") 
 		{

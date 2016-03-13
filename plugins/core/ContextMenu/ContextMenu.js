@@ -31,6 +31,8 @@ Editor.Plugin("ContextMenu",
 				this.buffer = null;
 			}
 		}
+
+		return true;
 	},
 
 	handleClick: function(domEvent) {

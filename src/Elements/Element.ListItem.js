@@ -6,16 +6,16 @@ meta.class("Element.ListItem", "Element.Basic",
 {
 	onCreate: function()
 	{
+		this._icon = new Element.Icon(this);
 		this._name = new Element.Name(this);
 
 		this.domElement.setAttribute("draggable", "true");
 
 		this.domElement.onclick = this.handleClick.bind(this);
-		this.domElement.ondblclick = this.handleDbClick.bind(this);
 		this.domElement.oncontextmenu = this.handleContextMenu.bind(this);
+		
 		this.domElement.ondragstart = this.handleDragStart.bind(this);
 		this.domElement.ondragend = this.handleDragEnd.bind(this);
-
 		this.domElement.ondragenter = this.handleDragEnter.bind(this);
 		this.domElement.ondragleave = this.handleDragLeave.bind(this);
 	},
@@ -23,13 +23,13 @@ meta.class("Element.ListItem", "Element.Basic",
 	handleClick: function(domEvent)
 	{
 		domEvent.stopPropagation();
-		this.emit("click", domEvent);
-	},
 
-	handleDbClick: function(domEvent)
-	{
-		domEvent.stopPropagation();
-		this.emit("dbClick", domEvent);
+		if(domEvent.detail % 2 === 0) {
+			this.emit("dbClick", domEvent);
+		}
+		else {
+			this.emit("click", domEvent);
+		}
 	},	
 
 	handleContextMenu: function(domEvent) {
@@ -56,6 +56,7 @@ meta.class("Element.ListItem", "Element.Basic",
 		domEvent.preventDefault();
 
 		var dragItem = this.parent.cache.dragItem;
+		if(!dragItem) { return; }
 		if(dragItem === this) { return; }
 		
 		var nextSibling = this.domElement.nextElementSibling;

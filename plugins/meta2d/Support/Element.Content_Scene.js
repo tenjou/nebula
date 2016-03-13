@@ -14,21 +14,58 @@ meta.class("Element.Content_Scene", "Element.Content",
 
 	showContextMenu: function(event) 
 	{
-		editor.plugins.ContextMenu.show(
-			[ 
-				{ name: "Create", type: "category" },
-				{ 
-					name: "Sprite", icon: "fa-cube", 
-					content: [
-						{ name: "Textures", type: "category", icon: "fa-delicious" },
-						"Tex1", "Tex2"
-					] 
-				}
-			], event.x, event.y, this.handleMenuChoice.bind(this));
+		var buffer = [];
+		
+		var assets = editor.plugins.AssetBrowser.db;
+		var images = assets.image;
+		var extBuffer, num, name;
+		for(var ext in images)
+		{
+			extBuffer = images[ext];
+			for(name in extBuffer) {
+				buffer.push(extBuffer[name]);
+			}
+		}
+
+		buffer.sort(this.sortFunc_byName);
+
+		var menu = [
+			{ 
+				name: "Create", 
+				type: "category", 
+				content: [
+					{ 
+						name: "Sprite", 
+						icon: "fa-cube",
+						content: [
+							{
+
+								name: "Textures",
+								type: "category",
+								icon: "fa-delicious",
+								content: buffer
+							}
+						]					
+					},
+					{
+						name: "ParticleEmitter", 
+						icon: "fa-certificate"						
+					}
+				] 
+			}
+		];
+
+		editor.plugins.ContextMenu.show(menu, event.x, event.y, this.handleMenuChoice.bind(this));
 	},
 
 	handleMenuChoice: function(buffer)
 	{
+		console.log(buffer);
+	},
 
+	sortFunc_byName: function(a, b) {
+		if(a.name < b.name) { return -1; }
+		if(a.name > b.name) { return 1; }
+		return 0;
 	}
 });

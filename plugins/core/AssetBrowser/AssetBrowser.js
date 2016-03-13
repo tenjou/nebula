@@ -1,18 +1,28 @@
 "use strict";
 
-meta.class("Editor.Plugin.AssetsBrowser", "Editor.Plugin",
+meta.class("Editor.Plugin.AssetBrowser", "Editor.Plugin",
 {
 	install: function()
 	{
 		var self = this;
 
 		var inputParserTypes = editor.inputParser.types;
-		inputParserTypes.assetList = function(parent, name, data) 
+		inputParserTypes.resourceList = function(parent, name, data) 
 		{
 			var list = new Element.List_Asset(parent, name);
 			list.onItemRemove = self.removeItem.bind(self);
 			list.itemCls = Element.ListItem_Asset;
-			list.info = "No assets found";
+			list.folderCls = Element.ListFolder_Asset;
+			list.info = "No resources found";
+			return list;
+		};
+		inputParserTypes.defList = function(parent, name, data) 
+		{
+			var list = new Element.List_Asset(parent, name);
+			list.onItemRemove = self.removeItem.bind(self);
+			list.itemCls = Element.ListItem_Asset;
+			list.folderCls = Element.ListFolder_Asset;
+			list.info = "No defs found";
 			return list;
 		};
 	},
@@ -56,12 +66,57 @@ meta.class("Editor.Plugin.AssetsBrowser", "Editor.Plugin",
 
 	renameSelectedItem: function(value) 
 	{
-		this.content.list.selectedItem.name = value;
-		if(this.content.list.selectedItem.name !== value) {
+		this.content.list.cache.selectedItem.name = value;
+		if(this.content.list.cache.selectedItem.name !== value) {
 			return false;
 		}
 		return true;
 	},
+
+	makeNameUnique: function(info, ext)
+	{
+		info.type = editor.resourceMgr.getTypeFromExt(info.ext);
+
+		var baseDict = this.db[info.type];
+		var extDict, dbDict;
+		if(!baseDict) 
+		{
+			baseDict = {};
+			baseDict[info.ext] = {};
+			this.db[info.type] = baseDict;
+
+			editor.needSave = true;
+			return info.name;
+		}
+
+		extDict = baseDict[info.ext];
+		if(!extDict) {
+			extDict = {};
+			baseDict[ext] = extDict;
+			this.db[info.type][ext] = extDict;
+		}
+
+		var index = 2;
+		var newName = info.name;
+
+		main_loop:
+		for(;;)
+		{
+			for(var fileName in extDict) 
+			{
+				if(fileName === newName) {
+					newName = info.name + "_" + index;
+					index++;
+					continue main_loop;
+				}
+			}
+
+			info.name = newName;
+			return newName;
+		}
+
+		return name;
+	},		
 
 	//
 	db: null,

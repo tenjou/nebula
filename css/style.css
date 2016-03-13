@@ -90,11 +90,15 @@ room {
 }
 
 content {
+
 	flex: 1 1 100%;
 	display: flex;
 	flex-direction: column;
     max-height: 100%;
-    overflow-y: auto;	
+    overflow-y: auto;
+     position: absolute;
+    width: 100%;
+    height: 100%;      	
 }
 
 wrapper {
@@ -131,12 +135,11 @@ toolbar {
 	align-items: stretch;
 	flex: 1 1 100%;
 	z-index: 1;
-	border: 2px solid #292929;
-	margin-left: 1px;
-	margin-right: 1px;
+	border: 1px solid #292929;
 }
 toolbar:first-child {
 	margin-left: 0;
+    overflow-x: hidden;
 }
 toolbar:last-child {
 	margin-right: 0;
@@ -146,6 +149,7 @@ toolbar > container {
 	display: flex;
 	flex: 1 1 100%;
 	background: #535353;
+    position: relative;
 }
 
 tabs {
@@ -153,6 +157,7 @@ tabs {
 	flex: 0 0 27px;
 	flex-direction: row;
 	text-transform: uppercase;
+    border-bottom: 2px solid #282828;	
 }
 tabs-inner {
 	flex: 0 0;
@@ -160,22 +165,19 @@ tabs-inner {
 }
 tabs-ctrl {
 	display: block;
-	flex: 0 1 100%;	
-	border-bottom: 2px solid #282828;
+	flex: 0 1 100%;
 	border-top: 2px solid #4a4a4a;
 }
 tab {
 	display: inline-block;
     position: relative;
     border-right: 2px solid #282828;
-    border-bottom: 2px solid #282828;
 }
 tab:hover {
 	color: white;
 }
 tab.active {
 	background: #535353;
-	border-bottom: none;
 	color: white;
 }
 tab tab-content {
@@ -209,7 +211,6 @@ content container {
 	flex: 100%;
 	display: flex;
 	flex-direction: column;
-    overflow-y: auto;	
 }
 
 content h2 {
@@ -274,12 +275,10 @@ content list {
 	display: flex;
 	flex: 100%;
 	flex-direction: column;
-	padding-top: 2px;
-	padding-left: 2px;
-	padding-right: 2px;
+	overflow: auto;
 }
-content list list item {
-	padding-left: 10px;
+folder list {
+	padding-left: 14px;
 }
 content list info {
 	flex: 100%;	
@@ -290,17 +289,20 @@ content list info {
 	font-size: 11px;
 }
 content list item,
-content list folder {
+content list folder inner {
 	display: block;
 	padding: 1px;
 	color: #fff;
 	font-size: 11px;
 	cursor: pointer;
+    white-space: nowrap;
 }
 content list item.selected,
+content list folder.selected > inner {
+	background: #6e7d92;
+}
 content list item:hover,
-content list folder.selected,
-content list folder:hover {
+content list folder inner:hover {
 	background: #6e7d92;
 }
 content list item icon,
@@ -311,10 +313,6 @@ content list caret {
 }
 content list item name {
 	cursor: pointer;
-	outline: none;
-}
-content name:focus {
-	outline: none;
 }
 
 content close {
@@ -369,6 +367,7 @@ overlay {
 	height: 100%;
 	z-index: 10000;
 	pointer-events: none;
+	overflow: hidden;
 }
 overlay > * {
 	pointer-events: all;
@@ -395,25 +394,33 @@ context-menu context-menu {
 	left: 100%;
 	margin-top: -5px;
 	opacity: 0;
+	pointer-events: none;
+    max-height: 600px;
+    overflow: auto;		
 }
 context-menu item:hover > context-menu {
-  opacity: 1;
+	opacity: 1;
+	pointer-events: auto;
 }
 context-menu category {
 	display: block;
-	color: #8C8888;
-	font-size: 9px;
-	font-weight: bold;
-	text-transform: uppercase;
-	padding: 4px 5px 0px 8px;
-	line-height: 21px;
+	padding-top: 2px;
 	border-top: 1px solid #444444;
-    margin-top: 3px;	
+    margin-top: 3px;		
 }
 context-menu category:first-child {
 	padding-top: 0;
 	margin-top: 0;
 	border-top: none;
+}
+context-menu category > header {
+	display: block;
+	color: #8C8888;
+	font-size: 9px;
+	font-weight: bold;
+	text-transform: uppercase;
+	padding: 0px 5px 0px 8px;
+	line-height: 21px;
 }
 context-menu icon {
 	width: 14px;
@@ -440,6 +447,7 @@ context-menu icon.float-right {
 }
 
 window {
+	position: relative;
 	display: flex;
 	width: 300px;
 	height: 400px;

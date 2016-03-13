@@ -6,6 +6,8 @@ meta.class("Element.List", "Element.Basic",
 	{
 		this.domElement.onclick = this.handleClick.bind(this);
 		this.domElement.ondragenter = this.handleDragEnter.bind(this);
+		this.domElement.ondragleave = this.handleDragLeave.bind(this);
+		this.domElement.addEventListener("drop", this.handleDrop.bind(this), false);
 
 		this.on("click", "item", this.selectItem.bind(this));
 		this.on("click", "folder", this.selectItem.bind(this));
@@ -40,7 +42,42 @@ meta.class("Element.List", "Element.Basic",
 		domEvent.preventDefault();
 
 		var dragItem = this.cache.dragItem;
+		if(!dragItem) { 
+			this.showDragStyle();
+			return; 
+		}
 		this.append(dragItem);
+	},
+
+	handleDragLeave: function(domEvent) 
+	{
+		console.log("leave")
+		domEvent.stopPropagation();
+		domEvent.preventDefault();
+
+		var dragItem = this.cache.dragItem;
+		if(!dragItem) { 
+			this.hideDragStyle();
+		}		
+	},
+
+	handleDrop: function(domEvent) 
+	{
+		domEvent.stopPropagation();
+		domEvent.preventDefault();
+
+		var dragItem = this.cache.dragItem;
+		if(!dragItem) { 
+			this.hideDragStyle();
+		}	
+	},
+
+	showDragStyle: function() {
+		this.domElement.style.background = "#656565";	
+	},
+
+	hideDragStyle: function() {
+		this.domElement.style.background = "";
 	},
 
 	createItem: function(name) 
@@ -74,16 +111,33 @@ meta.class("Element.List", "Element.Basic",
 
 	onItemRemove: null,
 
-	createFolder: function(name)
+	createFolder: function(name, item)
 	{
 		if(!this.folderCls) {
 			this.folderCls = Element.ListFolder;
 		}
 
-		var item = new this.folderCls(this);
-		item.name = name;
-		return item;
+		var folder;
+		if(item) 
+		{
+			folder = new this.folderCls();
+			folder.name = name;
+			this.insertBefore(folder, item);
+			folder.focus();
+
+			item.parent.remove(item);
+			folder.list.append(item);	
+			folder.open = true;
+		}
+		else {
+			folder = new this.folderCls(this);
+			folder.name = name;
+		}
+
+		return folder;
 	},
+
+	filterFunc: null,
 
 	set info(str) 
 	{

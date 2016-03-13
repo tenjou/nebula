@@ -4,22 +4,27 @@ meta.class("Element.List_Asset", "Element.List",
 {
 	onCreate: function()
 	{
-		this.domElement.ondragover = this.handleOnDragOver.bind(this);
-		this.domElement.ondrop = this.handleOnDrop.bind(this);		
+		this.domElement.oncontextmenu = this.handleContextMenu.bind(this);
+		this.domElement.ondragover = this.handleDragOver.bind(this);
 		this._super();	
 	},
 
-	handleOnDragOver: function(domEvent)
+	handleContextMenu: function(domEvent) {
+		domEvent.stopPropagation();
+		domEvent.preventDefault();
+		this.emit("menu", domEvent);
+	},
+
+	handleDragOver: function(domEvent)
 	{
 		domEvent.stopPropagation();
 		domEvent.preventDefault();
 		domEvent.dataTransfer.dropEffect = "copy";
 	},
 
-	handleOnDrop: function(domEvent)
+	handleDrop: function(domEvent)
 	{
-		domEvent.stopPropagation();
-		domEvent.preventDefault();
+		this._super(domEvent);
 
 		if(meta.device.name === "Chrome") {
 			this.handleFileSelect_Chrome(domEvent);
@@ -110,7 +115,7 @@ meta.class("Element.List_Asset", "Element.List",
 			type: null,
 			lastModified: file.lastModified
 		};
-		editor.plugins.AssetsBrowser.content.addItem(info);
+		editor.plugins.AssetBrowser.content.addItem(info);
 
 		var blob = dataURItoBlob(fileResult.target.result, file.type);
 		editor.fileSystem.writeBlob(info.name + "." + ext, blob, this._handleOnFileLoad.bind(this));		
@@ -122,6 +127,10 @@ meta.class("Element.List_Asset", "Element.List",
 		if(this.numItemsLoading === 0) {
 			editor.saveCfg();
 		}
+	},
+
+	sortFunc: function(a, b) {
+		
 	},
 
 	//

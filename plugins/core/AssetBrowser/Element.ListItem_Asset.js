@@ -13,35 +13,54 @@ meta.class("Element.ListItem_Asset", "Element.ListItem",
 
 	openMenu: function(event)
 	{
-		var contextMenu = editor.plugins.ContextMenu;
-		contextMenu.show([ "Create Folder", "Delete" ], event.x, event.y, this.handleMenuChoice.bind(this));
+		var menu = [
+			{
+				name: "Create", 
+				type: "category",
+				content: [
+					{ 
+						name: "Folder", 
+						icon: "fa-folder" 
+					}
+				]
+			},
+			{
+				name: "Actions", 
+				type: "category",
+				content: [
+					{
+						name: "Upload", 
+						icon: "fa-upload"
+					},
+					{
+						name: "Delete", 
+						icon: "fa-trash"
+					}
+				]
+			}
+		];
+
+		editor.plugins.ContextMenu.show(menu, event.x, event.y, this.handleMenuChoice.bind(this));
+		
 		return true;
 	},
 
 	handleMenuChoice: function(buffer) 
 	{
+		var plugin = editor.plugins.AssetBrowser;
+
 		var value = buffer[0];
 		switch(value) 
 		{
 			case "Delete":
-				this.parent.removeItem(this.parent.selectedItem);
+				this.parent.removeItem(this.parent.cache.selectedItem);
 				break;
 
-			case "Create Folder":
-				this.emit("create-folder");
+			case "Folder":
+				plugin.createFolder("Folder", this);
 				break;
 		}
 	},
-
-	set caret(value) 
-	{
-		if(this._caret === value) { return; }
-		this._caret = value;
-	},
-
-	get caret() {
-		return this._caret;
-	},	
 
 	set tag(name) {
 		this._tag.value = name;
@@ -52,7 +71,6 @@ meta.class("Element.ListItem_Asset", "Element.ListItem",
 	},	
 
 	//
-	_caret: false,
 	_tag: null,
 	info: null
 });

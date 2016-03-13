@@ -5,22 +5,33 @@ meta.class("Element.Content_Asset", "Element.Content",
 	onCreate: function()
 	{
 		this.data = {
-			Container: {
-				type: "container",
+			Resources: {
+				type: "containerNamed",
 				content: {
 					Browser: {
-						type: "assetList"
+						type: "resourceList"
 					}
 				}
-			}		
+			},
+			Defs: {
+				type: "containerNamed",
+				content: {
+					Browser: {
+						type: "defList"
+					}
+				}
+			}	
 		};
 
-		this.list = this.get("Container.Browser");
+		this.resList = this.get("Resources.Browser");
+		this.defList = this.get("Defs.Browser");
 
 		this.on("click", "Container.Browser.item", this.inspectItem.bind(this));
+		this.on("click", "Container.Browser.folder", this.inspectItem.bind(this));
 		this.on("update", "Container.Browser.item.name", this.renameItem.bind(this));
-		this.on("menu", "*", this.showContextMenu.bind(this));
-		this.on("create-folder", "*", this.createFolder.bind(this));
+		//this.on("update", "Container.Browser.folder.name", this.renameItem.bind(this));
+		this.resList.on("menu", "*", this.showResContextMenu.bind(this));
+		this.defList.on("menu", "*", this.showDefContextMenu.bind(this));
 	},
 
 	inspectItem: function(event) {
@@ -53,7 +64,7 @@ meta.class("Element.Content_Asset", "Element.Content",
 
 	updateInspect: function()
 	{
-		var info = this.list.selectedItem.info;
+		var info = this.list.cache.selectedItem.info;
 		editor.plugins.Inspect.show(info.type, info);
 	},
 
@@ -85,7 +96,7 @@ meta.class("Element.Content_Asset", "Element.Content",
 
 	addItem: function(info)
 	{
-		this.makeNameUnique(info);
+		editor.plugins.AssetBrowser.makeNameUnique(info);
 
 		var dict;
 		var typeDict = this.db[info.type];
@@ -109,75 +120,31 @@ meta.class("Element.Content_Asset", "Element.Content",
 
 	_addItem: function(info)
 	{
-		var item = this.list.createItem(info.name);
+		var item = this.resList.createItem(info.name);
 		item.tag = info.ext;
 		item.icon = editor.resourceMgr.getIconFromExt(info.ext);
 		item.info = info;
 	},
 
-	createFolder: function(event)
-	{
-		var parentList = event.element.parent;
-		var item = parentList.createFolder("testsss");
-	},
-
-	showContextMenu: function()
+	showResContextMenu: function()
 	{
 		var contextMenu = editor.plugins.ContextMenu;
-		contextMenu.show([ "Create Folder" ], event.x, event.y, this.handleMenuChoice.bind(this));
+		contextMenu.show([ "Create Folder", "Upload" ], event.x, event.y, this.handleMenuChoice.bind(this));
 	},
+
+	showDefContextMenu: function()
+	{
+		var contextMenu = editor.plugins.ContextMenu;
+		contextMenu.show([ "Create Folder2", "Upload" ], event.x, event.y, this.handleMenuChoice.bind(this));
+	},	
 
 	handleMenuChoice: function(buffer)
 	{
 
 	},
 
-	makeNameUnique: function(info, ext)
-	{
-		info.type = editor.resourceMgr.getTypeFromExt(info.ext);
-
-		var baseDict = this.db[info.type];
-		var extDict, dbDict;
-		if(!baseDict) 
-		{
-			baseDict = {};
-			baseDict[info.ext] = {};
-			this.db[info.type] = baseDict;
-
-			editor.needSave = true;
-			return info.name;
-		}
-
-		extDict = baseDict[info.ext];
-		if(!extDict) {
-			extDict = {};
-			baseDict[ext] = extDict;
-			this.db[info.type][ext] = extDict;
-		}
-
-		var index = 2;
-		var newName = info.name;
-
-		main_loop:
-		for(;;)
-		{
-			for(var fileName in extDict) 
-			{
-				if(fileName === newName) {
-					newName = info.name + "_" + index;
-					index++;
-					continue main_loop;
-				}
-			}
-
-			info.name = newName;
-			return newName;
-		}
-
-		return name;
-	},	
-
 	//
 	db: null,
-	list: null
+	resList: null,
+	defList: null
 });

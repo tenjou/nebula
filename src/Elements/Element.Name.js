@@ -7,7 +7,6 @@ meta.class("Element.Name", "Element.Basic",
 		this.domElement.setAttribute("spellcheck", "false");
 		this.domElement.setAttribute("tabindex", "0");
 		this.domElement.onclick = this.handleClick.bind(this);
-		this.domElement.ondblclick = this.handleDbClick.bind(this);
 		this.domElement.onfocus = this.handleFocus.bind(this);
 		this.domElement.onblur = this.handleBlur.bind(this);
 	},
@@ -25,18 +24,15 @@ meta.class("Element.Name", "Element.Basic",
 		this.domElement.innerHTML = this._value;
 	},
 
-	handleClick: function(domEvent) {
-		domEvent.stopPropagation();
-	},
-
-	handleDbClick: function(domEvent) 
+	handleClick: function(domEvent) 
 	{
-		domEvent.stopPropagation();
-		domEvent.preventDefault();
+		if(domEvent.detail % 2 === 0) 
+		{
+			domEvent.stopPropagation();
+			domEvent.preventDefault();
 
-		this.domElement.contentEditable = "true";
-		this.domElement.focus();
-		meta.selectElementContents(this.domElement);
+			this.focus();
+		}
 	},
 
 	handleFocus: function(domEvent)
@@ -89,6 +85,13 @@ meta.class("Element.Name", "Element.Basic",
 		}
 
 		domEvent.preventDefault();
+	},
+
+	focus: function() 
+	{
+		this.domElement.contentEditable = "true";
+		this.domElement.focus();
+		meta.selectElementContents(this.domElement);
 	},
 
 	set value(str) 
