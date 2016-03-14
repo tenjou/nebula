@@ -51,6 +51,7 @@ meta.class("Element.ListFolder", "Element.Basic",
 
 	handleDragEnd: function(domEvent) {
 		this.parent.cache.dragItem = null;
+		this.parent.sort();
 	},
 
 	handleDragEnter: function(domEvent) 
@@ -72,6 +73,8 @@ meta.class("Element.ListFolder", "Element.Basic",
 			else {
 				this.list.insertBefore(dragItem, firstChild);
 			}
+
+
 		}
 		else if(dragItem instanceof Element.ListFolder)
 		{

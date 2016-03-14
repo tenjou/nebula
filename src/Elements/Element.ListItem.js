@@ -6,8 +6,9 @@ meta.class("Element.ListItem", "Element.Basic",
 {
 	onCreate: function()
 	{
-		this._icon = new Element.Icon(this);
-		this._name = new Element.Name(this);
+		this._inner = new Element.WrappedElement("inner", this);
+		this._icon = new Element.Icon(this._inner);
+		this._name = new Element.Name(this._inner);
 
 		this.domElement.setAttribute("draggable", "true");
 
@@ -43,11 +44,22 @@ meta.class("Element.ListItem", "Element.Basic",
 	{
 		domEvent.stopPropagation();
 
+		this.preDragParent = this.parent;
 		this.parent.cache.dragItem = this;
 	},
 
-	handleDragEnd: function(domEvent) {
+	handleDragEnd: function(domEvent) 
+	{
+		domEvent.stopPropagation();
+
 		this.parent.cache.dragItem = null;
+
+		if(this.preDragParent !== this.parent) 
+		{
+			if(this.handleItemMove) {
+				this.handleItemMove();
+			}
+		}
 	},
 
 	handleDragEnter: function(domEvent) 
@@ -59,28 +71,38 @@ meta.class("Element.ListItem", "Element.Basic",
 		if(!dragItem) { return; }
 		if(dragItem === this) { return; }
 		
-		var nextSibling = this.domElement.nextElementSibling;
-		if(!nextSibling) {
-			this.parent.append(dragItem);
-		}
-		else 
+		if(this._folder)
 		{
-			if(nextSibling !== dragItem.domElement) {
-				this.parent.insertBefore(dragItem, nextSibling);
+			this.open = true;
+			this.list.append(dragItem);
+		}
+		else
+		{
+			var nextSibling = this.domElement.nextElementSibling;
+			if(!nextSibling) {
+				this.parent.append(dragItem);
 			}
 			else 
 			{
-				var prevSibling = this.domElement.previousElementSibling;
-				if(!prevSibling) {
-					this.parent.insertBefore(dragItem, this);
+				if(nextSibling !== dragItem.domElement) {
+					this.parent.insertBefore(dragItem, nextSibling);
 				}
-				else {
-					this.parent.insertBefore(dragItem, prevSibling);
+				else 
+				{
+					var prevSibling = this.domElement.previousElementSibling;
+					if(!prevSibling) {
+						this.parent.insertBefore(dragItem, this);
+					}
+					else {
+						this.parent.insertBefore(dragItem, prevSibling);
+					}
+					
 				}
-				
-			}
+			}			
 		}
 	},
+
+	handleItemMove: null,
 
 	handleDragLeave: function(domEvent) {
 		this.domElement.style.background = "";
@@ -93,7 +115,6 @@ meta.class("Element.ListItem", "Element.Basic",
 	set select(value) 
 	{
 		if(this._select === value) { return; }
-
 		this._select = value;
 
 		if(value) {
@@ -137,10 +158,78 @@ meta.class("Element.ListItem", "Element.Basic",
 		return this._icon.type;
 	},
 
+	set folder(value) 
+	{
+		if(this._folder === value) { return; }
+		this._folder = value;
+
+		if(value)
+		{
+			if(!this._caret)
+			{
+				this._caret = new Element.Caret();
+				this._inner.insertBefore(this._caret, this._inner.domElement.firstChild.holder);
+				this._caret.on("update", "*", this.handleCaretUpdate.bind(this));
+
+				this.list = new this.parent.__cls__(this);
+				this.list.itemCls = this.parent.itemCls;
+				this.list.db = this.parent.db;
+				this.list.addCls("hidden");				
+			}
+			else 
+			{
+				this._caret.removeCls("hidden");
+				this.list.removeCls("hidden");
+			}
+		}
+		else
+		{
+			this._caret.addCls("hidden");
+			this.list.addCls("hidden");
+		}
+	},
+
+	get folder() {
+		return this._folder;
+	},
+
+	handleCaretUpdate: function(event) {
+		this.open = event.element.open;
+	},
+
+	set open(value) 
+	{
+		if(!this._folder) { return; }
+		if(this._open === value) { return; }
+
+		this._open = value;
+		this._caret.open = value;
+
+		if(value) {
+			this._icon.type = "fa-folder-open";
+			this.list.removeCls("hidden");
+		}
+		else {
+			this._icon.type = "fa-folder";
+			this.list.addCls("hidden");
+		}
+	},
+
+	get open() {
+		return this._open;
+	},	
+
 	//
 	elementTag: "item",
+	preDragParent: null,
+
+	_inner: null,
 	_name: null,
 	_icon: null,
+	_caret: null,
+	list: null,
 
-	_select: false
+	_select: false,
+	_folder: false,
+	_open: false
 });

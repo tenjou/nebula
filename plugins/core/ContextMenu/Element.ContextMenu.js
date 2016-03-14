@@ -8,54 +8,63 @@ meta.class("Element.ContextMenu", "Element.Basic",
 		this.domElement.style.top = y + "px";
 	},
 
-	fill: function(data)
+	fill: function(data, id)
 	{
+		if(!id) { id = null; }
+
 		var num = data.length;
 		for(var n = 0; n < num; n++) {
-			this._loadItem(data[n]);
+			this._loadItem(data[n], id);
 		}
 	},
 
-	_loadItem: function(item)
+	_loadItem: function(item, id)
 	{
 		var strType = typeof(item);
 		if(strType === "object")
 		{
 			if(item.type === "category") {
-				this.createCategory(this, item);
+				this.createCategory(this, item, id);
 			}
 			else {
-				this.createItem(this, item);
+				this.createItem(this, item, id);
 			}
 		}
 		else if(strType === "string") {
-			this.createItem(this, item);
+			this.createItem(this, item, id);
 		}
 		else {
 			console.warn("(Element.ContextMenu.fill) Invalid data");
 		}
 	},
 
-	_loadCategoryItem: function(category, data) 
+	_loadCategoryItem: function(category, data, id) 
 	{
 		var strType = typeof(data);
 		if(strType === "object")
 		{
 			if(data.type !== "category") {
-				this.createItem(category, data);
+				this.createItem(category, data, id);
 			}
 		}
 		else if(strType === "string") {
-			this.createItem(category, data);
+			this.createItem(category, data, id);
 		}
 		else {
 			console.warn("(Element.ContextMenu.fill) Invalid data");
 		}
 	},
 
-	createCategory: function(parent, data)
+	createCategory: function(parent, data, id)
 	{
-		var categoryItem = new Element.ContextMenuCategory(parent);
+		if(id) {
+			id = id + "." + data.name;
+		}
+		else {
+			id = data.name;
+		}
+
+		var categoryItem = new Element.ContextMenuCategory(parent, id);
 		categoryItem.value = data.name;
 
 		if(data.icon) {
@@ -67,28 +76,39 @@ meta.class("Element.ContextMenu", "Element.Basic",
 			var items = data.content;
 			var num = items.length;
 			for(var n = 0; n < num; n++) {
-				this._loadCategoryItem(categoryItem.inner, items[n]);
+				this._loadCategoryItem(categoryItem.inner, items[n], id);
 			} 
 		}
 	},
 
-	createItem: function(parent, data) 
+	createItem: function(parent, data, id) 
 	{
-		var item = new Element.ContextMenuItem(parent);
+		var name = (typeof(data) === "object") ? data.name : data;
+
+		if(id) {
+			id = id + "." + name;
+		}
+		else {
+			id = name;
+		}		
+
+		var item = new Element.ContextMenuItem(parent, id);
 
 		if(typeof(data) === "object") 
 		{
+			item.value = name;
+
 			if(data.icon) {
 				item.icon = data.icon;
 			}
-			if(data.name) {
-				item.value = data.name;
-			}
+			
 			if(data.content) {
 				item.loadSubmenu(data.content);
 			}
 		}
-		else {
+		else 
+		{
+
 			item.value = data;
 		}
 	},

@@ -4,59 +4,66 @@ meta.class("Editor.ResourceManager",
 {
 	getTypeFromExt: function(ext)
 	{
-		var extInfo = this.ext[ext];
-		if(!extInfo) {
-			console.warn("(Editor.ResourceManager.getTypeFromExt): Extension not defined: " + ext);
-			return null;
+		var typeInfo, exts, num;
+		for(var typeName in this.types)
+		{
+			typeInfo = this.types[typeName];
+			exts = typeInfo.ext;
+			num = exts.length;
+			for(var n = 0; n < num; n++) 
+			{
+				if(ext === exts[n]) {
+					return typeName;
+				}
+			}
 		}
 
-		var typeInfo = this.types[extInfo];
-		if(!typeInfo) {
-			console.warn("(Editor.ResourceManager.getTypeFromExt): Type not defined for extension: " + ext);
-			return null;
-		}
-
-		return extInfo;
+		console.warn("(Editor.ResourceManager.getTypeFromExt): Extension not found: " + ext);
+		return "unknown";
 	},
 
 	getIconFromExt: function(ext)
 	{
-		var extInfo = this.ext[ext];
-		if(!extInfo) {
-			console.warn("(Editor.ResourceManager.getIconFromExt): Extension not defined: " + ext);
-			return "fa-question";
+		var typeInfo, exts, num;
+		for(var typeName in this.types)
+		{
+			typeInfo = this.types[typeName];
+			exts = typeInfo.ext;
+			num = exts.length;
+			for(var n = 0; n < num; n++) 
+			{
+				if(ext === exts[n]) {
+					return typeInfo.icon ? typeInfo.icon : "fa-question";
+				}
+			}
 		}
 
-		var typeInfo = this.types[extInfo];
-		if(!typeInfo) {
-			console.warn("(Editor.ResourceManager.getIconFromExt): Type not defined for extension: " + ext);
-			return "fa-question";
-		}
+		console.warn("(Editor.ResourceManager.getIconFromExt): Extension not found: " + ext);
 
-		return typeInfo.icon ? typeInfo.icon : "fa-question";
+		return "fa-question";
     },
 
 	//
-	ext: {
-		png: "image",
-		jpg: "image",
-		mp3: "sound",
-		m4a: "sound",
-		ogg: "sound",
-		wav: "sound",
-		txt: "text",
-		json: "text"
-	},
-
 	types: {
-		image: {
+		texture: {
+			ext: [ "png", "jpg", "bmp" ],
 			icon: "fa-delicious"
 		},
 		sound: {
+			ext: [ "mp3", "m4a", "ogg", "wav" ],
 			icon: "fa-music"
 		},
 		text: {
+			ext: [ "txt", "json" ],
 			icon: "fa-file-text-o"
+		},
+		folder: {
+			ext: [],
+			icon: "fa-folder"
+		},
+		unknown: {
+			ext: [],
+			icon: "fa-question"
 		}
 	}
 });

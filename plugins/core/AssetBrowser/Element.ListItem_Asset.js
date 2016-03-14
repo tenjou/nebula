@@ -6,9 +6,33 @@ meta.class("Element.ListItem_Asset", "Element.ListItem",
 	{
 		this._super();
 
-		this._tag = new Element.Tag(this);
-
 		this.on("menu", "*", this.openMenu.bind(this));
+	},
+
+	handleItemMove: function()
+	{
+		var db = this.preDragParent.db;
+		var index = db.indexOf(this.info);
+		if(index > -1) {
+			db[index] = db.pop();
+		}
+
+		this.parent.db.push(this.info);
+
+		var fileName = this.info.name;
+		if(this.info.ext) {
+			fileName += "." + this.info.ext;
+		}
+
+		this.info.path = this.parent.path;
+
+		editor.fileSystem.moveTo(
+			this.preDragParent.path + fileName, 
+			this.parent.path + fileName, 
+			function(data) {
+				console.log(data);
+			});
+		editor.saveCfg();
 	},
 
 	openMenu: function(event)
@@ -47,22 +71,39 @@ meta.class("Element.ListItem_Asset", "Element.ListItem",
 
 	handleMenuChoice: function(buffer) 
 	{
-		var plugin = editor.plugins.AssetBrowser;
+		console.log(buffer);
 
-		var value = buffer[0];
-		switch(value) 
+		var category = buffer[0];
+		if(category === "Create")
 		{
-			case "Delete":
-				this.parent.removeItem(this.parent.cache.selectedItem);
-				break;
-
-			case "Folder":
-				plugin.createFolder("Folder", this);
-				break;
+			var type = buffer[1];
+			if(type === "Folder") {
+				this.parent.addFolder(this);
+			}
 		}
+
+		// var plugin = editor.plugins.AssetBrowser;
+
+		// var value = buffer[0];
+		// switch(value) 
+		// {
+		// 	case "Delete":
+		// 		this.parent.removeItem(this.parent.cache.selectedItem);
+		// 		break;
+
+		// 	case "Folder":
+		// 		plugin.createFolder("Folder", this);
+		// 		break;
+		// }
 	},
 
-	set tag(name) {
+	set tag(name) 
+	{
+		if(!name) { return; }
+		
+		if(!this._tag) {
+			this._tag = new Element.Tag(this._inner);
+		}
 		this._tag.value = name;
 	},
 

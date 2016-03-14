@@ -48,12 +48,18 @@ meta.class("Element.Basic",
 
 	remove: function(element)
 	{
-		if(element instanceof Element.Basic) {
-			this.domElement.removeChild(element.domElement);
-			element.parent = null;
+		if(element)
+		{
+			if(element instanceof Element.Basic) {
+				this.domElement.removeChild(element.domElement);
+				element.parent = null;
+			}
+			else {
+				this.domElement.removeChild(element);
+			}
 		}
 		else {
-			this.domElement.removeChild(element);
+			this.parent.remove(this);
 		}
 	},
 
@@ -114,7 +120,8 @@ meta.class("Element.Basic",
 						return;
 					}
 				}
-				else if(eventBuffer["*"]) 
+				
+				if(eventBuffer["*"]) 
 				{
 					if(eventBuffer["*"](event)) {
 						return;
@@ -247,6 +254,7 @@ meta.class("Element.Basic",
 
 	//
 	parent: null,
+
 	events: null,
 
 	id: null,

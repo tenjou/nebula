@@ -15,21 +15,9 @@ Editor.Plugin("ContextMenu",
 	{
 		if(this.cb) 
 		{
-			if(event.id !== "item") {
-				this.buffer = [ event.element.value ];
-			}
-			else 
-			{
-				if(this.buffer) {
-					this.buffer.unshift(event.element.value);
-				}
-				else {
-					this.buffer = [ event.element.value ];
-				}
-				
-				this.cb(this.buffer);
-				this.buffer = null;
-			}
+			var buffer = event.element.id.split(".");
+			this.cb(buffer);
+			this.hide();
 		}
 
 		return true;
@@ -55,6 +43,5 @@ Editor.Plugin("ContextMenu",
 
 	//
 	menu: null,
-	buffer: null,
 	cb: null
 });

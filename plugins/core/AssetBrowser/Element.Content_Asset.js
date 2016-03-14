@@ -23,15 +23,14 @@ meta.class("Element.Content_Asset", "Element.Content",
 			}	
 		};
 
-		this.resList = this.get("Resources.Browser");
-		this.defList = this.get("Defs.Browser");
+		this.listRes = this.get("Resources.Browser");
+		this.listDefs = this.get("Defs.Browser");
 
-		this.on("click", "Container.Browser.item", this.inspectItem.bind(this));
-		this.on("click", "Container.Browser.folder", this.inspectItem.bind(this));
-		this.on("update", "Container.Browser.item.name", this.renameItem.bind(this));
+		this.listRes.on("select", "*", this.inspectItem.bind(this));
+		//this.on("update", "Container.Browser.item.name", this.renameItem.bind(this));
 		//this.on("update", "Container.Browser.folder.name", this.renameItem.bind(this));
-		this.resList.on("menu", "*", this.showResContextMenu.bind(this));
-		this.defList.on("menu", "*", this.showDefContextMenu.bind(this));
+		this.listRes.on("menu", "*", this.showResContextMenu.bind(this));
+		this.listDefs.on("menu", "*", this.showDefContextMenu.bind(this));
 	},
 
 	inspectItem: function(event) {
@@ -68,62 +67,31 @@ meta.class("Element.Content_Asset", "Element.Content",
 		editor.plugins.Inspect.show(info.type, info);
 	},
 
-	fill: function(data) 
+	fill: function(list, db) 
 	{
-		this.db = data;
+		list.db = db;
+		list.dbLookup = {};
 
-		for(var category in this.db) {
-			this._loadFromCategory(category, this.db[category]);
-		}		
+		this._loadFolder(db, list);
+
+		list.sort();	
 	},	
 
-	_loadFromCategory: function(category, data)
+	_loadFolder: function(db, list)
 	{
-		for(var ext in data) {
-			this._loadFromExt(ext, data[ext]);
-		}
-	},
-
-	_loadFromExt: function(ext, data)
-	{
-		var item;
-		for(var name in data)
+		var item, folder;
+		var num = db.length;
+		for(var n = 0; n < num; n++)
 		{
-			item = data[name];
-			this._addItem(item);
-		}
-	},	
-
-	addItem: function(info)
-	{
-		editor.plugins.AssetBrowser.makeNameUnique(info);
-
-		var dict;
-		var typeDict = this.db[info.type];
-		if(!typeDict) {
-			dict = {};
-			this.db[info.type] = dict;
-			typeDict = dict;
-		}
-
-		var extDict = typeDict[info.ext];
-		if(!extDict) {
-			dict = {};
-			typeDict[info.ext] = dict;
-			extDict = dict;
-		}		
-
-		extDict[info.name] = info;
-
-		this._addItem(info);
-	},
-
-	_addItem: function(info)
-	{
-		var item = this.resList.createItem(info.name);
-		item.tag = info.ext;
-		item.icon = editor.resourceMgr.getIconFromExt(info.ext);
-		item.info = info;
+			item = db[n];
+			if(item.type === "folder") {
+				folder = list._addFolder(item);
+				this._loadFolder(item.content, folder.list);
+			}
+			else {
+				list._addItem(item);
+			}
+		}	
 	},
 
 	showResContextMenu: function()
@@ -140,11 +108,14 @@ meta.class("Element.Content_Asset", "Element.Content",
 
 	handleMenuChoice: function(buffer)
 	{
-
+		var category = buffer[0];
+		if(category === "Create") 
+		{
+			
+		}
 	},
 
 	//
-	db: null,
-	resList: null,
-	defList: null
+	listRes: null,
+	listDefs: null
 });

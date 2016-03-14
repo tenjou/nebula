@@ -6,22 +6,20 @@ meta.class("Editor.Plugin.AssetBrowser", "Editor.Plugin",
 	{
 		var self = this;
 
-		var inputParserTypes = editor.inputParser.types;
-		inputParserTypes.resourceList = function(parent, name, data) 
+		var inputTypes = editor.inputParser.types;
+		inputTypes.resourceList = function(parent, name, data) 
 		{
 			var list = new Element.List_Asset(parent, name);
 			list.onItemRemove = self.removeItem.bind(self);
 			list.itemCls = Element.ListItem_Asset;
-			list.folderCls = Element.ListFolder_Asset;
 			list.info = "No resources found";
 			return list;
 		};
-		inputParserTypes.defList = function(parent, name, data) 
+		inputTypes.defList = function(parent, name, data) 
 		{
 			var list = new Element.List_Asset(parent, name);
 			list.onItemRemove = self.removeItem.bind(self);
 			list.itemCls = Element.ListItem_Asset;
-			list.folderCls = Element.ListFolder_Asset;
 			list.info = "No defs found";
 			return list;
 		};
@@ -38,16 +36,22 @@ meta.class("Editor.Plugin.AssetBrowser", "Editor.Plugin",
 
 	onDbLoad: function(db)
 	{
-		if(!db.assets) {
-			this.db = {};
-			db.assets = this.db;
+		if(!db.assets)
+		{
+			db.assets = {
+				resources: [],
+				defs: []
+			};
+
 			editor.needSave = true;
 		}
-		else {
-			this.db = db.assets;
-		}
-		
-		this.content.fill(this.db);
+
+		this.db = db.assets;
+		this.dbResources = this.db.resources;
+		this.dbDefs = this.db.defs;
+
+		this.content.fill(this.content.listRes, this.dbResources);
+		this.content.fill(this.content.listDefs, this.dbDefs);		
 	},
 
 	removeItem: function(element) 
@@ -66,59 +70,16 @@ meta.class("Editor.Plugin.AssetBrowser", "Editor.Plugin",
 
 	renameSelectedItem: function(value) 
 	{
-		this.content.list.cache.selectedItem.name = value;
+		this.content.resList.cache.selectedItem.name = value;
 		if(this.content.list.cache.selectedItem.name !== value) {
 			return false;
 		}
 		return true;
 	},
 
-	makeNameUnique: function(info, ext)
-	{
-		info.type = editor.resourceMgr.getTypeFromExt(info.ext);
-
-		var baseDict = this.db[info.type];
-		var extDict, dbDict;
-		if(!baseDict) 
-		{
-			baseDict = {};
-			baseDict[info.ext] = {};
-			this.db[info.type] = baseDict;
-
-			editor.needSave = true;
-			return info.name;
-		}
-
-		extDict = baseDict[info.ext];
-		if(!extDict) {
-			extDict = {};
-			baseDict[ext] = extDict;
-			this.db[info.type][ext] = extDict;
-		}
-
-		var index = 2;
-		var newName = info.name;
-
-		main_loop:
-		for(;;)
-		{
-			for(var fileName in extDict) 
-			{
-				if(fileName === newName) {
-					newName = info.name + "_" + index;
-					index++;
-					continue main_loop;
-				}
-			}
-
-			info.name = newName;
-			return newName;
-		}
-
-		return name;
-	},		
-
 	//
 	db: null,
+	dbResources: null,
+	dbDefs: null,
 	content: null
 });

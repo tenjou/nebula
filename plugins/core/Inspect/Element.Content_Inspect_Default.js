@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Element.Content_Inspect_Image", "Element.Content",
+meta.class("Element.Content_Inspect_Default", "Element.Content",
 {
 	onCreate: function()
 	{
@@ -28,7 +28,7 @@ meta.class("Element.Content_Inspect_Image", "Element.Content",
 	fill: function(data)
 	{
 		this.get("General.Name").value = data.name;
-		this.get("Image.Image").value = editor.fileSystem.fullPath + data.path + data.name + "." + data.ext;
+		this.get("Image.Image").value = editor.fileSystem.fullPath + data.name + "." + data.ext;
 	},
 
 	updateName: function(event)

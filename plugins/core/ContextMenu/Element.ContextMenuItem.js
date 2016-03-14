@@ -16,10 +16,14 @@ meta.class("Element.ContextMenuItem", "Element.Basic",
 	{
 		this.caret = true;
 		this.menu = new Element.ContextMenu(this);
-		this.menu.fill(items);
+		this.menu.fill(items, this.id);
 	},
 
-	handleClick: function(domEvent) {
+	handleClick: function(domEvent) 
+	{
+		domEvent.stopPropagation();
+		domEvent.preventDefault();
+
 		this.emit("click", domEvent);
 	},
 

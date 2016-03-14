@@ -4,6 +4,8 @@ meta.class("Element.List", "Element.Basic",
 {
 	onCreate: function() 
 	{
+		this.items = [];
+
 		this.domElement.onclick = this.handleClick.bind(this);
 		this.domElement.ondragenter = this.handleDragEnter.bind(this);
 		this.domElement.ondragleave = this.handleDragLeave.bind(this);
@@ -51,7 +53,6 @@ meta.class("Element.List", "Element.Basic",
 
 	handleDragLeave: function(domEvent) 
 	{
-		console.log("leave")
 		domEvent.stopPropagation();
 		domEvent.preventDefault();
 
@@ -80,18 +81,27 @@ meta.class("Element.List", "Element.Basic",
 		this.domElement.style.background = "";
 	},
 
-	createItem: function(name) 
+	createItem: function(name, insertBefore) 
 	{
 		if(!this.itemCls) {
 			this.itemCls = Element.ListItem;
 		}
 
-		var item = new this.itemCls(this);
+		var item = new this.itemCls();
 		item.name = name;
+
+		if(insertBefore) {
+			this.insertBefore(item, insertBefore);
+		}
+		else {
+			this.append(item);
+		}
 
 		if(this._info) {
 			this._info.enable = false;
 		}
+
+		this.items.push(item);
 
 		return item;
 	},
@@ -99,6 +109,11 @@ meta.class("Element.List", "Element.Basic",
 	removeItem: function(item) 
 	{
 		this.remove(item);
+
+		var index = this.items.indexOf(item);
+		if(index > -1) {
+			this.items[index] = this.items.pop();
+		}
 
 		if(this.domElement.childNodes.length === 0) {
 			this.info = this.infoTxt;
@@ -111,30 +126,17 @@ meta.class("Element.List", "Element.Basic",
 
 	onItemRemove: null,
 
-	createFolder: function(name, item)
+	sort: function()
 	{
-		if(!this.folderCls) {
-			this.folderCls = Element.ListFolder;
-		}
+		if(!this.items) { return; }
 
-		var folder;
-		if(item) 
-		{
-			folder = new this.folderCls();
-			folder.name = name;
-			this.insertBefore(folder, item);
-			folder.focus();
+		this.items.sort(this.sortFunc);
 
-			item.parent.remove(item);
-			folder.list.append(item);	
-			folder.open = true;
+		var parentDomElement = this.domElement;
+		var num = this.items.length;
+		for(var n = 0; n < num; n++) {
+			parentDomElement.appendChild(this.items[n].domElement);
 		}
-		else {
-			folder = new this.folderCls(this);
-			folder.name = name;
-		}
-
-		return folder;
 	},
 
 	filterFunc: null,
@@ -160,6 +162,7 @@ meta.class("Element.List", "Element.Basic",
 	//
 	elementTag: "list",
 
+	items: null,
 	itemCls: null,
 	folderCls: null, 
 

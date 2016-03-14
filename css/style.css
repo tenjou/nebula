@@ -204,9 +204,6 @@ tab.active tab-content {
 content section {
     margin-bottom: 2px;
 }
-content section:first-child {
-	margin-top: 1px;
-}
 content container {
 	flex: 100%;
 	display: flex;
@@ -277,7 +274,7 @@ content list {
 	flex-direction: column;
 	overflow: auto;
 }
-folder list {
+item list {
 	padding-left: 14px;
 }
 content list info {
@@ -288,8 +285,7 @@ content list info {
 	color: #C3C2C2;
 	font-size: 11px;
 }
-content list item,
-content list folder inner {
+content list item inner {
 	display: block;
 	padding: 1px;
 	color: #fff;
@@ -297,16 +293,13 @@ content list folder inner {
 	cursor: pointer;
     white-space: nowrap;
 }
-content list item.selected,
-content list folder.selected > inner {
+content list item.selected > inner {
 	background: #6e7d92;
 }
-content list item:hover,
-content list folder inner:hover {
+content list item inner:hover {
 	background: #6e7d92;
 }
 content list item icon,
-content list folder icon,
 content list caret {
 	padding: 4px;
 	font-size: 14px;

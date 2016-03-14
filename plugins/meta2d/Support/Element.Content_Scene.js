@@ -16,7 +16,7 @@ meta.class("Element.Content_Scene", "Element.Content",
 	{
 		var buffer = [];
 		
-		var assets = editor.plugins.AssetBrowser.db;
+		var assets = editor.plugins.AssetBrowser.dbResources;
 		var images = assets.image;
 		var extBuffer, num, name;
 		for(var ext in images)
