@@ -16,12 +16,11 @@ meta.class("Element.Content_Scene", "Element.Content",
 	{
 		var buffer = [];
 		
-		var assets = editor.plugins.AssetBrowser.dbResources;
-		var images = assets.image;
+		var assets = editor.plugins.AssetBrowser.db;
 		var extBuffer, num, name;
-		for(var ext in images)
+		for(var ext in assets)
 		{
-			extBuffer = images[ext];
+			extBuffer = assets[ext];
 			for(name in extBuffer) {
 				buffer.push(extBuffer[name]);
 			}

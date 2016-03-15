@@ -59,11 +59,8 @@ meta.class("Element.ListItem", "Element.Basic",
 
 		this.parent.cache.dragItem = null;
 
-		if(this.preDragParent !== this.parent) 
-		{
-			if(this.handleItemMove) {
-				this.handleItemMove();
-			}
+		if(this.preDragParent !== this.parent) {
+			this.emit("move", domEvent);
 		}
 	},
 
@@ -76,38 +73,36 @@ meta.class("Element.ListItem", "Element.Basic",
 		if(!dragItem) { return; }
 		if(dragItem === this) { return; }
 		
-		if(this._folder)
+		if(this.folder)
 		{
 			this.open = true;
 			this.list.append(dragItem);
 		}
-		else
-		{
-			var nextSibling = this.domElement.nextElementSibling;
-			if(!nextSibling) {
-				this.parent.append(dragItem);
-			}
-			else 
-			{
-				if(nextSibling !== dragItem.domElement) {
-					this.parent.insertBefore(dragItem, nextSibling);
-				}
-				else 
-				{
-					var prevSibling = this.domElement.previousElementSibling;
-					if(!prevSibling) {
-						this.parent.insertBefore(dragItem, this);
-					}
-					else {
-						this.parent.insertBefore(dragItem, prevSibling);
-					}
+		// else
+		// {
+		// 	var nextSibling = this.domElement.nextElementSibling;
+		// 	if(!nextSibling) {
+		// 		this.parent.append(dragItem);
+		// 	}
+		// 	else 
+		// 	{
+		// 		if(nextSibling !== dragItem.domElement) {
+		// 			this.parent.insertBefore(dragItem, nextSibling);
+		// 		}
+		// 		else 
+		// 		{
+		// 			var prevSibling = this.domElement.previousElementSibling;
+		// 			if(!prevSibling) {
+		// 				this.parent.insertBefore(dragItem, this);
+		// 			}
+		// 			else {
+		// 				this.parent.insertBefore(dragItem, prevSibling);
+		// 			}
 					
-				}
-			}			
-		}
+		// 		}
+		// 	}			
+		// }
 	},
-
-	handleItemMove: null,
 
 	handleDragLeave: function(domEvent) {
 		this.domElement.style.background = "";
@@ -174,7 +169,7 @@ meta.class("Element.ListItem", "Element.Basic",
 			{
 				this._caret = new Element.Caret();
 				this._inner.insertBefore(this._caret, this._inner.domElement.firstChild.holder);
-				this._caret.on("update", "*", this.handleCaretUpdate.bind(this));
+				this._caret.on("update", this.handleCaretUpdate.bind(this));
 
 				this.list = new this.parent.__cls__(this);
 				this.list.itemCls = this.parent.itemCls;
@@ -200,6 +195,7 @@ meta.class("Element.ListItem", "Element.Basic",
 
 	handleCaretUpdate: function(event) {
 		this.open = event.element.open;
+		return true;
 	},
 
 	set open(value) 

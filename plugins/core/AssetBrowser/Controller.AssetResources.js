@@ -23,6 +23,7 @@ meta.class("Controller.AssetResources",
 		this.list.on("drop", this.handleDrop.bind(this));
 		this.list.on("select", this.inspectItem.bind(this));
 		this.list.on("update", this.renameItem.bind(this));
+		this.list.on("move", this.moveItem.bind(this));
 		
 		this.upload = this.content.get("upload");
 		this.upload.on("update", this.handleUploadUpdate.bind(this));
@@ -34,10 +35,10 @@ meta.class("Controller.AssetResources",
 		this.dbLookup = {};
 		this.list.db = db;
 
-		this._loadFolder(db, this.list);
+		this._loadFolder(this.list, db);
 	},
 
-	_loadFolder: function(db, list)
+	_loadFolder: function(list, db)
 	{
 		var item, folder;
 		var num = db.length;
@@ -98,10 +99,65 @@ meta.class("Controller.AssetResources",
 		delete this.dbLookup[info.name];
 		this.dbLookup[element.value] = element.info;	
 		info.name = element.value;	
+		info.dataTransfer = Date.now();
 
 		element.parent.parent.parent.sort();
 		editor.saveCfg();
 	},	
+
+	moveItem: function(event)
+	{
+		var element = event.element;
+		var info = element.info;
+		
+		var db = element.preDragParent.db;
+		var index = db.indexOf(info);
+		if(index > -1) {
+			db[index] = db[db.length - 1];
+			db.pop();
+		}
+
+		db = element.parent.db;
+		db.push(element.info);
+		info.path = element.parent.path;
+		info.lastModified = Date.now();
+
+		var fileName = info.name;
+		if(element.folder)
+		{
+			editor.fileSystem.moveToDir(
+				element.preDragParent.path + fileName,
+				element.parent.path + fileName);
+
+			this._updateMoveItemDb(element.info.content, element.parent.path + fileName + "/");
+		}
+		else
+		{
+			fileName += "." + info.ext;
+
+			editor.fileSystem.moveTo(
+				element.preDragParent.path + fileName,
+				element.parent.path + fileName);
+		}
+		
+		element.parent.sort();
+		editor.saveCfg();
+	},
+
+	_updateMoveItemDb: function(db, path)
+	{
+		var item;
+		var num = db.length;
+		for(var n = 0; n < num; n++)
+		{
+			item = db[n];
+			item.path = path;
+
+			if(item.folder) {
+				this._updateMoveItemDb(item.info.content, path + item.info.name + "/");
+			}
+		}
+	},
 
 	openMenu: function(event)
 	{
@@ -220,12 +276,12 @@ meta.class("Controller.AssetResources",
 			db.pop();
 		}
 
+		var fileName = info.path + info.name;
 		if(item.folder) {
-			var fileName = info.path + info.name;
 			editor.fileSystem.removeDir(fileName);
 		}
 		else {
-			var fileName = info.path + info.name + "." + info.ext;
+			fileName += "." + info.ext;
 			editor.fileSystem.remove(fileName);
 		}
 
@@ -407,7 +463,7 @@ meta.class("Controller.AssetResources",
 	{
 		var item = this._addItem(list, info);
 		item.folder = true;
-		item.list.path = list.path + "/" + info.name;
+		item.list.path = list.path + info.name + "/";
 		item.list.db = info.content;
 
 		return item;
