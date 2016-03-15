@@ -22,7 +22,6 @@ meta.class("Element.ContextMenuItem", "Element.Basic",
 	handleClick: function(domEvent) 
 	{
 		domEvent.stopPropagation();
-		domEvent.preventDefault();
 
 		this.emit("click", domEvent);
 	},

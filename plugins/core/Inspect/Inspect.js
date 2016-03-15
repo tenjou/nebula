@@ -8,7 +8,7 @@ Editor.Plugin("Inspect",
 
 		this.contents = {
 			default: Element.Content,
-			image: Element.Content_Inspect_Image
+			texture: Element.Content_Inspect_Texture
 		};
 	},
 

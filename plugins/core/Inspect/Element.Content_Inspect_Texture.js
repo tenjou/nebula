@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Element.Content_Inspect_Image", "Element.Content",
+meta.class("Element.Content_Inspect_Texture", "Element.Content",
 {
 	onCreate: function()
 	{

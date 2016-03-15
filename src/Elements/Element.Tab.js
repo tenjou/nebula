@@ -13,6 +13,10 @@ meta.class("Editor.Element.Tab", "Element.Basic",
 		this.domElement.onclick = this.handleClick.bind(this);
 	},
 
+	addContent: function(content) {
+		this.container.append(content);
+	},
+
 	handleClick: function(domEvent) {
 		this.emit("click", domEvent);
 	},
@@ -22,8 +26,8 @@ meta.class("Editor.Element.Tab", "Element.Basic",
 		this._active = true;
 		this.domElement.setAttribute("class", "active");
 
-		if(this.content) {
-			this.content.hidden = false;
+		if(this.container) {
+			this.container.visible = true;
 		}
 	},
 
@@ -32,8 +36,8 @@ meta.class("Editor.Element.Tab", "Element.Basic",
 		this._active = false;
 		this.domElement.setAttribute("class", "");
 
-		if(this.content) {
-			this.content.hidden = true;
+		if(this.container) {
+			this.container.visible = false;
 		}
 	},
 
@@ -63,30 +67,11 @@ meta.class("Editor.Element.Tab", "Element.Basic",
 	get active() {
 		return this._active;
 	},
-
-	set content(content) 
-	{
-		if(this._content === content) { return; }
-
-		if(this._content) {
-			this.parentContainer.remove(this._content);
-		}
-		
-		this._content = content;
-
-		if(content) {
-			this.parentContainer.append(content);
-		}
-	},
-
-	get content() {
-		return this._content;
-	},
  
 	//
 	elementTag: "tab",
 
-	parentContainer: null,
+	container: null,
 
 	_name: null,
 	_content: null,

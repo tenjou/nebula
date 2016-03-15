@@ -6,8 +6,8 @@ meta.class("Element.Toolbar", "Element.Basic",
 	{
 		this.tabData = {};
 
-		this.tabs = new Editor.Element.Tabs(this);
-		this.container = new Element.Container(this);
+		this.holder = new Element.WrappedElement("holder", this);
+		this.tabs = new Editor.Element.Tabs(this.holder);
 	},
 
 	onTabChange: function(tabName)
@@ -15,11 +15,8 @@ meta.class("Element.Toolbar", "Element.Basic",
 
 	},
 
-	createTab: function(name)
-	{
-		var tab = this.tabs.createTab(name);
-		tab.parentContainer = this.container;
-		return tab;
+	createTab: function(name) {
+		return this.tabs.createTab(name);
 	},
 
 	set width(value) 
@@ -39,6 +36,8 @@ meta.class("Element.Toolbar", "Element.Basic",
 
 	tabs: null,
 	tabCls: Element.Tab,
+
+	holder: null,
 
 	_width: 0
 });

@@ -25,7 +25,12 @@ meta.class("Element.ListItem", "Element.Basic",
 	{
 		domEvent.stopPropagation();
 
-		if(domEvent.detail % 2 === 0) {
+		if(domEvent.detail % 2 === 0) 
+		{
+			if(this._folder) {
+				this.open = !this.open;
+			}
+			
 			this.emit("dbClick", domEvent);
 		}
 		else {

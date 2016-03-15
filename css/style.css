@@ -96,7 +96,7 @@ content {
 	flex-direction: column;
     max-height: 100%;
     overflow-y: auto;
-     position: absolute;
+    position: relative;
     width: 100%;
     height: 100%;      	
 }
@@ -130,6 +130,8 @@ wrapper > inner {
 }
 
 toolbar {
+    position: relative;
+    box-sizing: border-box;
 	display: flex;
 	flex-direction: column;
 	align-items: stretch;
@@ -144,12 +146,21 @@ toolbar:first-child {
 toolbar:last-child {
 	margin-right: 0;
 }
-
-toolbar > container {
+toolbar > holder {
+	position: absolute;
+	width: 100%;
+	height: 100%;
 	display: flex;
+	flex-direction: column;	
+}
+toolbar > holder > container {
+	display: flex;
+	flex-direction: column;
 	flex: 1 1 100%;
 	background: #535353;
     position: relative;
+	width: 100%;
+	height: 100%;    
 }
 
 tabs {

@@ -302,9 +302,25 @@ meta.class("Editor.FileSystem",
 
 	removeDir: function(name, cb)
 	{
-
+		this.fs.getDirectory(this.rootDir + name, {},
+			function(dirEntry)
+			{
+				dirEntry.removeRecursively(
+					function() 
+					{
+						if(cb) {
+							cb(dirEntryEntry.toURL());
+						}
+					},
+					function(fileError) {
+						self.handleError(fileError, cb, "remove", filename);
+					});
+			},
+			function(fileError) {
+				self.handleError(fileError, cb, "removeDir", name);
+			});
 	},
-
+	
 	moveToDir: function(path, targetPath, cb)
 	{
 		var self = this;

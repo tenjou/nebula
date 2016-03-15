@@ -149,6 +149,12 @@ meta.class("Editor.InputParser",
 		{
 			var image = new Element.Image(parent, name);
 			return image;
+		},
+
+		upload: function(parent, name, data)
+		{
+			var upload = new Element.Upload(parent, name);
+			return upload;
 		}
 	}
 });

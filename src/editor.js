@@ -60,6 +60,8 @@ meta.class("Editor",
 
 	loadProject: function(name)
 	{
+		document.title = name + " - META Editor";
+
 		this.onSplashEnd();
 
 		this.info.enable = true;

@@ -15,12 +15,12 @@ Editor.Plugin("Support",
 
 	onStart: function()
 	{
-		this.content = new Element.Content_Scene();
-		this.content.append(this.iframe);
-
 		var roomToolbar = editor.inner.roomToolbar;
-		var tab = roomToolbar.createTab("Scene");		
-		tab.content = this.content;
+		var tab = roomToolbar.createTab("Scene");
+
+		this.content = new Element.Content_Scene();
+		this.content.append(this.iframe);	
+		tab.addContent(this.content);
 	},
 
 	//

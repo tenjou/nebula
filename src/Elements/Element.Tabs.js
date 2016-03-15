@@ -41,6 +41,8 @@ meta.class("Editor.Element.Tabs", "Element.Basic",
 	{
 		var tab = new Editor.Element.Tab(this.inner);
 		tab.name = name;
+		tab.container = new Element.Container(this.parent);
+		tab.container.visible = false;
 
 		this.tabs[name] = tab;
 		this.numTabs++;

@@ -7,6 +7,7 @@ meta.class("Element.List", "Element.Basic",
 		this.items = [];
 
 		this.domElement.onclick = this.handleClick.bind(this);
+		this.domElement.oncontextmenu = this.handleContextMenu.bind(this);
 		this.domElement.ondragenter = this.handleDragEnter.bind(this);
 		this.domElement.ondragleave = this.handleDragLeave.bind(this);
 		this.domElement.addEventListener("drop", this.handleDrop.bind(this), false);
@@ -20,6 +21,12 @@ meta.class("Element.List", "Element.Basic",
 	handleClick: function(domEvent) {
 		this.emit("click", domEvent);
 	},
+
+	handleContextMenu: function(domEvent) {
+		domEvent.stopPropagation();
+		domEvent.preventDefault();
+		this.emit("menu", domEvent);
+	},	
 
 	selectItem: function(event)
 	{
@@ -71,6 +78,8 @@ meta.class("Element.List", "Element.Basic",
 		if(!dragItem) { 
 			this.hideDragStyle();
 		}	
+
+		this.emit("drop", domEvent);
 	},
 
 	showDragStyle: function() {
@@ -112,19 +121,14 @@ meta.class("Element.List", "Element.Basic",
 
 		var index = this.items.indexOf(item);
 		if(index > -1) {
-			this.items[index] = this.items.pop();
+			this.items[index] = this.items[this.items.length - 1];
+			this.items.pop();
 		}
 
 		if(this.domElement.childNodes.length === 0) {
 			this.info = this.infoTxt;
 		}
-
-		if(this.onItemRemove) {
-			this.onItemRemove(item);
-		}
 	},
-
-	onItemRemove: null,
 
 	sort: function()
 	{

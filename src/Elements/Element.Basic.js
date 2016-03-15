@@ -92,9 +92,16 @@ meta.class("Element.Basic",
 		if(domEvent) 
 		{
 			event.domEvent = domEvent;
-			event.x = domEvent.clientX;
-			event.y = domEvent.clientY;
-			this.updateEventElementOffset(event);
+			if(domEvent.clientX) 
+			{
+				event.x = domEvent.clientX;
+				event.y = domEvent.clientY;
+				this.updateEventElementOffset(event);
+			}
+			else {
+				event.x = 0;
+				event.y = 0;
+			}
 		}
 
 		this._emit(event);
@@ -149,6 +156,11 @@ meta.class("Element.Basic",
 
 	on: function(event, id, cb)
 	{
+		if(!cb && typeof(id) === "function") {
+			cb = id;
+			id = "*";
+		}
+
 		if(!this.events) {
 			this.events = {};
 		}

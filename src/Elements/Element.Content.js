@@ -13,6 +13,10 @@ meta.class("Element.Content", "Element.Basic",
 		}
 	},
 
+	load: function(ctrlCls) {
+		this.ctrl = new ctrlCls(this);
+	},
+
 	handleContextMenu: function(event) {
 		event.preventDefault();
 		this.emit("menu");
