@@ -7,9 +7,13 @@ Editor.Plugin("Inspect",
 		this.cachedContents = {};
 
 		this.contents = {
-			default: Element.Content,
-			texture: Element.Content_Inspect_Texture
+			default: Controller.Inspect_Default,
+			texture: Controller.Inspect_Texture
 		};
+
+		var content = new Element.Content();
+		content.load(Controller.Inspect_Default);
+		this.content = content;		
 	},
 
 	onStart: function() {
@@ -18,22 +22,27 @@ Editor.Plugin("Inspect",
 
 	show: function(type, data)
 	{
-		if(!this.contents[type]) {
-			console.warn("(Editor.Plugin.Inspect) No content found for type: " + type);
-			type = "default";
-		}
 
-		var content = this.cachedContents[type];
-		if(!content) {
-			content = new this.contents[type]();
-			this.cachedContents[type] = content;
-		}		
 
-		if(type !== "default") {
-			content.fill(data);
-		}
+		//this.tab.clearContent();
+		this.tab.addContent(this.content);
 
-		this.tab.content = content;
+		// if(!this.contents[type]) {
+		// 	console.warn("(Editor.Plugin.Inspect) No content found for type: " + type);
+		// 	type = "default";
+		// }
+
+		// var content = this.cachedContents[type];
+		// if(!content) {
+		// 	content = new this.contents[type]();
+		// 	this.cachedContents[type] = content;
+		// }		
+
+		// if(type !== "default") {
+		// 	content.fill(data);
+		// }
+
+		// this.tab.content = content;
 	},
 
 	empty: function() {

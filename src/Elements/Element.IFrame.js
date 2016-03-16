@@ -12,6 +12,8 @@ meta.class("Element.IFrame", "Element.Basic",
 		var contentDocument = this.domElement.contentWindow.document;
 		contentDocument.oncontextmenu = this.handleContextMenu.bind(this);
 		//contentDocument.onclick = this.handleClick.bind(this);
+
+		this.emit("load");
 	},
 
 	handleContextMenu: function(domEvent) 

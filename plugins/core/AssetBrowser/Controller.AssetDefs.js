@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Controller.AssetDefs", 
+meta.class("Controller.AssetDefs", "Controller.AssetBrowser",
 {
 	init: function(content) 
 	{
@@ -17,35 +17,109 @@ meta.class("Controller.AssetDefs",
 		};
 
 		this.list = this.content.get("Defs.Browser");
+		this.list.on("select", this.inspectItem.bind(this));
+		this.list.on("update", this.renameItem.bind(this));
+		this.list.on("move", this.moveItem.bind(this));		
+
+		this.content.on("menu", this.openMenu.bind(this));
 	},
 
-	loadFromDb: function(db)
+	createListMenu: function(element)
 	{
-		this.db = db;
-		this.dbLookup = {};
+		var menu = [
+			{
+				name: "Create", 
+				type: "category",
+				content: [
+					{ 
+						name: "Folder", 
+						icon: "fa-folder" 
+					},
+					{ 
+						name: "Sprite", 
+						icon: "fa-cube" 
+					}					
+				]
+			}
+		];
 
-		this._loadFolder(db, this.list);
+		this.currItem = element;
+		this.currList = element;		
+
+		return menu;
 	},
 
-	_loadFolder: function(db, list)
+	createItemMenu: function(element)
 	{
-		var item, folder;
-		var num = db.length;
-		for(var n = 0; n < num; n++)
+		var menu = [
+			{
+				name: "Create", 
+				type: "category",
+				content: [
+					{ 
+						name: "Folder", 
+						icon: "fa-folder" 
+					},
+					{ 
+						name: "Sprite", 
+						icon: "fa-cube" 
+					}					
+				]
+			},
+			{
+				name: "Actions", 
+				type: "category",
+				content: [
+					{
+						name: "Delete", 
+						icon: "fa-trash"
+					}
+				]
+			}			
+		];
+
+		this.currItem = element;
+		this.currList = element.parent;		
+
+		return menu;
+	},
+
+	handleContextMenu: function(buffer)
+	{
+		var category = buffer[0];
+		var type = buffer[1];
+
+		if(category === "Create")
 		{
-			item = db[n];
-			if(item.type === "folder") {
-				folder = list._addFolder(item);
-				this._loadFolder(item.content, folder.list);
-			}
-			else {
-				list._addItem(item);
-			}
+			switch(type)
+			{
+				case "Folder":
+					this.addFolder(this.currList);
+					break;
 
-			this.dbLookup[item.name] = item;
-		}	
+				case "Sprite":
+					this.createPrefab(this.currList, "sprite");
+					break;
+			}
+		}
+		else if(category === "Actions")
+		{
+			if(type === "Delete") {
+				this.removeItem(this.currList, this.currItem);
+			}
+		}
+	},
 
-		list.sort();	
+	createPrefab: function(list, type)
+	{
+		var info = {
+			name: type,
+			path: list.path,
+			type: type,
+			lastModified: Date.now()
+		};
+
+		this.addItem(list, info);
 	},
 
 	//

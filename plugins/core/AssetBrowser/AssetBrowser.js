@@ -15,8 +15,7 @@ meta.class("Editor.Plugin.AssetBrowser", "Editor.Plugin",
 		};
 		inputTypes.defList = function(parent, name, data) 
 		{
-			var list = new Element.List_Asset(parent, name);
-			list.itemCls = Element.ListItem_Asset;
+			var list = new Element.List(parent, name);
 			list.info = "No defs found";
 
 			return list;

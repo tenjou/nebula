@@ -304,9 +304,10 @@ content list item inner {
 	cursor: pointer;
     white-space: nowrap;
 }
-content list item.selected > inner {
-	background: #6e7d92;
+content list item inner.drag-over {
+	background: #7D7D7D;
 }
+content list item.selected > inner,
 content list item inner:hover {
 	background: #6e7d92;
 }

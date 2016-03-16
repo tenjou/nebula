@@ -4,13 +4,6 @@ Editor.Plugin("Support",
 {
 	install: function()
 	{
-		this.iframe = new Element.IFrame();
-		this.iframe.value = "plugins/meta2d/Support/index.html";
-	},
-
-	onSplashEnd: function()
-	{
-		
 	},
 
 	onStart: function()
@@ -18,8 +11,8 @@ Editor.Plugin("Support",
 		var roomToolbar = editor.inner.roomToolbar;
 		var tab = roomToolbar.createTab("Scene");
 
-		this.content = new Element.Content_Scene();
-		this.content.append(this.iframe);	
+		this.content = new Element.Content();
+		this.content.load(Controller.Scene);
 		tab.addContent(this.content);
 	},
 

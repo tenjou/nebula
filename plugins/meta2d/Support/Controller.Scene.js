@@ -5,19 +5,24 @@ meta.class("Controller.Scene",
 	init: function(content)
 	{
 		this.content = content;
+		this.content.data = {
+			Scene: {
+				type: "iframe",
+				value: "plugins/meta2d/Support/index.html"
+			}
+		};
+
+		this.scene = this.content.get("Scene");
+		this.scene.on("load", this.handleIFrameLoad.bind(this));
+		this.scene.on("menu", this.showContextMenu.bind(this));
 	},
 
-	onCreate: function() 
+	handleIFrameLoad: function(event)
 	{
-		this.domElement.onclick = this.handleClick.bind(this);
-		this.on("menu", "iframe", this.showContextMenu.bind(this));
+		console.log("iframe-load");
 	},
 
-	handleClick: function(domEvent) {
-
-	},
-
-	showContextMenu: function(event) 
+	showContextMenu: function(event)
 	{
 		var buffer = [];
 		
@@ -60,16 +65,5 @@ meta.class("Controller.Scene",
 		];
 
 		editor.plugins.ContextMenu.show(menu, event.x, event.y, this.handleMenuChoice.bind(this));
-	},
-
-	handleMenuChoice: function(buffer)
-	{
-		console.log(buffer);
-	},
-
-	sortFunc_byName: function(a, b) {
-		if(a.name < b.name) { return -1; }
-		if(a.name > b.name) { return 1; }
-		return 0;
 	}
 });

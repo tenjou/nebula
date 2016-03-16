@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Controller.AssetResources", 
+meta.class("Controller.AssetResources", "Controller.AssetBrowser",
 {
 	init: function(content) 
 	{
@@ -27,150 +27,6 @@ meta.class("Controller.AssetResources",
 		
 		this.upload = this.content.get("upload");
 		this.upload.on("update", this.handleUploadUpdate.bind(this));
-	},
-
-	loadFromDb: function(db)
-	{
-		this.db = db;
-		this.dbLookup = {};
-		this.list.db = db;
-
-		this._loadFolder(this.list, db);
-	},
-
-	_loadFolder: function(list, db)
-	{
-		var item, folder;
-		var num = db.length;
-		for(var n = 0; n < num; n++)
-		{
-			item = db[n];
-			if(item.type === "folder") {
-				folder = this._addFolder(list, item);
-				this._loadFolder(folder.list, item.content);
-			}
-			else {
-				this._addItem(list, item);
-			}
-
-			this.dbLookup[item.name] = item;
-		}	
-
-		list.sort();	
-	},
-
-	inspectItem: function(event)
-	{
-		var info = this.list.cache.selectedItem.info;
-		editor.plugins.Inspect.show(info.type, info);
-	},
-
-	updateInspectItem: function()
-	{
-
-	},
-
-	renameItem: function(event)
-	{
-		var element = event.element;
-		var item = element.parent.parent;
-		var info = element.parent.parent.info;
-
-		if(this.dbLookup[element.value]) {
-			element.revert();
-			return;
-		}
-
-		if(item.folder)
-		{
-			editor.fileSystem.moveToDir(
-				info.path + info.name, 
-				info.path + element.value, 
-				this.updateInspectItem.bind(this));
-		}
-		else
-		{
-			editor.fileSystem.moveTo(
-				info.path + info.name + "." + info.ext, 
-				info.path + element.value + "." + info.ext, 
-				this.updateInspectItem.bind(this));
-		}
-
-		delete this.dbLookup[info.name];
-		this.dbLookup[element.value] = element.info;	
-		info.name = element.value;	
-		info.dataTransfer = Date.now();
-
-		element.parent.parent.parent.sort();
-		editor.saveCfg();
-	},	
-
-	moveItem: function(event)
-	{
-		var element = event.element;
-		var info = element.info;
-		
-		var db = element.preDragParent.db;
-		var index = db.indexOf(info);
-		if(index > -1) {
-			db[index] = db[db.length - 1];
-			db.pop();
-		}
-
-		db = element.parent.db;
-		db.push(element.info);
-		info.path = element.parent.path;
-		info.lastModified = Date.now();
-
-		var fileName = info.name;
-		if(element.folder)
-		{
-			editor.fileSystem.moveToDir(
-				element.preDragParent.path + fileName,
-				element.parent.path + fileName);
-
-			this._updateMoveItemDb(element.info.content, element.parent.path + fileName + "/");
-		}
-		else
-		{
-			fileName += "." + info.ext;
-
-			editor.fileSystem.moveTo(
-				element.preDragParent.path + fileName,
-				element.parent.path + fileName);
-		}
-		
-		element.parent.sort();
-		editor.saveCfg();
-	},
-
-	_updateMoveItemDb: function(db, path)
-	{
-		var item;
-		var num = db.length;
-		for(var n = 0; n < num; n++)
-		{
-			item = db[n];
-			item.path = path;
-
-			if(item.folder) {
-				this._updateMoveItemDb(item.info.content, path + item.info.name + "/");
-			}
-		}
-	},
-
-	openMenu: function(event)
-	{
-		var menu;
-		var element = event.element;
-		if(element instanceof Element.ListItem) {
-			menu = this.createItemMenu(element);
-		}
-		else {
-			menu = this.createListMenu(element);
-		}
-		
-		editor.plugins.ContextMenu.show(menu, event.x, event.y, this.handleContextMenu.bind(this));
 	},
 
 	createListMenu: function(element) 
@@ -261,40 +117,29 @@ meta.class("Controller.AssetResources",
 		}
 	},
 
-	removeItem: function(list, item)
-	{
-		var info = item.info;
-		var db = list.db;
-
-		list.removeItem(item);
-
-		delete this.dbLookup[info.name];
-
-		var index = db.indexOf(info);
-		if(index > -1) {
-			db[index] = db[db.length - 1];
-			db.pop();
-		}
-
-		var fileName = info.path + info.name;
-		if(item.folder) {
-			editor.fileSystem.removeDir(fileName);
-		}
-		else {
-			fileName += "." + info.ext;
-			editor.fileSystem.remove(fileName);
-		}
-
-		editor.saveCfg();
-
-		// if(element.select) {
-		// 	editor.plugins.Inspect.show("default");
-		// }		
-	},
-
 	// upload
 	handleUploadUpdate: function(event)
 	{
+		// if(event.element instanceof Element.ListItem) 
+		// {
+		// 	if(event.element.folder) {
+		// 		this.currList = event.element.list;
+		// 		event.element.open = true;
+		// 	}
+		// 	else {
+		// 		this.currList = event.element.parent;
+		// 	}
+		// }
+		// else if(event.element instanceof Element.List) {
+		// 	this.currList = event.element;
+		// }
+		// else {
+		// 	this.currList = null;
+		// 	return;
+		// }
+
+		this.currList = this.list;
+
 		var files = event.domEvent.target.files;
 		var num = files.length;
 
@@ -306,6 +151,25 @@ meta.class("Controller.AssetResources",
 	handleDrop: function(event)
 	{
 		var domEvent = event.domEvent;
+
+		this.currList = this.list;
+
+		// if(event.element instanceof Element.ListItem) 
+		// {
+		// 	if(event.element.folder) {
+		// 		this.currList = event.element.list;
+		// 	}
+		// 	else {
+		// 		this.currList = event.element.parent;
+		// 	}
+		// }
+		// else if(event.element instanceof Element.List) {
+		// 	this.currList = event.element;
+		// }
+		// else {
+		// 	this.currList = null;
+		// 	return;
+		// }
 
 		if(meta.device.name === "Chrome") {
 			this.handleFileSelect_Chrome(domEvent);
@@ -389,15 +253,15 @@ meta.class("Controller.AssetResources",
 
 		var info = {
 			name: idName,
-			path: this.list.path,
+			path: this.currList.path,
 			ext: ext,
 			type: editor.resourceMgr.getTypeFromExt(ext),
 			lastModified: file.lastModified
 		};
-		this.addItem(this.list, info);
+		this.addItem(this.currList, info);
 
 		var blob = dataURItoBlob(fileResult.target.result, file.type);
-		editor.fileSystem.writeBlob(this.list.path + info.name + "." + ext, blob, this._handleOnFileLoad.bind(this));		
+		editor.fileSystem.writeBlob(this.currList.path + info.name + "." + ext, blob, this._handleOnFileLoad.bind(this));		
 	},
 
 	_handleOnFileLoad: function(path)
@@ -408,97 +272,8 @@ meta.class("Controller.AssetResources",
 		}
 	},	
 
-	addItem: function(list, info)
-	{
-		this.makeNameUnique(info);
-
-		var item = this._addItem(list, info);
-
-		list.db.push(info);
-		list.sort();
-		editor.saveCfg();
-
-		return item;
-	},
-
-	_addItem: function(list, info)
-	{
-		var typeInfo = editor.resourceMgr.types[info.type];
-		if(!typeInfo) {
-			typeInfo = editor.resourceMgr.types.unknown;
-		}
-
-		var item = list.createItem(info.name);
-		item.tag = info.ext;
-		item.icon = typeInfo.icon ? typeInfo.icon : "fa-unknown";
-		item.info = info;
-
-		this.dbLookup[info.name] = info;
-
-		return item;
-	},	
-
-	addFolder: function(list)
-	{
-		var info = {
-			name: "Folder",
-			path: list.path,
-			ext: "",
-			type: "folder",
-			lastModified: Date.now(),
-			content: []
-		};
-
-		var item = this.addItem(list, info);
-		item.folder = true;
-		item.list.path = list.path + info.name + "/";
-		item.list.db = info.content;
-
-		editor.fileSystem.createDir(item.list.path);
-
-		return item;
-	},
-
-	_addFolder: function(list, info) 
-	{
-		var item = this._addItem(list, info);
-		item.folder = true;
-		item.list.path = list.path + info.name + "/";
-		item.list.db = info.content;
-
-		return item;
-	},		
-
-	makeNameUnique: function(info)
-	{
-		var index = 2;
-		var newName = info.name;
-
-		for(;;)
-		{
-			if(this.dbLookup[newName]) {
-				newName = info.name + "." + index;
-				index++;
-				continue;
-			}
-
-			info.name = newName;
-			return newName;
-		}
-
-		return name;
-	},	
-
 	//
-	content: null,
-	list: null,
 	upload: null,
-
-	db: null,
-	dbLookup: null,
-
-	currItem: null,
-	currList: null,
 
 	numItemsLoading: 0
 });

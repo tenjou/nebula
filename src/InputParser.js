@@ -151,6 +151,13 @@ meta.class("Editor.InputParser",
 			return image;
 		},
 
+		iframe: function(parent, name, data)
+		{
+			var iframe = new Element.IFrame(parent, name);
+			iframe.value = data.value;
+			return iframe;
+		},
+
 		upload: function(parent, name, data)
 		{
 			var upload = new Element.Upload(parent, name);

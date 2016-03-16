@@ -64,6 +64,9 @@ meta.class("Editor.ResourceManager",
 		unknown: {
 			ext: [],
 			icon: "fa-question"
+		},
+		sprite: {
+			icon: "fa-cube"
 		}
 	}
 });

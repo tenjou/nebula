@@ -19,6 +19,7 @@ meta.class("Element.ListItem", "Element.Basic",
 		this.domElement.ondragend = this.handleDragEnd.bind(this);
 		this.domElement.ondragenter = this.handleDragEnter.bind(this);
 		this.domElement.ondragleave = this.handleDragLeave.bind(this);
+		this.domElement.addEventListener("drop", this.handleDrop.bind(this), false);
 	},
 
 	handleClick: function(domEvent)
@@ -41,7 +42,6 @@ meta.class("Element.ListItem", "Element.Basic",
 	handleContextMenu: function(domEvent) {
 		domEvent.preventDefault();
 		domEvent.stopPropagation();
-		this.emit("click", domEvent);
 		this.emit("menu", domEvent);
 	},	
 
@@ -59,15 +59,22 @@ meta.class("Element.ListItem", "Element.Basic",
 
 		this.parent.cache.dragItem = null;
 
+		this.hideDragStyle();
+
 		if(this.preDragParent !== this.parent) {
 			this.emit("move", domEvent);
 		}
-	},
+	},		
 
 	handleDragEnter: function(domEvent) 
 	{
 		domEvent.stopPropagation();
 		domEvent.preventDefault();
+
+		this.showDragStyle();
+		if(this.folder) {
+			this.open = true;
+		}
 
 		var dragItem = this.parent.cache.dragItem;
 		if(!dragItem) { return; }
@@ -75,9 +82,10 @@ meta.class("Element.ListItem", "Element.Basic",
 		
 		if(this.folder)
 		{
-			this.open = true;
 			this.list.append(dragItem);
 		}
+
+		
 		// else
 		// {
 		// 	var nextSibling = this.domElement.nextElementSibling;
@@ -105,7 +113,25 @@ meta.class("Element.ListItem", "Element.Basic",
 	},
 
 	handleDragLeave: function(domEvent) {
-		this.domElement.style.background = "";
+		domEvent.stopPropagation();
+		this.hideDragStyle();
+	},
+
+	handleDrop: function(domEvent) 
+	{
+		domEvent.stopPropagation();
+		domEvent.preventDefault();
+		
+		this.hideDragStyle();
+		this.emit("drop", domEvent);
+	},
+
+	showDragStyle: function() {
+		this._inner.addCls("drag-over");
+	},
+
+	hideDragStyle: function() {
+		this._inner.removeCls("drag-over");
 	},
 
 	focus: function() {
