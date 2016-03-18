@@ -22,3 +22,47 @@ meta.selectElementContents = function(element)
 	selection.removeAllRanges();
 	selection.addRange(range);
 };
+
+meta.merge = function(a, b)
+{
+	var output = {};
+
+	for(var key in a) {
+		output[key] = a[key];
+	}
+
+	meta.mergeAppend(output, b);
+
+	return output;
+};
+
+meta.mergeAppend = function(target, src)
+{
+	var value, targetValue;
+	for(var key in src)
+	{
+		if(src.hasOwnProperty(key)) 
+		{
+			value = src[key];
+			if(typeof(value) === "object") 
+			{
+				targetValue = target[key];
+				if(!targetValue) {
+					target[key] = src[key];
+				}
+				else 
+				{
+					if(typeof(targetValue) === "object") {
+						meta.mergeAppend(targetValue, value);
+					}
+					else {
+						console.warn("(meta.mergeAppend) Incompatible types for '" + key + "' key");
+					}
+				}
+			}
+			else {
+				target[key] = src[key];
+			}
+		}
+	}
+};

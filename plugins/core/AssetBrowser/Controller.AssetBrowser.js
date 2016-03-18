@@ -1,14 +1,13 @@
 "use strict";
 
-meta.class("Controller.AssetBrowser", 
+Editor.controller("AssetBrowser", 
 {
-	loadFromDb: function(db)
+	onBindData: function()
 	{
-		this.db = db;
 		this.dbLookup = {};
-		this.list.db = db;
+		this.list.db = this.data;
 
-		this._loadFolder(this.list, db);
+		this._loadFolder(this.list, this.data);
 	},
 
 	_loadFolder: function(list, db)

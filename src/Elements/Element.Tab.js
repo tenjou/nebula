@@ -67,6 +67,11 @@ meta.class("Editor.Element.Tab", "Element.Basic",
 	get active() {
 		return this._active;
 	},
+
+	set content(content) {
+		this.container.domElement.innerHTML = "";
+		this.container.append(content);	
+	},
  
 	//
 	elementTag: "tab",

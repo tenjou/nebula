@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Editor.Plugin.AssetBrowser", "Editor.Plugin",
+Editor.plugin("AssetBrowser", 
 {
 	install: function()
 	{
@@ -20,6 +20,37 @@ meta.class("Editor.Plugin.AssetBrowser", "Editor.Plugin",
 
 			return list;
 		};
+
+		editor.addContent("AssetBrowser.Resources", 
+			{
+				ctrl: "AssetResources",
+				data: {
+					Resources: {
+						type: "containerNamed",
+						content: {
+							Browser: {
+								type: "resourceList"
+							}
+						}
+					},
+					upload: "@upload"
+				}
+			});
+
+		editor.addContent("AssetBrowser.Defs", 
+			{
+				ctrl: "AssetDefs",
+				data: {
+					Defs: {
+						type: "containerNamed",
+						content: {
+							Browser: {
+								type: "defList"
+							}
+						}
+					}
+				}
+			});		
 	},
 
 	onStart: function()
@@ -27,12 +58,10 @@ meta.class("Editor.Plugin.AssetBrowser", "Editor.Plugin",
 		var leftToolbar = editor.inner.leftToolbar;
 		var tab = leftToolbar.createTab("Project");
 
-		this.contentResources = new Element.Content();
-		this.contentResources.load(Controller.AssetResources);
+		this.contentResources = editor.createContent("AssetBrowser.Resources");
 		tab.addContent(this.contentResources);
 
-		this.contentDefs = new Element.Content();
-		this.contentDefs.load(Controller.AssetDefs);
+		this.contentDefs = editor.createContent("AssetBrowser.Defs");
 		tab.addContent(this.contentDefs);
 	},
 
@@ -50,8 +79,8 @@ meta.class("Editor.Plugin.AssetBrowser", "Editor.Plugin",
 
 		this.db = db.assets;
 
-		this.contentResources.ctrl.loadFromDb(this.db.resources);
-		this.contentDefs.ctrl.loadFromDb(this.db.defs);	
+		this.contentResources.bindData(this.db.resources);
+		this.contentDefs.bindData(this.db.defs);	
 	},
 
 	renameSelectedItem: function(value) 

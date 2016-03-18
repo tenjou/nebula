@@ -6,6 +6,7 @@ meta.class("Element.Content", "Element.Basic",
 	{
 		this._init(parent, id);
 
+		this.ctrls = [];
 		this.domElement.oncontextmenu = this.handleContextMenu.bind(this);
 
 		if(this.onCreate) {
@@ -13,13 +14,39 @@ meta.class("Element.Content", "Element.Basic",
 		}
 	},
 
-	load: function(ctrlCls) {
-		this.ctrl = new ctrlCls(this);
-	},
-
 	handleContextMenu: function(event) {
 		event.preventDefault();
 		this.emit("menu");
+	},
+
+	addCtrl: function(ctrlName) 
+	{
+		var ctrlCls = Editor.ControllerMap[ctrlName];
+		if(!ctrlCls) {
+			console.warn("Element.addCtrl) No such controller found: " + ctrlName);
+			return;
+		}
+
+		var ctrl = new ctrlCls(this);
+
+		if(!this.ctrls) {
+			this.ctrls = [ ctrl ];
+		}
+		else {
+			this.ctrls.push(ctrl);
+		}
+
+		if(this.tree) {
+			ctrl.load();
+		}
+	},
+
+	bindData: function(data)
+	{
+		var num = this.ctrls.length;
+		for(var n = 0; n < num; n++) {
+			this.ctrls[n].bindData(data);
+		}
 	},
 
 	get: function(id)
@@ -44,8 +71,21 @@ meta.class("Element.Content", "Element.Basic",
 
 	fill: function(data) {},
 
-	set data(data) {
+	empty: function() {
+		this.domElement.innerHTML = "";
+	},
+
+	set data(data) 
+	{
 		this.tree = editor.inputParser.parse(this, data);
+
+		if(this.ctrls)
+		{
+			var num = this.ctrls.length;
+			for(var n = 0; n < num; n++) {
+				this.ctrls[n].load();
+			}
+		}
 	},
 
 	set hidden(value) 
@@ -70,5 +110,6 @@ meta.class("Element.Content", "Element.Basic",
 
 	//
 	elementTag: "content",
-	tree: null
+	tree: null,
+	ctrls: null
 });

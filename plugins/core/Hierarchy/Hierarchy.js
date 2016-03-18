@@ -1,6 +1,6 @@
 "use strict";
 
-Editor.Plugin("Hierarchy", 
+Editor.plugin("Hierarchy", 
 {
 	onStart: function()
 	{

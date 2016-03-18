@@ -1,6 +1,6 @@
 "use strict";
 
-Editor.Plugin("ContextMenu", 
+Editor.plugin("ContextMenu", 
 {
 	onSplashStart: function()
 	{

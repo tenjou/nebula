@@ -1,56 +1,80 @@
 "use strict";
 
-Editor.Plugin("Inspect",
+Editor.plugin("Inspect",
 {
 	install: function()
 	{
-		this.cachedContents = {};
+		editor.addContent("inspect.default", 
+			{
+				ctrl: "Inspect.Default",
+				data: {
+					General: {
+						type: "section",
+						content: {
+							Name: "@string",
+						}
+					}
+				}
+			});
 
-		this.contents = {
-			default: Controller.Inspect_Default,
-			texture: Controller.Inspect_Texture
-		};
-
-		var content = new Element.Content();
-		content.load(Controller.Inspect_Default);
-		this.content = content;		
+		editor.addContent("inspect.texture", 
+			{
+				ctrl: "Inspect.Texture",
+				extend: [ "inspect.default" ],
+				data: {
+					Image: {
+						type: "section",
+						content: {
+							Image: "@image"
+						}
+					}
+				}
+			});	
 	},
 
-	onStart: function() {
+	onStart: function() 
+	{
 		this.tab = editor.inner.rightToolbar.createTab("Inspect");
 	},
 
-	show: function(type, data)
+	show: function(typeName, data)
 	{
+		var content = editor.createContent("inspect." + typeName);
+		if(!content) {
+			content = editor.createContent("inspect.default");
+		}
 
-
-		//this.tab.clearContent();
-		this.tab.addContent(this.content);
-
-		// if(!this.contents[type]) {
-		// 	console.warn("(Editor.Plugin.Inspect) No content found for type: " + type);
-		// 	type = "default";
-		// }
-
-		// var content = this.cachedContents[type];
-		// if(!content) {
-		// 	content = new this.contents[type]();
-		// 	this.cachedContents[type] = content;
-		// }		
-
-		// if(type !== "default") {
-		// 	content.fill(data);
-		// }
-
-		// this.tab.content = content;
+		content.bindData(data);
+		this.tab.content = content;	
 	},
 
 	empty: function() {
+		this.content.empty();
+	},
 
+	addType: function(name, info)
+	{
+		if(this.types[name]) {
+			console.warn("(Plugin.Inspect.addType) There is already such type defined: " + name);
+			return;
+		}
+
+		this.types[name] = info;
+	},
+
+	getType: function(name) 
+	{
+		var type = this.types[name];
+		if(!type) {
+			console.warn("(Plugin.Inspect.show) No type found: " + name);
+			return null;
+		}
+
+		return type;
 	},
 
 	//
-	contents: null,
-	cachedContents: null,
 	tab: null
 });
+
+

@@ -1,27 +1,18 @@
 "use strict";
 
-meta.class("Controller.AssetDefs", "Controller.AssetBrowser",
+Editor.controller("AssetDefs", "AssetBrowser",
 {
-	init: function(content) 
+	onCreate: function() 
 	{
-		this.content = content;
-		this.content.data = {
-			Defs: {
-				type: "containerNamed",
-				content: {
-					Browser: {
-						type: "defList"
-					}
-				}
-			}
-		};
+		this.content.on("menu", this.openMenu.bind(this));
+	},
 
+	onLoad: function()
+	{
 		this.list = this.content.get("Defs.Browser");
 		this.list.on("select", this.inspectItem.bind(this));
 		this.list.on("update", this.renameItem.bind(this));
-		this.list.on("move", this.moveItem.bind(this));		
-
-		this.content.on("menu", this.openMenu.bind(this));
+		this.list.on("move", this.moveItem.bind(this));	
 	},
 
 	createListMenu: function(element)

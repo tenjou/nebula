@@ -1,17 +1,9 @@
 "use strict";
 
-meta.class("Controller.Scene",
+Editor.controller("Meta2D.Scene",
 {
-	init: function(content)
+	onLoad: function()
 	{
-		this.content = content;
-		this.content.data = {
-			Scene: {
-				type: "iframe",
-				value: "plugins/meta2d/Support/index.html"
-			}
-		};
-
 		this.scene = this.content.get("Scene");
 		this.scene.on("load", this.handleIFrameLoad.bind(this));
 		this.scene.on("menu", this.showContextMenu.bind(this));

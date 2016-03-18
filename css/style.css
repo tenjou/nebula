@@ -262,7 +262,7 @@ content prop > span {
 content name {
 	display: inline-block;
 	cursor: text;
-	padding: 3px;
+	padding: 2px;
 }
 
 content tag {
@@ -271,8 +271,7 @@ content tag {
     padding: 2px;
     padding-left: 4px;
     padding-right: 4px;
-    margin-left: 1px;
-    border-radius: 3px;
+    margin-left: 2px;
     text-transform: uppercase;
     font-size: 9px;
     color: #aeaeae;

@@ -1,6 +1,6 @@
 "use strict";
 
-Editor.Plugin("ProjectWindow",
+Editor.plugin("ProjectWindow",
 {
 	install: function()
 	{

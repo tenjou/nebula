@@ -4,8 +4,13 @@ meta.class("Editor",
 {
 	init: function()
 	{		
+		this.ctrls = {};
+
 		this.inputParser = new Editor.InputParser();
 		this.resourceMgr = new Editor.ResourceManager();
+
+		this.contents = {};
+		this.contentsCached = [];
 	},
 
 	prepare: function()
@@ -173,6 +178,99 @@ meta.class("Editor",
 		console.log("db-saved");
 	},
 
+	addContent: function(name, info)
+	{
+		var buffer = name.split(".");
+		var contentInfo = editor.getContentInfoFromBuffer(buffer);
+		if(contentInfo) {
+			console.warn("(Editor.addContent) There is already a content with such name: " + name);
+			return null;
+		}
+
+		info.__index = this.currContentIndex++;
+
+		var item;
+		var scope = this.contents;
+		var num = buffer.length;
+		for(var n = 0; n < num; n++) 
+		{
+			item = scope[buffer[n]];
+			if(!item) 
+			{
+				item = {
+					info: null,
+					content: {}
+				};
+				scope[buffer[n]] = item;
+			}
+				
+			scope = item.content;
+		}
+
+		scope.info = info;
+	},
+
+	createContent: function(name)
+	{
+		var contentInfo = this.getContentInfo(name);
+		if(!contentInfo) {
+			console.warn("(Editor.addContent) There is already a content with such name: " + name);
+			return null;			
+		}
+
+		var content = this.contentsCached[contentInfo.index];
+		if(content) {
+			return content;
+		}
+
+		content = new Element.Content();
+
+		var contentData = {};
+		var extendBuffer = contentInfo.extend;
+		if(extendBuffer && extendBuffer.length > 0) 
+		{
+			var extendContentInfo;
+			for(var n = 0; n < extendBuffer.length; n++) 
+			{
+				extendContentInfo = this.getContentInfo(extendBuffer[n]);
+				if(!extendContentInfo) { continue; }
+
+				content.addCtrl(extendContentInfo.ctrl);
+				meta.mergeAppend(contentData, extendContentInfo.data);
+			}
+		}
+
+		content.addCtrl(contentInfo.ctrl);
+		meta.mergeAppend(contentData, contentInfo.data);
+
+		content.data = contentData;
+
+		return content;
+	},
+
+	getContentInfo: function(name)
+	{
+		var buffer = name.split(".");
+		return this.getContentInfoFromBuffer(buffer);
+	},
+
+	getContentInfoFromBuffer: function(buffer)
+	{
+		var obj = this.contents;
+		var num = buffer.length;
+		for(var n = 0; n < num; n++)
+		{
+			obj = obj[buffer[n]];
+			if(!obj) {
+				return null;
+			}
+			
+			obj = obj.content;
+		}
+
+		return obj.info;
+	},
+
 	//
 	db: null,
 	version: "0.1",
@@ -182,10 +280,15 @@ meta.class("Editor",
 	resourceMgr: null,
 
 	plugins: null,
+	ctrls: null,
 
 	wrapper: null,
 	top: null,
 	inner: null,
 	bottom: null,
-	overlay: null
+	overlay: null,
+
+	contentsCached: null,
+	contents: null,
+	currContentIndex: 0
 });

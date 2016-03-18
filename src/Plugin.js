@@ -1,10 +1,10 @@
 "use strict";
 
-Editor.Plugin = function(clsName, obj) {
-	meta.class("Editor.Plugin." + clsName, "Editor.PluginCore", obj);
+Editor.plugin = function(clsName, obj) {
+	meta.class("Editor.Plugin." + clsName, "Editor.Plugin", obj);
 };
 
-meta.class("Editor.PluginCore", 
+meta.class("Editor.Plugin", 
 {
 	install: null,
 

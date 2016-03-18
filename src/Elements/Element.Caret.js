@@ -3,7 +3,7 @@
 meta.class("Element.Caret", "Element.Basic",
 {
 	onCreate: function() {
-		this.domElement.onclick = this.handleOnClick;
+		this.domElement.onclick = this.handleOnClick.bind(this);
 		this.domElement.setAttribute("class", "fa fa-caret-right");
 	},
 

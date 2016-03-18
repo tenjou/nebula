@@ -1,24 +1,14 @@
 "use strict";
 
-meta.class("Controller.AssetResources", "Controller.AssetBrowser",
+Editor.controller("AssetResources", "AssetBrowser",
 {
-	init: function(content) 
+	onCreate: function() 
 	{
-		this.content = content;
-		this.content.data = {
-			Resources: {
-				type: "containerNamed",
-				content: {
-					Browser: {
-						type: "resourceList"
-					}
-				}
-			},
-			upload: "@upload"
-		};
-
 		this.content.on("menu", this.openMenu.bind(this));
+	},
 
+	onLoad: function() 
+	{
 		this.list = this.content.get("Resources.Browser");
 		this.list.on("drop", this.handleDrop.bind(this));
 		this.list.on("select", this.inspectItem.bind(this));
