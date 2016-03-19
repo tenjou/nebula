@@ -2,7 +2,7 @@
 
 Editor.plugin("ProjectWindow",
 {
-	install: function()
+	onCreate: function()
 	{
 		this.projects = {};
 		
@@ -13,20 +13,45 @@ Editor.plugin("ProjectWindow",
 			return list;
 		};
 
+		editor.addContent("ProjectWindow", 
+			{
+				ctrl: "ProjectWindow",
+				data: {
+					Projects: {
+						type: "containerNamed",
+						content: {
+							Browser: {
+								type: "container",
+								content: {
+									List: "@projectList"
+								}
+							},
+							Create: "@button"
+						}
+					}	
+				}
+			});		
+	},
+
+	onSplashStart: function() 
+	{
 		editor.fileSystem.readDir("", this.loadProjects.bind(this));
 	},
 
-	onSplashStart: function() {
-		this.wnd = new Element.ProjectWindow(editor.overlay);
-		this.wnd.loadProjects();
-	},
-
-	onSplashEnd: function() {
+	onSplashEnd: function() 
+	{
 		this.wnd.enable = false;
 	},
 
 	loadProjects: function(dirs)
 	{
+		if(!this.wnd) {
+			this.wnd = new Element.ProjectWindow(editor.overlay);
+		}
+		else {
+			this.wnd.enable = true;
+		}
+
 		var dir;
 		var num = dirs.length - 1;
 		for(var n = num; n >= 0; n--) 

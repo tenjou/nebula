@@ -8,6 +8,7 @@ meta.class("Editor",
 
 		this.inputParser = new Editor.InputParser();
 		this.resourceMgr = new Editor.ResourceManager();
+		this.resources = this.resourceMgr;
 
 		this.contents = {};
 		this.contentsCached = [];
@@ -19,6 +20,16 @@ meta.class("Editor",
 		this.fileSystem.onReady.add(this.handleFileSystemReady, this);
 	},
 
+	handleFileSystemReady: function(data, event)
+	{
+		this.prepareUI();
+		this.createPlugins();
+
+		this.info.enable = false;
+
+		this.onSplashStart();
+	},
+
 	prepareUI: function()
 	{
 		this.wrapper = new Element.Wrapper(document.body);
@@ -26,61 +37,7 @@ meta.class("Editor",
 		this.overlay = new Element.WrappedElement("overlay", document.body);		
 		this.info = new Element.Info(this.overlay);
 		this.info.value = "Initializing";
-
-		this.loadPlugins();
-
-		this.info.enable = false;
-	},
-
-	handleFileSystemReady: function(data, event)
-	{
-		this.prepareUI();
-		this.onSplashStart();
-	},
-
-	loadPlugins: function()
-	{
-		this.plugins = {};
-
-		for(var key in Editor.Plugin) {
-			this.installPlugin(key);
-		}
-	},
-
-	installPlugin: function(name)
-	{
-		if(this.plugins[name]) {
-			console.error("(Editor.installPlugin) There is already installed plugin '" + name + "'");
-			return;
-		}
-
-		var plugin = new Editor.Plugin[name]();
-
-		if(plugin.install) {
-			plugin.install();
-		}
-		
-		this.plugins[name] = plugin;
-	},
-
-	loadProject: function(name)
-	{
-		document.title = name + " - META Editor";
-
-		this.onSplashEnd();
-
-		this.info.enable = true;
-		this.info.value = "Loading Project";
-
-		this.projectName = name;
-		this.fileSystem.rootDir = name + "/";
-		this.fileSystem.fullPath = "filesystem:http://" + window.location.hostname + "/persistent/" + editor.fileSystem.rootDir;
-		this.fileSystem.read("db.json", this._handleReadDb.bind(this));	
-	},
-
-	saveCfg: function() {
-		this.fileSystem.write("db.json", JSON.stringify(this.db), this._handleSavedDb.bind(this));
-	},
+	},	
 
 	onSplashStart: function()
 	{
@@ -116,19 +73,86 @@ meta.class("Editor",
 				plugin.onStart();
 			}
 		}
+	},	
+
+	createPlugins: function()
+	{
+		this.plugins = {};
+
+		for(var key in Editor.Plugin) {
+			this.createPlugin(key);
+		}
 	},
 
-	onDbLoad: function()
+	createPlugin: function(name)
 	{
-		var plugin;
-		for(var key in this.plugins) 
+		if(this.plugins[name]) {
+			console.error("(Editor.createPlugin) There is already installed plugin '" + name + "'");
+			return;
+		}
+
+		var plugin = new Editor.Plugin[name]();
+		
+		this.plugins[name] = plugin;
+	},
+
+	installPlugins: function()
+	{
+		for(var key in Editor.Plugin) 
 		{
-			plugin = this.plugins[key];
-			if(plugin.onDbLoad) {
-				plugin.onDbLoad(this.db);
+			if(!this.db.plugins[key]) {
+				this.installPlugin(key);
 			}
 		}
-	},	
+	},
+
+	installPlugin: function(name) 
+	{
+		if(this.db.plugins[name]) {
+			console.warn("(Editor.installPlugin) Plugin is already installed: " + name);
+			return;
+		}
+
+		var plugin = this.plugins[name];
+		if(!plugin) {
+			console.warn("(Editor.installPlugin) There is no such plugin available: " + name);
+		}
+
+		if(plugin.install) {
+			plugin.install(this.db);
+		}
+
+		this.db.plugins[name] = {};
+	},
+
+	loadPlugins: function()
+	{
+		for(var key in this.plugins) {
+			this.plugins[key].load(this.db);
+		}
+	},
+
+	startPlugins: function()
+	{
+		for(var key in this.plugins) {
+			this.plugins[key].start();
+		}
+	},
+
+	loadProject: function(name)
+	{
+		document.title = name + " - META Editor";
+
+		this.onSplashEnd();
+
+		this.info.enable = true;
+		this.info.value = "Loading Project";
+
+		this.projectName = name;
+		this.fileSystem.rootDir = name + "/";
+		this.fileSystem.fullPath = "filesystem:http://" + window.location.hostname + "/persistent/" + editor.fileSystem.rootDir;
+		this.fileSystem.read("db.json", this._handleReadDb.bind(this));	
+	},
 
 	_handleReadDb: function(data)
 	{
@@ -138,16 +162,21 @@ meta.class("Editor",
 		else {
 			this._handleLoadDb(data);
 		}
-	},
+	},	
 
 	_handleCreateDb: function()
 	{
-		var db = {
+		this.db = {
 			name: this.projectName,
-			version: this.version
+			version: this.version,
+			plugins: {}
 		};
-		this.fileSystem.write("db.json", JSON.stringify(db), this._handleLoadDb.bind(this));
-	},
+
+		this.installPlugins();
+
+		this.needSave = false;
+		this.fileSystem.write("db.json", JSON.stringify(this.db), this._handleLoadDb.bind(this));
+	},	
 
 	_handleLoadDb: function(json)
 	{
@@ -160,24 +189,27 @@ meta.class("Editor",
 		this.inner = new Element.Inner(this.wrapper);
 		//this.bottom = new Element.Bottom(this.wrapper);
 
-		this.onStart();
-		this.onDbLoad();
+		this.installPlugins();
+		this.loadPlugins();
+		this.startPlugins();
 
 		if(this.needSave) {
-			this.saveDb();
+			this.saveCfg();
 		}
 	},
 
-	saveDb: function() {
+	saveCfg: function() 
+	{
 		this.fileSystem.write("db.json", JSON.stringify(this.db), this._handleSavedDb.bind(this));
 		this.needSave = false;
-	},
+	},	
 
 	_handleSavedDb: function(json)
 	{
 		console.log("db-saved");
 	},
 
+	// CONTENT:
 	addContent: function(name, info)
 	{
 		var buffer = name.split(".");
@@ -278,6 +310,7 @@ meta.class("Editor",
 	fileSystem: null,
 	inputParser: null,
 	resourceMgr: null,
+	resources: null,
 
 	plugins: null,
 	ctrls: null,

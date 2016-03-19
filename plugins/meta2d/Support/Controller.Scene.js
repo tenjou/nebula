@@ -16,6 +16,9 @@ Editor.controller("Meta2D.Scene",
 
 	showContextMenu: function(event)
 	{
+		this.clickedX = event.domEvent.clientX;
+		this.clickedY = event.domEvent.clientY;
+
 		var buffer = [];
 		
 		this._collectTextures(buffer, editor.db.assets.resources);
@@ -66,14 +69,33 @@ Editor.controller("Meta2D.Scene",
 		}
 	},
 
-	handleMenuChoice: function(buffer)
-	{
-
-	},
-
 	sortFunc_byName: function(a, b) {
 		if(a.name < b.name) { return -1; }
 		if(a.name > b.name) { return 1; }
 		return 0;
-	}	
+	},	
+
+	handleMenuChoice: function(buffer)
+	{
+		var category = buffer.shift();
+		var item = buffer.shift();
+
+		var func = this["$" + category + "_" + item];
+		if(func) {
+			func.call(this, buffer);
+		}
+	},
+
+	$Create_Sprite: function(buffer)
+	{
+		var scope = this.scene.contentWindow;
+
+		var entity = new scope.Entity.Geometry();
+		entity.position(this.clickedX, this.clickedY);
+		scope.meta.view.attach(entity);
+	},
+
+	//
+	clickedX: 0,
+	clickedY: 0
 });

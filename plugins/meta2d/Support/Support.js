@@ -2,8 +2,26 @@
 
 Editor.plugin("Support", 
 {
-	install: function()
+	onInstall: function(db)
 	{
+		var info = {
+			name: "master",
+			type: "view",
+			folder: true,
+			dateModified: Date.now(),
+			content: []
+		};
+
+		db.assets.hierarchy.push(info);
+	},
+
+	onLoad: function()
+	{
+		editor.resources.addType("view", 
+			{
+				icon: "fa-picture-o"
+			});
+
 		editor.addContent("Meta2D.Scene", 
 			{
 				ctrl: "Meta2D.Scene",

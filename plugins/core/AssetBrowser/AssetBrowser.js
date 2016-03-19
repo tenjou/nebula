@@ -2,8 +2,19 @@
 
 Editor.plugin("AssetBrowser", 
 {
-	install: function()
+	onInstall: function(db)
 	{
+		db.assets = {
+			resources: [],
+			defs: [],
+			hierarchy: []
+		};
+	},
+
+	onLoad: function(db)
+	{
+		this.db = db.assets;
+
 		var inputTypes = editor.inputParser.types;
 		inputTypes.resourceList = function(parent, name, data) 
 		{
@@ -20,6 +31,28 @@ Editor.plugin("AssetBrowser",
 
 			return list;
 		};
+		inputTypes.hierarchyList = function(parent, name, data) 
+		{
+			var list = new Element.List(parent, name);
+			list.info = "Hierarchy is empty";
+
+			return list;
+		};		
+
+		editor.addContent("AssetBrowser.Hierarchy", 
+			{
+				ctrl: "AssetHierarchy",
+				data: {
+					Hierarchy: {
+						type: "containerNamed",
+						content: {
+							Browser: {
+								type: "hierarchyList"
+							}
+						}
+					}
+				}
+			});		
 
 		editor.addContent("AssetBrowser.Resources", 
 			{
@@ -58,33 +91,21 @@ Editor.plugin("AssetBrowser",
 		var leftToolbar = editor.inner.leftToolbar;
 		var tab = leftToolbar.createTab("Project");
 
+		this.contentHierarchy = editor.createContent("AssetBrowser.Hierarchy");
+		this.contentHierarchy.bindData(this.db.hierarchy);
+		tab.addContent(this.contentHierarchy);
+
 		this.contentResources = editor.createContent("AssetBrowser.Resources");
+		this.contentResources.bindData(this.db.resources);
 		tab.addContent(this.contentResources);
 
 		this.contentDefs = editor.createContent("AssetBrowser.Defs");
+		this.contentDefs.bindData(this.db.defs);
 		tab.addContent(this.contentDefs);
 	},
 
-	onDbLoad: function(db)
-	{
-		if(!db.assets)
-		{
-			db.assets = {
-				resources: [],
-				defs: []
-			};
-
-			editor.needSave = true;
-		}
-
-		this.db = db.assets;
-
-		this.contentResources.bindData(this.db.resources);
-		this.contentDefs.bindData(this.db.defs);	
-	},
-
 	//
-	db: null,
+	contentHierarchy: null,
 	contentResources: null,
 	contentDefs: null
 });

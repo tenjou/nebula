@@ -2,7 +2,7 @@
 
 Editor.plugin("Inspect",
 {
-	install: function()
+	onLoad: function()
 	{
 		editor.addContent("inspect.default", 
 			{

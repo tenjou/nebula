@@ -43,6 +43,16 @@ meta.class("Editor.ResourceManager",
 		return "fa-question";
     },
 
+    addType: function(name, info)
+    {
+    	if(this.types[name]) {
+    		console.warn("(Editor.ResourceManager.addType) There is already defined such type: " + name);
+    		return;
+    	}
+
+    	this.types[name] = info;
+    },
+
 	//
 	types: {
 		texture: {

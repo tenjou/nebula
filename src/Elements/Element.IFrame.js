@@ -9,6 +9,8 @@ meta.class("Element.IFrame", "Element.Basic",
 
 	handleLoad: function(domEvent) 
 	{
+		this.contentWindow = this.domElement.contentWindow;
+
 		var contentDocument = this.domElement.contentWindow.document;
 		contentDocument.oncontextmenu = this.handleContextMenu.bind(this);
 		//contentDocument.onclick = this.handleClick.bind(this);
@@ -35,5 +37,6 @@ meta.class("Element.IFrame", "Element.Basic",
 	},
 
 	//
-	elementTag: "iframe"
+	elementTag: "iframe",
+	contentWindow: null
 });

@@ -15,7 +15,7 @@ Editor.plugin("ContextMenu",
 	{
 		if(this.cb) 
 		{
-			var buffer = event.element.id.split(".");
+			var buffer = event.element.id.split("*");
 			this.cb(buffer);
 			this.hide();
 		}

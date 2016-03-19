@@ -14,9 +14,9 @@ meta.class("Element.Content", "Element.Basic",
 		}
 	},
 
-	handleContextMenu: function(event) {
-		event.preventDefault();
-		this.emit("menu");
+	handleContextMenu: function(domEvent) {
+		domEvent.preventDefault();
+		this.emit("menu", domEvent);
 	},
 
 	addCtrl: function(ctrlName) 

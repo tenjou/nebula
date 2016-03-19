@@ -58,7 +58,7 @@ meta.class("Element.ContextMenu", "Element.Basic",
 	createCategory: function(parent, data, id)
 	{
 		if(id) {
-			id = id + "." + data.name;
+			id = id + "*" + data.name;
 		}
 		else {
 			id = data.name;
@@ -86,7 +86,7 @@ meta.class("Element.ContextMenu", "Element.Basic",
 		var name = (typeof(data) === "object") ? data.name : data;
 
 		if(id) {
-			id = id + "." + name;
+			id = id + "*" + name;
 		}
 		else {
 			id = name;

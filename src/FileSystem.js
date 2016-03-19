@@ -266,14 +266,13 @@ meta.class("Editor.FileSystem",
 				dirReader.readEntries(
 					function(results) 
 					{
-						if(results.length) 
-						{
+						if(results.length) {
 							entries = entries.concat(results);
-							
-							if(cb) {
-								cb(entries);
-							}
 						}
+
+						if(cb) {
+							cb(entries);
+						}						
 					},
 					function(fileError) {
 						self.handleError(fileError, cb, "readDir", name);
