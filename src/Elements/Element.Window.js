@@ -2,15 +2,18 @@
 
 meta.class("Element.Window", "Element.Basic",
 {
-	init: function(parent, id)
+	set content(content) 
 	{
-		this._init(parent, id);
-		
-		this.content = new Element.Content(this);
-		
-		if(this.onCreate) {
-			this.onCreate();
+		if(this._content) {
+			this.remove(this._content);
 		}
+
+		this._content = content;
+		this.append(this._content);
+	},
+
+	get content() {
+		return this._content;
 	},
 
 	//

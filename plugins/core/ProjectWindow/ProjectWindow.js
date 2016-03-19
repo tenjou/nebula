@@ -46,27 +46,24 @@ Editor.plugin("ProjectWindow",
 	loadProjects: function(dirs)
 	{
 		if(!this.wnd) {
-			this.wnd = new Element.ProjectWindow(editor.overlay);
-		}
-		else {
-			this.wnd.enable = true;
+			this.wnd = new Element.Window(editor.overlay);
 		}
 
 		var dir;
 		var num = dirs.length - 1;
+		var projects = {};
 		for(var n = num; n >= 0; n--) 
 		{
 			dir = dirs[n];
-			this.projects[dir.name] = {};
+			projects[dir.name] = {};
 		}	
 
-		if(this.wnd) {
-			this.wnd.loadProjects();
-		}
+		var content = editor.createContent("ProjectWindow");
+		content.bindData(projects);
+		this.wnd.content = content;
+		this.wnd.enable = true;
 	},
 
 	//
-	projects: null,
-
 	wnd: null
 });
