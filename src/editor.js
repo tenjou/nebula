@@ -214,7 +214,7 @@ meta.class("Editor",
 	{
 		var contentInfo = this.getContentInfo(name);
 		if(!contentInfo) {
-			console.warn("(Editor.addContent) There is already a content with such name: " + name);
+			console.warn("(Editor.addContent) No content info found for: " + name);
 			return null;			
 		}
 

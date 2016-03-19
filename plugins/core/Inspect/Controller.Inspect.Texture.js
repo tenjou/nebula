@@ -1,13 +1,9 @@
 "use strict";
 
-meta.class("Controller.Inspect.Texture",
+Editor.controller("Inspect.Texture",
 {
-	init: function(content) {
-		this.content = content;
-	},
-
-	loadContent: function()
+	onBindData: function()
 	{
-		// this.content.data = 
+		this.content.get("Image.Holder").value = editor.fileSystem.fullPath + this.data.path + this.data.name + "." + this.data.ext;
 	}
 });

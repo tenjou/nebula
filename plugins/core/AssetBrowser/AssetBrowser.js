@@ -83,15 +83,6 @@ Editor.plugin("AssetBrowser",
 		this.contentDefs.bindData(this.db.defs);	
 	},
 
-	renameSelectedItem: function(value) 
-	{
-		this.content.resList.cache.selectedItem.name = value;
-		if(this.content.list.cache.selectedItem.name !== value) {
-			return false;
-		}
-		return true;
-	},
-
 	//
 	db: null,
 	contentResources: null,

@@ -1,7 +1,5 @@
 "use strict";
 
-Editor.ControllerMap = {};
-
 Editor.controller = function(clsName, extendName, obj) 
 {
 	if(typeof(extendName) === "object") {
@@ -10,20 +8,6 @@ Editor.controller = function(clsName, extendName, obj)
 	else {
 		meta.class("Editor.Controller." + clsName, "Editor.Controller." + extendName, obj);
 	}
-
-	var scope = Editor.Controller;
-	var buffer = clsName.split(".");
-	var num = buffer.length;
-	for(var n = 0; n < num; n++) 
-	{
-		scope = scope[buffer[n]];
-		if(!scope) {
-			console.warn("(Editor.controller) Invalid class: Editor.Controller." + clsName);
-			break;
-		}
-	}
-
-	Editor.ControllerMap[clsName] = scope;
 };
 
 meta.class("Editor.Controller",

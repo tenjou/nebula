@@ -21,7 +21,19 @@ meta.class("Element.Content", "Element.Basic",
 
 	addCtrl: function(ctrlName) 
 	{
-		var ctrlCls = Editor.ControllerMap[ctrlName];
+		var scope = Editor.Controller;
+		var buffer = ctrlName.split(".");
+		var num = buffer.length;
+		for(var n = 0; n < num; n++) 
+		{
+			scope = scope[buffer[n]];
+			if(!scope) {
+				console.warn("(Editor.controller) Invalid class: Editor.Controller." + clsName);
+				break;
+			}
+		}
+
+		var ctrlCls = scope;
 		if(!ctrlCls) {
 			console.warn("Element.addCtrl) No such controller found: " + ctrlName);
 			return;

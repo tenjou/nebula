@@ -11,9 +11,9 @@ Editor.controller("AssetResources", "AssetBrowser",
 	{
 		this.list = this.content.get("Resources.Browser");
 		this.list.on("drop", this.handleDrop.bind(this));
-		this.list.on("select", this.inspectItem.bind(this));
-		this.list.on("update", this.renameItem.bind(this));
-		this.list.on("move", this.moveItem.bind(this));
+		this.list.on("select", this.handleInspectItem.bind(this));
+		this.list.on("update", this.handleRenameItem.bind(this));
+		this.list.on("move", this.handleMoveItem.bind(this));
 		
 		this.upload = this.content.get("upload");
 		this.upload.on("update", this.handleUploadUpdate.bind(this));

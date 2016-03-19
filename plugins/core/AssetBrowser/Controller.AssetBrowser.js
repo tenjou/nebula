@@ -92,42 +92,55 @@ Editor.controller("AssetBrowser",
 		return item;
 	},	
 
-	renameItem: function(event)
+	handleRenameItem: function(event)
 	{
 		var element = event.element;
 		var item = element.parent.parent;
-		var info = element.parent.parent.info;
 
-		if(this.dbLookup[element.value]) {
+		var prevName = element.prevValue;
+		item.info.name = element.value;
+
+		if(!this.renameItem(item, prevName)) {
 			element.revert();
-			return;
+		}
+	},
+
+	renameItem: function(item, prevName)
+	{
+		var info = item.info;
+
+		if(this.dbLookup[info.name]) {
+			info.name = prevName;
+			this.handleInspectItem();
+			return false;
 		}
 
 		if(item.folder)
 		{
 			editor.fileSystem.moveToDir(
-				info.path + info.name, 
-				info.path + element.value, 
-				this.updateInspectItem.bind(this));
+				info.path + prevName,
+				info.path + info.name,
+				this.handleInspectItem.bind(this));
 		}
 		else
 		{
 			editor.fileSystem.moveTo(
-				info.path + info.name + "." + info.ext, 
-				info.path + element.value + "." + info.ext, 
-				this.updateInspectItem.bind(this));
+				info.path + prevName + "." + info.ext, 
+				info.path + info.name + "." + info.ext,
+				this.handleInspectItem.bind(this));
 		}
 
-		delete this.dbLookup[info.name];
-		this.dbLookup[element.value] = element.info;	
-		info.name = element.value;	
+		delete this.dbLookup[prevName];
+		this.dbLookup[info.name] = info;
 		info.dataTransfer = Date.now();
 
-		element.parent.parent.parent.sort();
+		item.parent.sort();
 		editor.saveCfg();
+
+		return true;
 	},	
 
-	moveItem: function(event)
+	handleMoveItem: function(event)
 	{
 		var element = event.element;
 		var info = element.info;
@@ -163,7 +176,12 @@ Editor.controller("AssetBrowser",
 		}
 		
 		element.parent.sort();
+
 		editor.saveCfg();
+
+		if(element.select) {
+			this.inspectItem();
+		}
 	},
 
 	_updateMoveItemDb: function(db, path)
@@ -207,20 +225,25 @@ Editor.controller("AssetBrowser",
 
 		editor.saveCfg();
 
-		// if(element.select) {
-		// 	editor.plugins.Inspect.show("default");
-		// }		
+		if(element.select) {
+			editor.plugins.Inspect.empty();
+		}		
 	},
 
-	inspectItem: function(event)
+	handleInspectItem: function(event) {
+		this.inspectItem();
+	},
+
+	inspectItem: function()
 	{
 		var info = this.list.cache.selectedItem.info;
-		editor.plugins.Inspect.show(info.type, info);
+		editor.plugins.Inspect.show(info.type, info, this.handleInspectUpdate.bind(this));
 	},
 
-	updateInspectItem: function()
+	handleInspectUpdate: function() 
 	{
-
+		var item = this.list.cache.selectedItem;
+		item.name = item.info.name;
 	},
 
 	openMenu: function(event)

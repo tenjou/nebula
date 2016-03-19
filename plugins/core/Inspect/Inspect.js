@@ -25,7 +25,7 @@ Editor.plugin("Inspect",
 					Image: {
 						type: "section",
 						content: {
-							Image: "@image"
+							Holder: "@image"
 						}
 					}
 				}
@@ -37,7 +37,7 @@ Editor.plugin("Inspect",
 		this.tab = editor.inner.rightToolbar.createTab("Inspect");
 	},
 
-	show: function(typeName, data)
+	show: function(typeName, data, cb)
 	{
 		var content = editor.createContent("inspect." + typeName);
 		if(!content) {
@@ -45,6 +45,9 @@ Editor.plugin("Inspect",
 		}
 
 		content.bindData(data);
+		content.on("data-update", this.handleContentUpdate.bind(this));
+
+		this.cb = cb ? cb : null;
 		this.tab.content = content;	
 	},
 
@@ -52,29 +55,16 @@ Editor.plugin("Inspect",
 		this.content.empty();
 	},
 
-	addType: function(name, info)
-	{
-		if(this.types[name]) {
-			console.warn("(Plugin.Inspect.addType) There is already such type defined: " + name);
-			return;
+	handleContentUpdate: function(event)
+	{	
+		if(this.cb) {
+			this.cb();
 		}
-
-		this.types[name] = info;
-	},
-
-	getType: function(name) 
-	{
-		var type = this.types[name];
-		if(!type) {
-			console.warn("(Plugin.Inspect.show) No type found: " + name);
-			return null;
-		}
-
-		return type;
 	},
 
 	//
-	tab: null
+	tab: null,
+	cb: null
 });
 
 

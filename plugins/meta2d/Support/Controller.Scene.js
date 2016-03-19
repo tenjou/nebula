@@ -18,15 +18,7 @@ Editor.controller("Meta2D.Scene",
 	{
 		var buffer = [];
 		
-		var assets = editor.plugins.AssetBrowser.db;
-		var extBuffer, num, name;
-		for(var ext in assets)
-		{
-			extBuffer = assets[ext];
-			for(name in extBuffer) {
-				buffer.push(extBuffer[name]);
-			}
-		}
+		this._collectTextures(buffer, editor.db.assets.resources);
 
 		buffer.sort(this.sortFunc_byName);
 
@@ -57,5 +49,31 @@ Editor.controller("Meta2D.Scene",
 		];
 
 		editor.plugins.ContextMenu.show(menu, event.x, event.y, this.handleMenuChoice.bind(this));
-	}
+	},
+
+	_collectTextures: function(buffer, data)
+	{
+		var item;
+		for(var key in data)
+		{
+			item = data[key];
+			if(item.type === "folder") {
+				this._collectTextures(buffer, item.content);
+			}
+			else if(item.type === "texture") {
+				buffer.push(item);
+			}
+		}
+	},
+
+	handleMenuChoice: function(buffer)
+	{
+
+	},
+
+	sortFunc_byName: function(a, b) {
+		if(a.name < b.name) { return -1; }
+		if(a.name > b.name) { return 1; }
+		return 0;
+	}	
 });

@@ -10,9 +10,9 @@ Editor.controller("AssetDefs", "AssetBrowser",
 	onLoad: function()
 	{
 		this.list = this.content.get("Defs.Browser");
-		this.list.on("select", this.inspectItem.bind(this));
-		this.list.on("update", this.renameItem.bind(this));
-		this.list.on("move", this.moveItem.bind(this));	
+		this.list.on("select", this.handleInspectItem.bind(this));
+		this.list.on("update", this.handleRenameItem.bind(this));
+		this.list.on("move", this.handleMoveItem.bind(this));	
 	},
 
 	createListMenu: function(element)
