@@ -69,7 +69,8 @@ meta.class("Editor.ResourceManager",
 		},
 		folder: {
 			ext: [],
-			icon: "fa-folder"
+			icon: "fa-folder",
+			iconOpen: "fa-folder-open"
 		},
 		unknown: {
 			ext: [],

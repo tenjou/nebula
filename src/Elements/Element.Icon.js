@@ -6,21 +6,21 @@ meta.class("Element.Icon", "Element.Basic",
 		this.addCls("fa");
 	},
 
-	set type(type) 
+	set value(value) 
 	{
-		if(this._type) {
-			this.removeCls(this._type);
+		if(this._value) {
+			this.removeCls(this._value);
 		}
 
-		this._type = type;
-		this.addCls(this._type);
+		this._value = value;
+		this.addCls(this._value);
 	},
 
-	get type() {
-		return this._type;
+	get value() {
+		return this._value;
 	},
 
 	//
 	elementTag: "icon",
-	_type: null
+	_value: null
 });

@@ -7,7 +7,6 @@ Editor.plugin("Support",
 		var info = {
 			name: "master",
 			type: "view",
-			folder: true,
 			dateModified: Date.now(),
 			content: []
 		};

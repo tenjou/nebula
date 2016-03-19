@@ -167,23 +167,26 @@ meta.class("Element.ListItem", "Element.Basic",
 		return this._name.value;
 	},
 
-	set icon(type) 
+	set type(typeInfo) 
 	{
-		if(!this._icon) {
-			this._icon = new Element.Icon();
-			this.insertBefore(this._icon, this._name);
-		}
+		this._type = typeInfo;
 
-		this._icon.type = type;
+		if(typeInfo)
+		{		
+			if(this.open) {
+				this._icon.value = typeInfo.iconActive ? typeInfo.iconActive : typeInfo.icon;
+			}
+			else {
+				this._icon.value = typeInfo.icon;
+			}
+		}
+		else {
+			this._icon.value = "";
+		}
 	},
 
-	get icon() 
-	{
-		if(!this._icon) {
-			return null;
-		}
-
-		return this._icon.type;
+	get type() {
+		return this._type;
 	},
 
 	set folder(value) 
@@ -235,11 +238,11 @@ meta.class("Element.ListItem", "Element.Basic",
 		this._caret.open = value;
 
 		if(value) {
-			this._icon.type = "fa-folder-open";
+			this._icon.value = this._type.iconActive ? this._type.iconActive : this._type.icon;
 			this.list.removeCls("hidden");
 		}
 		else {
-			this._icon.type = "fa-folder";
+			this._icon.value = this._type.icon;
 			this.list.addCls("hidden");
 		}
 	},
@@ -260,5 +263,8 @@ meta.class("Element.ListItem", "Element.Basic",
 
 	_select: false,
 	_folder: false,
-	_open: false
+	_open: false,
+
+	info: null,
+	_type: null
 });

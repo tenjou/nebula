@@ -17,6 +17,5 @@ meta.class("Element.ListItem_Asset", "Element.ListItem",
 	},	
 
 	//
-	_tag: null,
-	info: null
+	_tag: null
 });

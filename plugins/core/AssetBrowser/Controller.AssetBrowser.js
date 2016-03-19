@@ -17,7 +17,7 @@ Editor.controller("AssetBrowser",
 		for(var n = 0; n < num; n++)
 		{
 			item = db[n];
-			if(item.type === "folder") {
+			if(item.content) {
 				folder = this._addFolder(list, item);
 				this._loadFolder(folder.list, item.content);
 			}
@@ -53,7 +53,7 @@ Editor.controller("AssetBrowser",
 
 		var item = list.createItem(info.name);
 		item.tag = info.ext;
-		item.icon = typeInfo.icon ? typeInfo.icon : "fa-unknown";
+		item.type = typeInfo;
 		item.info = info;
 
 		this.dbLookup[info.name] = info;
