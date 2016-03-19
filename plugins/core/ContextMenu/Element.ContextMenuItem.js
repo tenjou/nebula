@@ -35,7 +35,7 @@ meta.class("Element.ContextMenuItem", "Element.Basic",
 	},
 
 	set icon(value) {
-		this._icon.type = value;
+		this._icon.value = value;
 	},
 
 	set caret(value) 
