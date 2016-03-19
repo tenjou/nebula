@@ -17,6 +17,10 @@ meta.class("Editor.Element.Tab", "Element.Basic",
 		this.container.append(content);
 	},
 
+	empty: function() {
+		this.container.innerHTML = "";
+	},
+
 	handleClick: function(domEvent) {
 		this.emit("click", domEvent);
 	},

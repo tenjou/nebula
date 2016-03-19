@@ -52,7 +52,7 @@ Editor.plugin("Inspect",
 	},
 
 	empty: function() {
-		this.content.empty();
+		this.tab.empty();
 	},
 
 	handleContentUpdate: function(event)

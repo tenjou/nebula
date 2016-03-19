@@ -49,6 +49,10 @@ meta.class("Element.ListItem", "Element.Basic",
 	{
 		domEvent.stopPropagation();
 
+		if(this.folder) {
+			this.open = false;
+		}
+
 		this.preDragParent = this.parent;
 		this.parent.cache.dragItem = this;
 	},
@@ -72,9 +76,6 @@ meta.class("Element.ListItem", "Element.Basic",
 		domEvent.preventDefault();
 
 		this.showDragStyle();
-		if(this.folder) {
-			this.open = true;
-		}
 
 		var dragItem = this.parent.cache.dragItem;
 		if(!dragItem) { return; }
@@ -82,6 +83,7 @@ meta.class("Element.ListItem", "Element.Basic",
 		
 		if(this.folder)
 		{
+			this.open = true;
 			this.list.append(dragItem);
 		}
 

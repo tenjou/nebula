@@ -225,7 +225,7 @@ Editor.controller("AssetBrowser",
 
 		editor.saveCfg();
 
-		if(element.select) {
+		if(item.select) {
 			editor.plugins.Inspect.empty();
 		}		
 	},
