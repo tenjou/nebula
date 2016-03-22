@@ -23,7 +23,7 @@ meta.selectElementContents = function(element)
 	selection.addRange(range);
 };
 
-meta.merge = function(a, b)
+meta.mergeObjects = function(a, b)
 {
 	var output = {};
 
@@ -36,7 +36,7 @@ meta.merge = function(a, b)
 	return output;
 };
 
-meta.mergeAppend = function(target, src)
+meta.appendObject = function(target, src)
 {
 	var value, targetValue;
 	for(var key in src)

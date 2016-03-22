@@ -11,7 +11,32 @@ Editor.controller("Meta2D.Scene",
 
 	handleIFrameLoad: function(event)
 	{
-		console.log("iframe-load");
+		this.hierarchy = editor.plugins.AssetBrowser.contentHierarchy;
+
+		this.$ = this.scene.contentWindow;
+		this.$.meta.camera.draggable = true;
+		this.$.meta.loadCfg(this.data);
+
+		this.loadResources(this.data.assets.resources);
+	},
+
+	loadResources: function(data)
+	{
+		var mgr = this.$.meta.resources;
+		var fullPath = editor.fileSystem.fullPath;
+
+		var item;
+		var num = data.length;
+		for(var n = 0; n < num; n++) 
+		{
+			item = data[n];
+			switch(item.type)
+			{
+				case "texture":
+					mgr.loadTexture(fullPath + item.path + item.name + "." + item.ext);
+					break;
+			}
+		}
 	},
 
 	showContextMenu: function(event)
@@ -88,14 +113,22 @@ Editor.controller("Meta2D.Scene",
 
 	$Create_Sprite: function(buffer)
 	{
-		var scope = this.scene.contentWindow;
-
-		var entity = new scope.Entity.Geometry();
+		var entity = new this.$.Entity.Geometry(buffer[1]);
 		entity.position(this.clickedX, this.clickedY);
-		scope.meta.view.attach(entity);
+		this.$.meta.view.attach(entity);
+
+		this.hierarchy.ctrls[0]._addItem(this.hierarchy.ctrls[0].list, {
+			name: "stuff",
+			type: "sprite",
+			dateModified: Date.now()
+		});
 	},
 
 	//
+	hierarchy: null,
+
+	$: null,
+
 	clickedX: 0,
 	clickedY: 0
 });

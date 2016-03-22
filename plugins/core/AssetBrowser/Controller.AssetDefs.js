@@ -15,66 +15,6 @@ Editor.controller("AssetDefs", "AssetBrowser",
 		this.list.on("move", this.handleMoveItem.bind(this));	
 	},
 
-	createListMenu: function(element)
-	{
-		var menu = [
-			{
-				name: "Create", 
-				type: "category",
-				content: [
-					{ 
-						name: "Folder", 
-						icon: "fa-folder" 
-					},
-					{ 
-						name: "Sprite", 
-						icon: "fa-cube" 
-					}					
-				]
-			}
-		];
-
-		this.currItem = element;
-		this.currList = element;		
-
-		return menu;
-	},
-
-	createItemMenu: function(element)
-	{
-		var menu = [
-			{
-				name: "Create", 
-				type: "category",
-				content: [
-					{ 
-						name: "Folder", 
-						icon: "fa-folder" 
-					},
-					{ 
-						name: "Sprite", 
-						icon: "fa-cube" 
-					}					
-				]
-			},
-			{
-				name: "Actions", 
-				type: "category",
-				content: [
-					{
-						name: "Delete", 
-						icon: "fa-trash"
-					}
-				]
-			}			
-		];
-
-		this.currItem = element;
-		this.currList = element.parent;		
-
-		return menu;
-	},
-
 	handleContextMenu: function(buffer)
 	{
 		var category = buffer[0];
@@ -115,7 +55,7 @@ Editor.controller("AssetDefs", "AssetBrowser",
 
 	//
 	list: null,
-	
+
 	db: null,
 	dbLookup: null	
 });

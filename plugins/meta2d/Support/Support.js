@@ -14,8 +14,15 @@ Editor.plugin("Support",
 		db.assets.hierarchy.push(info);
 	},
 
-	onLoad: function()
+	onLoad: function(db)
 	{
+		this.db = db;
+
+		editor.resources.addType("sprite", 
+			{
+				icon: "fa-cube"
+			});
+
 		editor.resources.addType("view", 
 			{
 				icon: "fa-picture-o"
@@ -39,6 +46,7 @@ Editor.plugin("Support",
 		var tab = roomToolbar.createTab("Scene");
 
 		this.content = editor.createContent("Meta2D.Scene");
+		this.content.bindData(this.db);
 		tab.addContent(this.content);
 	},
 

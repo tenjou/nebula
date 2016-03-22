@@ -268,12 +268,12 @@ meta.class("Editor",
 				if(!extendContentInfo) { continue; }
 
 				content.addCtrl(extendContentInfo.ctrl);
-				meta.mergeAppend(contentData, extendContentInfo.data);
+				meta.appendObject(contentData, extendContentInfo.data);
 			}
 		}
 
 		content.addCtrl(contentInfo.ctrl);
-		meta.mergeAppend(contentData, contentInfo.data);
+		meta.appendObject(contentData, contentInfo.data);
 
 		content.data = contentData;
 

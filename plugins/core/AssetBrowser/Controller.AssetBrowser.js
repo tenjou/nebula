@@ -260,6 +260,26 @@ Editor.controller("AssetBrowser",
 		editor.plugins.ContextMenu.show(menu, event.x, event.y, this.handleContextMenu.bind(this));
 	},	
 
+	createListMenu: function(element)
+	{
+		this.currItem = element;
+		this.currList = element;		
+
+		var pluginAssetBrowser = editor.plugins.AssetBrowser;
+		return pluginAssetBrowser.menuDefs;
+	},
+
+	createItemMenu: function(element)
+	{
+		this.currItem = element;
+		this.currList = element.parent;	
+
+		var pluginAssetBrowser = editor.plugins.AssetBrowser;
+		return editor.plugins.ContextMenu.mergeMenus(
+			pluginAssetBrowser.menuDefs, 
+			pluginAssetBrowser.menuItemDefs);
+	},	
+
 	makeNameUnique: function(info)
 	{
 		var index = 2;

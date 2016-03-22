@@ -41,6 +41,48 @@ Editor.plugin("ContextMenu",
 		this.cb = cb;
 	},
 
+	mergeMenus: function(a, b)
+	{
+		var menu = [].concat(a);
+
+		this.appendMenu(menu, b);
+
+		return menu;
+	},
+
+	appendMenu: function(a, b)
+	{
+		var itemA, itemB, nA;
+		var numA = a.length;
+		var numB = b.length;
+
+		merge:
+		for(var nB = 0; nB < numB; nB++) 
+		{
+			itemB = b[nB];
+			for(nA = 0; nA < numA; nA++) 
+			{
+				itemA = a[nA];
+				if(itemA.name === itemB.name)
+				{
+					if(itemB.content)
+					{
+						if(!itemA.content) {
+							itemA.content = itemB.content;
+						}
+						else {
+							itemA.content = this.mergeMenus(itemA.content, itemB.content);
+						}
+					}
+
+					continue merge;
+				}
+			}
+
+			a.push(itemB);
+		}		
+	},
+
 	//
 	menu: null,
 	cb: null
