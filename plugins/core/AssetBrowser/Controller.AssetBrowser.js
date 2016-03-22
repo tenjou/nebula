@@ -250,34 +250,22 @@ Editor.controller("AssetBrowser",
 	{
 		var menu;
 		var element = event.element;
-		if(element instanceof Element.ListItem) {
+		if(element instanceof Element.ListItem) 
+		{
+			this.currItem = element;
+			this.currList = element.parent;	
+
 			menu = this.createItemMenu(element);
 		}
-		else {
+		else 
+		{
+			this.currItem = element;
+			this.currList = element;
+
 			menu = this.createListMenu(element);
 		}
 		
 		editor.plugins.ContextMenu.show(menu, event.x, event.y, this.handleContextMenu.bind(this));
-	},	
-
-	createListMenu: function(element)
-	{
-		this.currItem = element;
-		this.currList = element;		
-
-		var pluginAssetBrowser = editor.plugins.AssetBrowser;
-		return pluginAssetBrowser.menuDefs;
-	},
-
-	createItemMenu: function(element)
-	{
-		this.currItem = element;
-		this.currList = element.parent;	
-
-		var pluginAssetBrowser = editor.plugins.AssetBrowser;
-		return editor.plugins.ContextMenu.mergeMenus(
-			pluginAssetBrowser.menuDefs, 
-			pluginAssetBrowser.menuItemDefs);
 	},	
 
 	makeNameUnique: function(info)

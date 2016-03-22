@@ -26,7 +26,7 @@ meta.class("Element.ContextMenuCategory", "Element.Basic",
 	},
 
 	set icon(value) {
-		this._icon.type = value;
+		this._icon.value = value;
 	},
 
 	//

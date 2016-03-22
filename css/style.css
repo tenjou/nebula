@@ -427,7 +427,7 @@ context-menu category > header {
 	line-height: 21px;
 }
 context-menu icon {
-	width: 14px;
+	width: 15px;
 }
 context-menu item {
 	display: block;
@@ -438,7 +438,7 @@ context-menu item {
 	cursor: pointer;
 }
 context-menu item icon {
-	width: 16px;
+	width: 17px;
 }
 context-menu item:hover {
 	background: #6385BB;

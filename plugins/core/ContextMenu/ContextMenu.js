@@ -16,7 +16,33 @@ Editor.plugin("ContextMenu",
 		if(this.cb) 
 		{
 			var buffer = event.element.id.split("*");
-			this.cb(buffer);
+			var translatedBuffer = new Array(buffer.length);
+
+			// translate:
+			var data = this.currData;
+			var num = data.length;
+			
+			var n, item, name;
+			for(var i = 0; i < buffer.length; i++)
+			{
+				name = buffer[i];
+
+				for(n = 0; n < num; n++) 
+				{
+					item = data[n];
+					if(item.name === name) 
+					{
+						translatedBuffer[i] = item;
+						if(item.content) {
+							data = item.content;
+							num = data.length;
+						}
+						break;
+					}
+				}	
+			}
+
+			this.cb(translatedBuffer);
 			this.hide();
 		}
 
@@ -39,6 +65,7 @@ Editor.plugin("ContextMenu",
 		this.menu.position(x, y);
 		this.menu.enable = true;
 		this.cb = cb;
+		this.currData = data;
 	},
 
 	mergeMenus: function(a, b)
@@ -85,5 +112,6 @@ Editor.plugin("ContextMenu",
 
 	//
 	menu: null,
-	cb: null
+	cb: null,
+	currData: null
 });

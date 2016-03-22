@@ -19,23 +19,37 @@ Editor.controller("AssetResources", "AssetBrowser",
 		this.upload.on("update", this.handleUploadUpdate.bind(this));
 	},
 
+	createListMenu: function(element)
+	{
+		var pluginAssetBrowser = editor.plugins.AssetBrowser;
+		return pluginAssetBrowser.menuResources;
+	},
+
+	createItemMenu: function(element)
+	{
+		var pluginAssetBrowser = editor.plugins.AssetBrowser;
+		return editor.plugins.ContextMenu.mergeMenus(
+			pluginAssetBrowser.menuResources, 
+			pluginAssetBrowser.menuItemResources);
+	},	
+
 	handleContextMenu: function(buffer)
 	{
 		var category = buffer[0];
-		var type = buffer[1];
+		var item = buffer[1];
 
-		if(category === "Create")
+		if(category.name === "Create")
 		{
-			if(type === "Folder") {
+			if(item.name === "Folder") {
 				this.addFolder(this.currList, this.currItem);
 			}
 		}
-		else if(category === "Actions")
+		else if(category.name === "Actions")
 		{
-			if(type === "Upload") {
+			if(item.name === "Upload") {
 				this.upload.open();
 			}
-			else if(type === "Delete") {
+			else if(item.name === "Delete") {
 				this.removeItem(this.currList, this.currItem);
 			}
 		}

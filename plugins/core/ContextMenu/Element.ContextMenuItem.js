@@ -44,7 +44,7 @@ meta.class("Element.ContextMenuItem", "Element.Basic",
 		{
 			if(!this._caret) {
 				this._caret = new Element.Icon(this);
-				this._caret.type = "fa-caret-right";
+				this._caret.value = "fa-caret-right";
 				this._caret.addCls("float-right");
 			}
 			else {

@@ -46,7 +46,8 @@ Editor.plugin("AssetBrowser",
 				content: [
 					{ 
 						name: "Folder", 
-						icon: "fa-folder" 
+						icon: "fa-folder",
+						type: "folder"
 					}
 				]
 			}];

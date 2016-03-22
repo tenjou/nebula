@@ -15,27 +15,41 @@ Editor.controller("AssetDefs", "AssetBrowser",
 		this.list.on("move", this.handleMoveItem.bind(this));	
 	},
 
+	createListMenu: function(element)
+	{
+		var pluginAssetBrowser = editor.plugins.AssetBrowser;
+		return pluginAssetBrowser.menuDefs;
+	},
+
+	createItemMenu: function(element)
+	{
+		var pluginAssetBrowser = editor.plugins.AssetBrowser;
+		return editor.plugins.ContextMenu.mergeMenus(
+			pluginAssetBrowser.menuDefs, 
+			pluginAssetBrowser.menuItemDefs);
+	},		
+
 	handleContextMenu: function(buffer)
 	{
 		var category = buffer[0];
-		var type = buffer[1];
+		var item = buffer[1];
 
-		if(category === "Create")
+		if(category.name === "Create")
 		{
-			switch(type)
+			switch(item.type)
 			{
-				case "Folder":
+				case "folder":
 					this.addFolder(this.currList);
 					break;
 
-				case "Sprite":
-					this.createPrefab(this.currList, "sprite");
+				default:
+					this.createPrefab(this.currList, item.type);
 					break;
 			}
 		}
-		else if(category === "Actions")
+		else if(category.name === "Actions")
 		{
-			if(type === "Delete") {
+			if(item.name === "Delete") {
 				this.removeItem(this.currList, this.currItem);
 			}
 		}

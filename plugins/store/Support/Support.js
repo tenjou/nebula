@@ -43,8 +43,24 @@ Editor.plugin("StoreSupport",
 					content: [
 						{ 
 							name: "Mesh", 
+							type: "mesh",
 							icon: "fa-cube" 
-						}					
+						},
+						{
+							name: "Material",
+							type: "material",
+							icon: "fa-diamond"
+						},
+						{
+							name: "Video",
+							type: "video",
+							icon: "fa-video-camera"
+						},
+						{
+							name: "Cubemap",
+							type: "cubemap",
+							icon: "fa-map-o"
+						}
 					]
 				}
 			]);
