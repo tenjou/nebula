@@ -102,7 +102,7 @@ meta.class("Element.ContextMenu", "Element.Basic",
 				item.icon = data.icon;
 			}
 			
-			if(data.content) {
+			if(data.content && data.content.length > 0) {
 				item.loadSubmenu(data.content);
 			}
 		}

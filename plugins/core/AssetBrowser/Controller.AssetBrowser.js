@@ -248,25 +248,30 @@ Editor.controller("AssetBrowser",
 
 	openMenu: function(event)
 	{
-		var menu;
 		var element = event.element;
 		if(element instanceof Element.ListItem) 
 		{
 			this.currItem = element;
 			this.currList = element.parent;	
 
-			menu = this.createItemMenu(element);
+			editor.plugins.ContextMenu.show(this.name + "Item", event.x, event.y);
 		}
 		else 
 		{
 			this.currItem = element;
 			this.currList = element;
 
-			menu = this.createListMenu(element);
+			editor.plugins.ContextMenu.show(this.name, event.x, event.y);
 		}
-		
-		editor.plugins.ContextMenu.show(menu, event.x, event.y, this.handleContextMenu.bind(this));
 	},	
+
+	menu_Folder: function() {
+		this.addFolder(this.currList, this.currItem);
+	},
+
+	menu_Delete: function() {
+		this.removeItem(this.currList, this.currItem);
+	},		
 
 	makeNameUnique: function(info)
 	{

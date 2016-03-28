@@ -4,12 +4,29 @@ Editor.controller("ProjectWindow",
 {
 	onLoad: function()
 	{
+		editor.plugins.ContextMenu.add({
+			name: "ProjectWindow",
+			content: [
+				{
+					name: "Actions", 
+					type: "category",
+					content: [
+						{
+							name: "Delete", 
+							icon: "fa-trash",
+							func: this.menu_Delete.bind(this)
+						}
+					]
+				}
+			]
+		});
+
 		this.list = this.content.get("Projects.Browser.List");
 		this.list.on("menu", "item", this.openMenu.bind(this));
 
 		this.content.on("click", "Projects.Create", this.createProject.bind(this));
 		this.content.on("dbClick", "Projects.Browser.list.item", this.openProject.bind(this));
-		this.content.on("update", "Projects.Browser.list.item.name", this.renameProject.bind(this));		
+		this.content.on("update", "Projects.Browser.list.item.name", this.renameProject.bind(this));				
 	},
 
 	onBindData: function()
@@ -21,39 +38,11 @@ Editor.controller("ProjectWindow",
 
 	openMenu: function(event)
 	{
-		var menu = [
-			{
-				name: "Actions", 
-				type: "category",
-				content: [
-					{
-						name: "Delete", 
-						icon: "fa-trash"
-					}
-				]
-			}
-		];
-
 		event.element.select = true;
 
-		editor.plugins.ContextMenu.show(menu, event.x, event.y, this.handleContextMenu.bind(this));
+		editor.plugins.ContextMenu.show("ProjectWindow", event.x, event.y);
 	},
 
-	handleContextMenu: function(buffer)
-	{
-		var category = buffer[0];
-		var type = buffer[1];
-		
-		switch(category) 
-		{
-			case "Actions":
-			{
-				if(type === "Delete") {
-					this.deleteProject(this.list.cache.selectedItem);
-				}
-			} break;
-		}
-	},
 
 	createProject: function(event)
 	{
@@ -107,6 +96,12 @@ Editor.controller("ProjectWindow",
 		editor.fileSystem.removeDir(name);
 
 		this.list.removeItem(item);
+		delete this.data[item.name];
+	},
+
+	menu_Delete: function()
+	{
+		this.deleteProject(this.list.cache.selectedItem);
 	},
 
 	getUniqueProjectName: function()

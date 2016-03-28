@@ -83,7 +83,6 @@ meta.class("Element.ListItem", "Element.Basic",
 		
 		if(this.folder)
 		{
-			this.open = true;
 			this.list.append(dragItem);
 		}
 

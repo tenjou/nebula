@@ -2,68 +2,6 @@
 
 Editor.plugin("AssetBrowser", 
 {
-	onCreate: function()
-	{
-		// MENU RESOURCES
-		this.menuResources = [
-			{
-				name: "Create", 
-				type: "category",
-				content: [
-					{ 
-						name: "Folder", 
-						icon: "fa-folder" 
-					}
-				]
-			},
-			{
-				name: "Actions", 
-				type: "category",
-				content: [
-					{
-						name: "Upload", 
-						icon: "fa-upload"
-					}
-				]
-			}];
-		this.menuItemResources = [
-			{
-				name: "Actions", 
-				type: "category",
-				content: [
-					{
-						name: "Delete", 
-						icon: "fa-trash"
-					}
-				]
-			}];
-
-		// MENU DEFS
-		this.menuDefs = [
-			{
-				name: "Create", 
-				type: "category",
-				content: [
-					{ 
-						name: "Folder", 
-						icon: "fa-folder",
-						type: "folder"
-					}
-				]
-			}];
-		this.menuItemDefs = [
-			{
-				name: "Actions", 
-				type: "category",
-				content: [
-					{
-						name: "Delete", 
-						icon: "fa-trash"
-					}
-				]
-			}];		
-	},
-
 	onInstall: function(db)
 	{
 		db.assets = {
@@ -169,15 +107,5 @@ Editor.plugin("AssetBrowser",
 	//
 	contentHierarchy: null,
 	contentResources: null,
-	contentDefs: null,
-
-	// menu defs:
-	menuHierarchy: null,
-	menuItemHierarchy: null,
-
-	menuResources: null,
-	menuItemResources: null,
-
-	menuDefs: null,
-	menuItemDefs: null
+	contentDefs: null
 });

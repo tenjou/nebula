@@ -2,57 +2,69 @@
 
 Editor.controller("AssetResources", "AssetBrowser",
 {
-	onCreate: function() 
-	{
-		this.content.on("menu", this.openMenu.bind(this));
-	},
-
 	onLoad: function() 
 	{
+		var ctxMenu = editor.plugins.ContextMenu;
+
+		ctxMenu.add({
+			name: "Resources",
+			content: [
+				{
+					name: "Create", 
+					type: "category",
+					content: [
+						{
+							name: "Folder", 
+							icon: "fa-folder",
+							func: this.menu_Folder.bind(this)
+						}
+					]
+				},
+				{
+					name: "Actions", 
+					type: "category",
+					content: [
+						{
+							name: "Upload", 
+							icon: "fa-upload",
+							func: this.menu_Upload.bind(this)
+						}
+					]
+				}
+			]
+		});
+
+		ctxMenu.add({
+			name: "ResourcesItem",
+			extend: [ "Resources" ],
+			content: [
+				{
+					name: "Actions", 
+					type: "category",
+					content: [
+						{
+							name: "Delete", 
+							icon: "fa-trash",
+							func: this.menu_Delete.bind(this)
+						}
+					]
+				}
+			]
+		});
+
 		this.list = this.content.get("Resources.Browser");
 		this.list.on("drop", this.handleDrop.bind(this));
 		this.list.on("select", this.handleInspectItem.bind(this));
 		this.list.on("update", this.handleRenameItem.bind(this));
 		this.list.on("move", this.handleMoveItem.bind(this));
+		this.list.on("menu", this.openMenu.bind(this));
 		
 		this.upload = this.content.get("upload");
 		this.upload.on("update", this.handleUploadUpdate.bind(this));
 	},
 
-	createListMenu: function(element)
-	{
-		var pluginAssetBrowser = editor.plugins.AssetBrowser;
-		return pluginAssetBrowser.menuResources;
-	},
-
-	createItemMenu: function(element)
-	{
-		var pluginAssetBrowser = editor.plugins.AssetBrowser;
-		return editor.plugins.ContextMenu.mergeMenus(
-			pluginAssetBrowser.menuResources, 
-			pluginAssetBrowser.menuItemResources);
-	},	
-
-	handleContextMenu: function(buffer)
-	{
-		var category = buffer[0];
-		var item = buffer[1];
-
-		if(category.name === "Create")
-		{
-			if(item.name === "Folder") {
-				this.addFolder(this.currList, this.currItem);
-			}
-		}
-		else if(category.name === "Actions")
-		{
-			if(item.name === "Upload") {
-				this.upload.open();
-			}
-			else if(item.name === "Delete") {
-				this.removeItem(this.currList, this.currItem);
-			}
-		}
+	menu_Upload: function() {
+		this.upload.open();
 	},
 
 	// upload
@@ -211,6 +223,8 @@ Editor.controller("AssetResources", "AssetBrowser",
 	},	
 
 	//
+	name: "Resources",
+
 	upload: null,
 
 	numItemsLoading: 0

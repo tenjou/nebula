@@ -267,12 +267,18 @@ meta.class("Editor",
 				extendContentInfo = this.getContentInfo(extendBuffer[n]);
 				if(!extendContentInfo) { continue; }
 
-				content.addCtrl(extendContentInfo.ctrl);
+				if(extendContentInfo.ctrl) {
+					content.addCtrl(extendContentInfo.ctrl);
+				}
+				
 				meta.appendObject(contentData, extendContentInfo.data);
 			}
 		}
 
-		content.addCtrl(contentInfo.ctrl);
+		if(contentInfo.ctrl) {
+			content.addCtrl(contentInfo.ctrl);
+		}
+		
 		meta.appendObject(contentData, contentInfo.data);
 
 		content.data = contentData;

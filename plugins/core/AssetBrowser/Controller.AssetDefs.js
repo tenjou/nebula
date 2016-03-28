@@ -2,58 +2,52 @@
 
 Editor.controller("AssetDefs", "AssetBrowser",
 {
-	onCreate: function() 
-	{
-		this.content.on("menu", this.openMenu.bind(this));
-	},
-
 	onLoad: function()
 	{
+		var ctxMenu = editor.plugins.ContextMenu;
+
+		ctxMenu.add({
+			name: "Defs",
+			content: [
+				{
+					name: "Create", 
+					type: "category",
+					content: [
+						{ 
+							name: "Folder", 
+							icon: "fa-folder",
+							type: "folder",
+							func: this.menu_Folder.bind(this)
+						}
+					]
+				}
+			]
+		});
+
+		ctxMenu.add({
+			name: "DefsItem",
+			extend: [ "Defs" ],
+			content: [
+				{
+					name: "Actions", 
+					type: "category",
+					content: [
+						{
+							name: "Delete", 
+							icon: "fa-trash",
+							func: this.menu_Delete.bind(this)
+						}
+					]
+				}
+			]
+		});
+
 		this.list = this.content.get("Defs.Browser");
 		this.list.on("select", this.handleInspectItem.bind(this));
 		this.list.on("update", this.handleRenameItem.bind(this));
-		this.list.on("move", this.handleMoveItem.bind(this));	
-	},
-
-	createListMenu: function(element)
-	{
-		var pluginAssetBrowser = editor.plugins.AssetBrowser;
-		return pluginAssetBrowser.menuDefs;
-	},
-
-	createItemMenu: function(element)
-	{
-		var pluginAssetBrowser = editor.plugins.AssetBrowser;
-		return editor.plugins.ContextMenu.mergeMenus(
-			pluginAssetBrowser.menuDefs, 
-			pluginAssetBrowser.menuItemDefs);
-	},		
-
-	handleContextMenu: function(buffer)
-	{
-		var category = buffer[0];
-		var item = buffer[1];
-
-		if(category.name === "Create")
-		{
-			switch(item.type)
-			{
-				case "folder":
-					this.addFolder(this.currList);
-					break;
-
-				default:
-					this.createPrefab(this.currList, item.type);
-					break;
-			}
-		}
-		else if(category.name === "Actions")
-		{
-			if(item.name === "Delete") {
-				this.removeItem(this.currList, this.currItem);
-			}
-		}
-	},
+		this.list.on("move", this.handleMoveItem.bind(this));
+		this.list.on("menu", this.openMenu.bind(this));	
+	},	
 
 	createPrefab: function(list, type)
 	{
@@ -68,6 +62,7 @@ Editor.controller("AssetDefs", "AssetBrowser",
 	},
 
 	//
+	name: "Defs",
 	list: null,
 
 	db: null,
