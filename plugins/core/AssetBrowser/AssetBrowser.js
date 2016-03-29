@@ -21,6 +21,7 @@ Editor.plugin("AssetBrowser",
 			var list = new Element.List_Asset(parent, name);
 			list.itemCls = Element.ListItem_Asset;
 			list.info = "No resources found";
+			list.selectable = true;
 
 			return list;
 		};
@@ -28,6 +29,7 @@ Editor.plugin("AssetBrowser",
 		{
 			var list = new Element.List(parent, name);
 			list.info = "No defs found";
+			list.selectable = true;
 
 			return list;
 		};
@@ -35,6 +37,7 @@ Editor.plugin("AssetBrowser",
 		{
 			var list = new Element.List(parent, name);
 			list.info = "Hierarchy is empty";
+			list.selectable = true;
 
 			return list;
 		};		
@@ -107,5 +110,7 @@ Editor.plugin("AssetBrowser",
 	//
 	contentHierarchy: null,
 	contentResources: null,
-	contentDefs: null
+	contentDefs: null,
+
+	selectedItem: null
 });

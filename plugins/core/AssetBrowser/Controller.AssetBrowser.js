@@ -4,6 +4,8 @@ Editor.controller("AssetBrowser",
 {
 	onBindData: function()
 	{
+		editor.registerDataset(this.name, this.data);
+
 		this.dbLookup = {};
 		this.list.db = this.data;
 
@@ -111,7 +113,7 @@ Editor.controller("AssetBrowser",
 
 		if(this.dbLookup[info.name]) {
 			info.name = prevName;
-			this.handleInspectItem();
+			this.inspectItem();
 			return false;
 		}
 
@@ -120,14 +122,14 @@ Editor.controller("AssetBrowser",
 			editor.fileSystem.moveToDir(
 				info.path + prevName,
 				info.path + info.name,
-				this.handleInspectItem.bind(this));
+				this.inspectItem.bind(this));
 		}
 		else
 		{
 			editor.fileSystem.moveTo(
 				info.path + prevName + "." + info.ext, 
 				info.path + info.name + "." + info.ext,
-				this.handleInspectItem.bind(this));
+				this.inspectItem.bind(this));
 		}
 
 		delete this.dbLookup[prevName];
@@ -230,19 +232,27 @@ Editor.controller("AssetBrowser",
 		}		
 	},
 
-	handleInspectItem: function(event) {
+	handleSelect: function(event) 
+	{		
+		var plugin = editor.plugins.AssetBrowser;
+		if(plugin.selectedItem) {
+			plugin.selectedItem.select = false;
+		}
+
+		plugin.selectedItem = event.element;
+
 		this.inspectItem();
 	},
 
 	inspectItem: function()
 	{
-		var info = this.list.cache.selectedItem.info;
+		var info = editor.plugins.AssetBrowser.selectedItem.info;
 		editor.plugins.Inspect.show(info.type, info, this.handleInspectUpdate.bind(this));
 	},
 
 	handleInspectUpdate: function() 
 	{
-		var item = this.list.cache.selectedItem;
+		var item = editor.plugins.AssetBrowser.selectedItem;
 		item.name = item.info.name;
 	},
 

@@ -43,7 +43,7 @@ Editor.controller("AssetDefs", "AssetBrowser",
 		});
 
 		this.list = this.content.get("Defs.Browser");
-		this.list.on("select", this.handleInspectItem.bind(this));
+		this.list.on("select", this.handleSelect.bind(this));
 		this.list.on("update", this.handleRenameItem.bind(this));
 		this.list.on("move", this.handleMoveItem.bind(this));
 		this.list.on("menu", this.openMenu.bind(this));	

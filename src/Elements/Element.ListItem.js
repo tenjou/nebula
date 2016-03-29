@@ -36,6 +36,7 @@ meta.class("Element.ListItem", "Element.Basic",
 		}
 		else {
 			this.emit("click", domEvent);
+			editor.emit("click", domEvent);
 		}
 	},	
 

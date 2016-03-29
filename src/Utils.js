@@ -53,7 +53,7 @@ meta.appendObject = function(target, src)
 				else 
 				{
 					if(typeof(targetValue) === "object") {
-						meta.mergeAppend(targetValue, value);
+						meta.appendObject(targetValue, value);
 					}
 					else {
 						console.warn("(meta.mergeAppend) Incompatible types for '" + key + "' key");

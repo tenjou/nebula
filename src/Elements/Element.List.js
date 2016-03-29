@@ -14,8 +14,6 @@ meta.class("Element.List", "Element.Basic",
 
 		this.on("click", "item", this.selectItem.bind(this));
 		this.on("click", "folder", this.selectItem.bind(this));
-		this.on("select", "item", this.handleSelectedItem.bind(this));
-		this.on("select", "folder", this.handleSelectedItem.bind(this));
 	},
 
 	handleClick: function(domEvent) {
@@ -30,19 +28,14 @@ meta.class("Element.List", "Element.Basic",
 
 	selectItem: function(event)
 	{
-		if(event.element === this.cache.selectedItem) { return; }
-		event.element.select = true;	
-	},
+		if(!this.selectable) { return; }
 
-	handleSelectedItem: function(event)
-	{
-		if(!this.cache.selectedItem) {
-			this.cache.selectedItem = event.element;
+		if(this.selectedItem) {
+			this.selectedItem.select = false;
 		}
-		else {
-			this.cache.selectedItem.select = false;
-			this.cache.selectedItem = event.element;
-		}
+
+		this.selectedItem = event.element;
+		this.selectedItem.select = true;
 	},
 
 	handleDragEnter: function(domEvent) 
@@ -130,6 +123,16 @@ meta.class("Element.List", "Element.Basic",
 		}
 	},
 
+	removeAll: function()
+	{
+		for(var n = 0; n < this.items.length; n++) {
+			this.remove(this.items[n]);
+		}
+
+		this.items.length = 0;
+		this.info = this.infoTxt;
+	},
+
 	sort: function()
 	{
 		if(!this.items) { return; }
@@ -163,6 +166,23 @@ meta.class("Element.List", "Element.Basic",
 		return this._info.value;
 	},
 
+	set selectable(value) 
+	{
+		if(this._selectable === value) { return; }
+		this._selectable = value;
+
+		if(!value)
+		{
+			if(this.selectedItem) {
+				this.selectedItem = false;
+			}
+		}
+	},
+
+	get selectable() {
+		return this._selectable;
+	},
+
 	//
 	elementTag: "list",
 
@@ -171,10 +191,12 @@ meta.class("Element.List", "Element.Basic",
 	folderCls: null, 
 
 	cache: {
-		selectedItem: null,
 		dragItem: null,
 	},
 
 	_info: null,
-	infoTxt: null
+	infoTxt: null,
+
+	_selectable: false,
+	selectedItem: null
 });

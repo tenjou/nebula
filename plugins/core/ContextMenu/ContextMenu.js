@@ -6,6 +6,8 @@ Editor.plugin("ContextMenu",
 	{
 		this.menuDefs = {};
 		this.cbShow = {};
+
+		editor.on("click", this.hide.bind(this));
 	},
 
 	onSplashStart: function()

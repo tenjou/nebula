@@ -2,28 +2,23 @@
 
 meta.class("Element.Property", "Element.Basic",
 {
-	addTag: function(name) 
+	onCreate: function()
 	{
-		var nameElement = document.createElement("span");
-		nameElement.innerHTML = name;
-		this.domElement.appendChild(nameElement);
+		this.name = document.createElement("span");
+		this.domElement.appendChild(this.name);
 	},
 
-	addInput: function(data)
+	set value(value)
 	{
-		var input = document.createElement("input");
-		input.setAttribute("type", "text");
+		if(this._value === value) { return; }
+		this._value = value;
 
-		if(typeof(data) === "object") {
-			input.value = data.value;
-		}
-		else {
-			input.value = data;
-		}
-
-		this.domElement.appendChild(input);
+		this.name.innerHTML = value;
 	},	
 
 	//
-	elementTag: "prop"
+	elementTag: "prop",
+
+	name: null,
+	_value: null
 });

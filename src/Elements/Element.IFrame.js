@@ -10,22 +10,23 @@ meta.class("Element.IFrame", "Element.Basic",
 	handleLoad: function(domEvent) 
 	{
 		this.contentWindow = this.domElement.contentWindow;
+		this.contentWindow.addEventListener("click", this.handleClick.bind(this));
 
 		var contentDocument = this.domElement.contentWindow.document;
 		contentDocument.oncontextmenu = this.handleContextMenu.bind(this);
-		//contentDocument.onclick = this.handleClick.bind(this);
 
 		this.emit("load");
+	},
+
+	handleClick: function(domEvent)
+	{
+		editor.emit("click", domEvent);
 	},
 
 	handleContextMenu: function(domEvent) 
 	{
 		domEvent.preventDefault();
 		this.emit("menu", domEvent);
-	},
-
-	handleClick: function(domEvent) {
-		console.log("click");
 	},
 
 	set value(value) {

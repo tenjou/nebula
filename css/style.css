@@ -256,7 +256,7 @@ content prop {
 }
 
 content prop > span {
-	flex: 1 1 120px;
+	flex: 0 0 70px;
 }
 
 content name {
@@ -344,6 +344,39 @@ content image img {
 	border: 3px solid #4EB4E4;
 }
 
+content dropdown {
+	position: relative;
+    display: flex;
+    flex: 1 1 100%;	
+}
+content dropdown input {
+	padding-right: 20px;
+}
+content dropdown icon {
+	position: absolute;
+	right: 7px;
+	top: 4px;
+	color: black;
+	font-size: 14px !important;
+}
+content dropdown list {
+    display: block;
+    position: absolute;
+    width: 100%;
+    background: rgba(19, 18, 18, 0.97);
+    left: 0;
+    top: 21px;
+    z-index: 9999;
+    box-shadow: 1px 1px 4px rgba(0,0,0,.2);	
+    box-sizing: border-box;
+}
+content dropdown item {
+	color: white;
+}
+content dropdown info {
+	padding: 2px;
+}
+
 content iframe {
     border: 0;
     box-sizing: border-box;
@@ -352,9 +385,11 @@ content iframe {
 }
 
 input {
-    flex: 100%;
+	width: 100%;
+    flex: 1 1 100%;
 	color: #272727;
 	font-weight: 600;
+	box-sizing: border-box;
 }
 
 input:focus {

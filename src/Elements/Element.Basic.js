@@ -82,6 +82,10 @@ meta.class("Element.Basic",
 		}
 	},
 
+	empty: function() {
+		this.domElement.innerHTML = "";
+	},
+
 	emit: function(eventName, domEvent) 
 	{
 		var event = new this.Event();
@@ -111,7 +115,8 @@ meta.class("Element.Basic",
 	{
 		if(this.pickable && this.events) 
 		{
-			var eventBuffer;
+			var eventBuffer, buffer;
+
 			if(this.events[event.name]) {
 				eventBuffer = this.events[event.name];
 			}
@@ -121,18 +126,32 @@ meta.class("Element.Basic",
 
 			if(eventBuffer)
 			{
-				if(eventBuffer[event.id]) 
+				var stop = false;
+
+				buffer = eventBuffer[event.id];
+				if(buffer) 
 				{
-					if(eventBuffer[event.id](event)) {
-						return;
+					for(var n = 0; n < buffer.length; n++) 
+					{
+						if(buffer[n](event)) {
+							stop = true;
+						}
 					}
 				}
 				
-				if(eventBuffer["*"]) 
+				buffer = eventBuffer["*"];
+				if(buffer) 
 				{
-					if(eventBuffer["*"](event)) {
-						return;
+					for(var n = 0; n < buffer.length; n++) 
+					{
+						if(buffer[n](event)) {
+							stop = true;
+						}
 					}
+				}
+
+				if(stop) {
+					return;
 				}
 			}
 		}
@@ -172,9 +191,11 @@ meta.class("Element.Basic",
 		}
 
 		if(eventBuffer[id]) {
-			console.warn("(Editor.Element.Basic.on) Overwriting callback '" + event + "' function for: ", id);
+			eventBuffer[id].push(cb);
 		}
-		eventBuffer[id] = cb;
+		else {
+			eventBuffer[id] = [ cb ];
+		}
 	},
 
 	updateEventElementOffset: function(event)

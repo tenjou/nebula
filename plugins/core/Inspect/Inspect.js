@@ -60,6 +60,8 @@ Editor.plugin("Inspect",
 		if(this.cb) {
 			this.cb();
 		}
+
+		editor.saveCfg();
 	},
 
 	//

@@ -4,7 +4,9 @@ meta.class("Editor",
 {
 	init: function()
 	{		
+		this.eventBuffer = {};
 		this.ctrls = {};
+		this.datasets = {};
 
 		this.inputParser = new Editor.InputParser();
 		this.resourceMgr = new Editor.ResourceManager();
@@ -12,6 +14,8 @@ meta.class("Editor",
 
 		this.contents = {};
 		this.contentsCached = [];
+
+		window.addEventListener("click", this.handleClick.bind(this));
 	},
 
 	prepare: function()
@@ -309,10 +313,69 @@ meta.class("Editor",
 		return obj.info;
 	},
 
+	registerDataset: function(name, buffer)
+	{
+		if(this.datasets[name]) {
+			console.warn("(Editor.addDataset) There is already dataset with such name: " + name);
+			return;
+		}
+
+		this.datasets[name] = buffer;
+	},
+
+	getDataset: function(name) 
+	{
+		if(!name) { return null; }
+
+		var dataset = this.datasets[name];
+		if(!dataset) {
+			console.warn("Editor.getDataset) No such dataset registered: " + name);
+			return null;
+		}
+
+		return dataset;
+	},
+
+	handleClick: function(domEvent) {
+		this.emit("click", domEvent);
+	},
+
+	on: function(event, cb) 
+	{
+		var buffer = this.eventBuffer[event];
+		if(!buffer) {
+			this.eventBuffer[event] = [ cb ];
+		}
+		else {
+			buffer.push(cb);
+		}
+	},
+
+	off: function(event, cb)
+	{
+		var buffer = this.eventBuffer[event];
+		if(buffer) {
+			var index = buffer.indexOf(cb);
+			buffer = buffer.splice(index, 1);
+		}
+	},
+
+	emit: function(event, domEvent)
+	{
+		var buffer = this.eventBuffer[event];
+		if(!buffer) { return; }
+
+		for(var n = 0; n < buffer.length; n++) {
+			buffer[n](domEvent);
+		}
+	},
+
 	//
 	db: null,
 	version: "0.1",
 	
+	eventBuffer: null,
+
 	fileSystem: null,
 	inputParser: null,
 	resourceMgr: null,
@@ -320,6 +383,7 @@ meta.class("Editor",
 
 	plugins: null,
 	ctrls: null,
+	datasets: null,
 
 	wrapper: null,
 	top: null,

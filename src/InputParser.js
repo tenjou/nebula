@@ -73,7 +73,7 @@ meta.class("Editor.InputParser",
 		number: function(parent, name, data) 
 		{
 			var prop = new Element.Property(parent, name);
-			prop.addTag(name);
+			prop.value = name;
 
 			var input = new Element.Number(prop);
 			if(data.value) {
@@ -86,7 +86,7 @@ meta.class("Editor.InputParser",
 		boolean: function(parent, name, data) 
 		{
 			var prop = new Element.Property(parent, name);
-			prop.addTag(name);
+			prop.value = name;
 
 			var input = new Element.Number(prop);
 			if(data.value) {
@@ -99,7 +99,7 @@ meta.class("Editor.InputParser",
 		string: function(parent, name, data) 
 		{
 			var prop = new Element.Property(parent, name);
-			prop.addTag(name);
+			prop.value = name;
 
 			var input = new Element.String(prop);
 			if(data.value) {
@@ -149,6 +149,17 @@ meta.class("Editor.InputParser",
 		{
 			var image = new Element.Image(parent, name);
 			return image;
+		},
+
+		dropdown: function(parent, name, data)
+		{
+			var prop = new Element.Property(parent, name);
+			prop.value = name;
+
+			var dropdown = new Element.Dropdown(prop, name);
+			dropdown.dataset = data.dataset;
+			dropdown.filterType = data.filterType;
+			return dropdown;
 		},
 
 		iframe: function(parent, name, data)
