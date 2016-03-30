@@ -173,6 +173,15 @@ meta.class("Editor.InputParser",
 		{
 			var upload = new Element.Upload(parent, name);
 			return upload;
-		}
+		},
+
+		color: function(parent, name, data)
+		{
+			var prop = new Element.Property(parent, name);
+			prop.value = name;
+
+			var color = new Element.Color(prop);
+			return prop;
+		},
 	}
 });
