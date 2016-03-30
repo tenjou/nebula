@@ -313,14 +313,17 @@ meta.class("Editor",
 		return obj.info;
 	},
 
-	registerDataset: function(name, buffer)
+	registerDataset: function(name, buffer, type)
 	{
 		if(this.datasets[name]) {
 			console.warn("(Editor.addDataset) There is already dataset with such name: " + name);
 			return;
 		}
 
-		this.datasets[name] = buffer;
+		this.datasets[name] = {
+			buffer: buffer,
+			type: type ? type : "array"
+		};
 	},
 
 	getDataset: function(name) 

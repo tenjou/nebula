@@ -26,7 +26,14 @@ meta.class("Element.Dropdown", "Element.Basic",
 		this.list.removeAll();
 		this.items.length = 0;
 
-		this._fill(data);
+		if(!data) { return; }
+
+		if(data.type === "content") {
+			this._fill_content(data.buffer);
+		}
+		else {
+			this.items = this.items.concat(data.buffer);
+		}
 
 		this.items.sort(function(a, b) {
 			if(a < b) { return -1; }
@@ -39,15 +46,13 @@ meta.class("Element.Dropdown", "Element.Basic",
 		}
 	},
 
-	_fill: function(data)
+	_fill_content: function(data)
 	{
-		if(!data) { return; }
-
 		for(var n = 0; n < data.length; n++)
 		{
 			var dataItem = data[n];
 			if(dataItem.type === "folder") {
-				this._fill(dataItem.content);
+				this._fill_content(dataItem.content);
 			}
 			else 
 			{
@@ -67,18 +72,21 @@ meta.class("Element.Dropdown", "Element.Basic",
 			return;
 		}
 
-		var found = false;
-		for(var n = 0; n < this.items.length; n++) 
+		if(newValue !== null)
 		{
-			if(newValue === this.items[n]) {
-				found = true;
-				break;
+			var found = false;
+			for(var n = 0; n < this.items.length; n++) 
+			{
+				if(newValue === this.items[n]) {
+					found = true;
+					break;
+				}
 			}
-		}
 
-		if(!found) { 
-			this.value = this.prevValue;
-			return;
+			if(!found) { 
+				this.value = this.prevValue;
+				return;
+			}
 		}
 
 		this._value = newValue;

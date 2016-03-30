@@ -4,7 +4,7 @@ Editor.controller("AssetBrowser",
 {
 	onBindData: function()
 	{
-		editor.registerDataset(this.name, this.data);
+		editor.registerDataset(this.name, this.data, "content");
 
 		this.dbLookup = {};
 		this.list.db = this.data;

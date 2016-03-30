@@ -11,7 +11,10 @@ Editor.plugin("Inspect",
 					General: {
 						type: "section",
 						content: {
-							Name: "@string",
+							Name: {
+								alias: "name",
+								type: "string"
+							}
 						}
 					}
 				}
