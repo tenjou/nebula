@@ -257,6 +257,11 @@ content prop {
 
 content prop > span {
 	flex: 0 0 70px;
+	max-width: 70px;
+	display: inline-block;
+	margin-right: 10px;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 content name {
@@ -382,6 +387,35 @@ content iframe {
     box-sizing: border-box;
     display: flex;
     flex: 1 1 100%;	
+}
+
+content options {
+	width: 100%;
+	flex: 1 1 100%;
+	display: flex;
+	height: 22px;
+	line-height: 22px;
+	border-radius: 2px;
+	color: #272727;
+	font-weight: 600;
+	background-color: #616060;
+	box-sizing: border-box;
+}
+content option {
+	flex: 1 1 100%;
+	text-align: center;
+	color: #1D1D1D;
+	border-radius: 3px;
+	font-size: 10px;
+	font-weight: bold;
+	text-transform: uppercase;
+	cursor: pointer;
+}
+content option.active {
+	background: #C5C5C5;
+}
+content option:hover {
+	text-decoration: underline;
 }
 
 input {

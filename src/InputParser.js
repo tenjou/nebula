@@ -158,6 +158,24 @@ meta.class("Editor.InputParser",
 			return image;
 		},
 
+		option: function(parent, name, data)
+		{
+			var prop = new Element.Property(parent, name);
+			prop.value = name;
+
+			var option = new Element.Option(prop, name);
+			return option;
+		},
+
+		bool: function(parent, name, data)
+		{
+			var prop = new Element.Property(parent, name);
+			prop.value = name;
+
+			var bool = new Element.Bool(prop, name);
+			return bool;
+		},
+
 		dropdown: function(parent, name, data)
 		{
 			var prop = new Element.Property(parent, name);
