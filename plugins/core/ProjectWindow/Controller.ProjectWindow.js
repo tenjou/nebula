@@ -43,7 +43,6 @@ Editor.controller("ProjectWindow",
 		editor.plugins.ContextMenu.show("ProjectWindow", event.x, event.y);
 	},
 
-
 	createProject: function(event)
 	{
 		if(this.selectedItem) {
@@ -101,7 +100,7 @@ Editor.controller("ProjectWindow",
 
 	menu_Delete: function()
 	{
-		this.deleteProject(this.list.cache.selectedItem);
+		this.deleteProject(this.list.cache.menuItem);
 	},
 
 	getUniqueProjectName: function()

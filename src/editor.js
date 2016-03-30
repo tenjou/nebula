@@ -254,7 +254,7 @@ meta.class("Editor",
 			return null;			
 		}
 
-		var content = this.contentsCached[contentInfo.index];
+		var content = this.contentsCached[contentInfo.__index];
 		if(content) {
 			return content;
 		}
@@ -286,6 +286,7 @@ meta.class("Editor",
 		meta.appendObject(contentData, contentInfo.data);
 
 		content.data = contentData;
+		this.contentsCached[contentInfo.__index] = content;
 
 		return content;
 	},

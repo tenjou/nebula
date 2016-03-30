@@ -44,6 +44,13 @@ meta.class("Element.Basic",
 		else {
 			this.domElement.appendChild(element);
 		}
+
+		if(!this.children) {
+			this.children = [ element ];
+		}
+		else {
+			this.children.push(element);
+		}
 	},
 
 	remove: function(element)
@@ -61,6 +68,23 @@ meta.class("Element.Basic",
 		else {
 			this.parent.remove(this);
 		}
+
+		if(this.children) 
+		{
+			var index = this.children.indexOf(element);
+			this.children = this.children.splice(index, 1);
+		}
+	},
+
+	removeAll: function()
+	{
+		if(!this.children) { return; }
+
+		for(var n = 0; n < this.children.length; n++) {
+			this.remove(this.children[n]);
+		}
+
+		this.children.length = 0;
 	},
 
 	insertBefore: function(element, insertBeforeElement) 
@@ -80,10 +104,6 @@ meta.class("Element.Basic",
 		else {
 			this.domElement.insertBefore(element, insertDomElement);
 		}
-	},
-
-	empty: function() {
-		this.domElement.innerHTML = "";
 	},
 
 	emit: function(eventName, domEvent) 
@@ -257,23 +277,22 @@ meta.class("Element.Basic",
 		return this._enabled;
 	},
 
-	set visible(value) 
+	set hidden(value) 
 	{
-		if(value === this._visible) { return; }
-
-		this._visible = value;
+		if(this._hidden === value) { return; }
+		this._hidden = value;
 
 		if(value) {
-			this.removeCls("hidden");
+			this.domElement.setAttribute("class", "hidden");
 		}
 		else {
-			this.addCls("hidden");
+			this.domElement.setAttribute("class", "");
 		}
 	},
 
-	get visible() {
-		return this._visible;
-	},
+	get hidden() {
+		return this._hidden;
+	},	
 
 	Event: function() 
 	{
@@ -287,6 +306,7 @@ meta.class("Element.Basic",
 
 	//
 	parent: null,
+	children: null,
 
 	events: null,
 
@@ -295,7 +315,7 @@ meta.class("Element.Basic",
 	elementTag: "div",
 
 	pickable: true,
-	_visible: true,
+	_hidden: false,
 	_enabled: true
 });
 

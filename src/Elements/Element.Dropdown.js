@@ -16,7 +16,7 @@ meta.class("Element.Dropdown", "Element.Basic",
 		icon.value = "fa-caret-down";
 
 		this.list = new Element.List(this);
-		this.list.visible = false;
+		this.list.hidden = true;
 		this.list.info = "Nothing found";
 		this.list.on("click", "item", this.handleItemClick.bind(this));
 	},
@@ -102,15 +102,15 @@ meta.class("Element.Dropdown", "Element.Basic",
 
 		this.prevValue = this._value;
 		this.fill(this._dataset);
-		this.list.visible = true;
+		this.list.hidden = false;
 	},
 
 	hideList: function()
 	{
-		if(this.list.visible) 
+		if(!this.list.hidden) 
 		{
 			editor.off("click", this._cachedClickFunc);
-			this.list.visible = false;
+			this.list.hidden = true;
 		}
 	},
 

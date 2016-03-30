@@ -1,7 +1,5 @@
 "use strict";
 
-var dragSrcEl = null;
-
 meta.class("Element.ListItem", "Element.Basic",
 {
 	onCreate: function()
@@ -40,9 +38,12 @@ meta.class("Element.ListItem", "Element.Basic",
 		}
 	},	
 
-	handleContextMenu: function(domEvent) {
+	handleContextMenu: function(domEvent) 
+	{
 		domEvent.preventDefault();
 		domEvent.stopPropagation();
+
+		this.parent.cache.menuItem = this;
 		this.emit("menu", domEvent);
 	},	
 
@@ -205,6 +206,7 @@ meta.class("Element.ListItem", "Element.Basic",
 				this.list = new this.parent.__cls__(this);
 				this.list.itemCls = this.parent.itemCls;
 				this.list.db = this.parent.db;
+				this.list.cache = this.parent.cache;
 				this.list.addCls("hidden");				
 			}
 			else 

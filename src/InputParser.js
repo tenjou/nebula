@@ -136,7 +136,13 @@ meta.class("Editor.InputParser",
 			var h2 = new Element.H2(container);
 			h2.value = name;			
 			return container;
-		},			
+		},	
+
+		slot: function(parent, name, data)
+		{
+			var slot = new Element.Slot(parent, name);
+			return slot;
+		},	
 
 		button: function(parent, name, data)
 		{

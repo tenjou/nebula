@@ -5,6 +5,10 @@ meta.class("Element.List", "Element.Basic",
 	onCreate: function() 
 	{
 		this.items = [];
+		this.cache = {
+			selectedItem: null,
+			menuItem: null
+		};
 
 		this.domElement.onclick = this.handleClick.bind(this);
 		this.domElement.oncontextmenu = this.handleContextMenu.bind(this);
@@ -20,9 +24,12 @@ meta.class("Element.List", "Element.Basic",
 		this.emit("click", domEvent);
 	},
 
-	handleContextMenu: function(domEvent) {
+	handleContextMenu: function(domEvent) 
+	{
 		domEvent.stopPropagation();
 		domEvent.preventDefault();
+
+		this.cache.menuItem = this;
 		this.emit("menu", domEvent);
 	},	
 
@@ -43,7 +50,7 @@ meta.class("Element.List", "Element.Basic",
 		domEvent.stopPropagation();
 		domEvent.preventDefault();
 
-		var dragItem = this.cache.dragItem;
+		var dragItem = this.internalCache.dragItem;
 		if(!dragItem) { 
 			this.showDragStyle();
 			return; 
@@ -56,7 +63,7 @@ meta.class("Element.List", "Element.Basic",
 		domEvent.stopPropagation();
 		domEvent.preventDefault();
 
-		var dragItem = this.cache.dragItem;
+		var dragItem = this.internalCache.dragItem;
 		if(!dragItem) { 
 			this.hideDragStyle();
 		}		
@@ -67,7 +74,7 @@ meta.class("Element.List", "Element.Basic",
 		domEvent.stopPropagation();
 		domEvent.preventDefault();
 
-		var dragItem = this.cache.dragItem;
+		var dragItem = this.internalCache.dragItem;
 		if(!dragItem) { 
 			this.hideDragStyle();
 		}	
@@ -190,7 +197,8 @@ meta.class("Element.List", "Element.Basic",
 	itemCls: null,
 	folderCls: null, 
 
-	cache: {
+	cache: null,
+	internalCache: {
 		dragItem: null,
 	},
 
@@ -198,5 +206,4 @@ meta.class("Element.List", "Element.Basic",
 	infoTxt: null,
 
 	_selectable: false,
-	selectedItem: null
 });

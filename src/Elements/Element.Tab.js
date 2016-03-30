@@ -31,7 +31,7 @@ meta.class("Editor.Element.Tab", "Element.Basic",
 		this.domElement.setAttribute("class", "active");
 
 		if(this.container) {
-			this.container.visible = true;
+			this.container.hidden = false;
 		}
 	},
 
@@ -41,7 +41,7 @@ meta.class("Editor.Element.Tab", "Element.Basic",
 		this.domElement.setAttribute("class", "");
 
 		if(this.container) {
-			this.container.visible = false;
+			this.container.hidden = true;
 		}
 	},
 
