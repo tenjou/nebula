@@ -25,8 +25,8 @@ Editor.controller("ProjectWindow",
 		this.list.on("menu", "item", this.openMenu.bind(this));
 
 		this.content.on("click", "Projects.Create", this.createProject.bind(this));
-		this.content.on("dbClick", "Projects.Browser.list.item", this.openProject.bind(this));
-		this.content.on("update", "Projects.Browser.list.item.name", this.renameProject.bind(this));				
+		this.content.on("dbClick", "Projects.List.item", this.openProject.bind(this));
+		this.content.on("update", "Projects.List.item.name", this.renameProject.bind(this));				
 	},
 
 	onBindData: function()

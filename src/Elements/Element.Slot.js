@@ -23,7 +23,7 @@ meta.class("Element.Slot", "Element.Basic",
 			scope = scope[buffer[n]];
 			if(!scope) {
 				console.warn("(Editor.controller) Invalid class: Editor.Controller." + ctrlName);
-				break;
+				return;
 			}
 		}
 

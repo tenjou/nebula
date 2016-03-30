@@ -101,7 +101,7 @@ meta.class("Editor.InputParser",
 			var prop = new Element.Property(parent, name);
 			prop.value = name;
 
-			var input = new Element.String(prop);
+			var input = new Element.String(prop, name);
 			if(data.value) {
 				input.value = data.value;
 			}
@@ -133,6 +133,7 @@ meta.class("Editor.InputParser",
 		containerNamed: function(parent, name, data) 
 		{
 			var container = new Element.Container(parent, name);
+			container.pickable = true;
 			var h2 = new Element.H2(container);
 			h2.value = name;			
 			return container;
@@ -186,8 +187,8 @@ meta.class("Editor.InputParser",
 			var prop = new Element.Property(parent, name);
 			prop.value = name;
 
-			var color = new Element.Color(prop);
-			return prop;
+			var color = new Element.Color(prop, name);
+			return color;
 		},
 	}
 });

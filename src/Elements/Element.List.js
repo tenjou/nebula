@@ -7,7 +7,8 @@ meta.class("Element.List", "Element.Basic",
 		this.items = [];
 		this.cache = {
 			selectedItem: null,
-			menuItem: null
+			menuItem: null,
+			selectable: true
 		};
 
 		this.domElement.onclick = this.handleClick.bind(this);
@@ -35,14 +36,14 @@ meta.class("Element.List", "Element.Basic",
 
 	selectItem: function(event)
 	{
-		if(!this.selectable) { return; }
+		if(!this.cache.selectable) { return; }
 
-		if(this.selectedItem) {
-			this.selectedItem.select = false;
+		if(this.cache.selectedItem) {
+			this.cache.selectedItem.select = false;
 		}
 
-		this.selectedItem = event.element;
-		this.selectedItem.select = true;
+		this.cache.selectedItem = event.element;
+		this.cache.selectedItem.select = true;
 	},
 
 	handleDragEnter: function(domEvent) 
@@ -175,19 +176,19 @@ meta.class("Element.List", "Element.Basic",
 
 	set selectable(value) 
 	{
-		if(this._selectable === value) { return; }
-		this._selectable = value;
+		if(this.cache.selectable === value) { return; }
+		this.cache.selectable = value;
 
 		if(!value)
 		{
-			if(this.selectedItem) {
-				this.selectedItem = false;
+			if(this.cache.selectedItem) {
+				this.cache.selectedItem = false;
 			}
 		}
 	},
 
 	get selectable() {
-		return this._selectable;
+		return this.cache.selectable;
 	},
 
 	//
@@ -203,7 +204,5 @@ meta.class("Element.List", "Element.Basic",
 	},
 
 	_info: null,
-	infoTxt: null,
-
-	_selectable: false,
+	infoTxt: null
 });

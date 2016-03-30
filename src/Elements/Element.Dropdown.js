@@ -180,7 +180,6 @@ meta.class("Element.Dropdown", "Element.Basic",
 
 	//
 	elementTag: "dropdown",
-	pickable: false,
 
 	input: null,
 	list: null,

@@ -1,4 +1,4 @@
-"use strict";
+	"use strict";
 
 meta.class("Element.Name", "Element.Basic",
 {

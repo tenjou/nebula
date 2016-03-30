@@ -48,7 +48,6 @@ meta.class("Element.String", "Element.Basic",
 
 	//
 	elementTag: "input",
-	pickable: false,
 
 	_value: null,
 	prevValue: null

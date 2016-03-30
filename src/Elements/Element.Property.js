@@ -20,5 +20,6 @@ meta.class("Element.Property", "Element.Basic",
 	elementTag: "prop",
 
 	name: null,
-	_value: null
+	_value: null,
+	pickable: false
 });
