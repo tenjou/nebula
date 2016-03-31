@@ -76,20 +76,13 @@ meta.class("Editor.InputParser",
 			prop.value = name;
 
 			var input = new Element.Number(prop);
-			if(data.value) {
-				input.value = data.value;
+			if(data.min !== void(0)) {
+				input.min = data.min;
 			}
-			
-			return input;
-		},
-
-		boolean: function(parent, name, data) 
-		{
-			var prop = new Element.Property(parent, name);
-			prop.value = name;
-
-			var input = new Element.Number(prop);
-			if(data.value) {
+			if(data.max !== void(0)) {
+				input.max = data.max;
+			}
+			if(data.value !== void(0)) {
 				input.value = data.value;
 			}
 
@@ -173,6 +166,9 @@ meta.class("Editor.InputParser",
 			prop.value = name;
 
 			var bool = new Element.Bool(prop, name);
+			if(data.value !== void(0)) {
+				bool.value = data.value;
+			}
 			return bool;
 		},
 
