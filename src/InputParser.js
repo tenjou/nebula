@@ -112,13 +112,16 @@ meta.class("Editor.InputParser",
 		section: function(parent, name, data) 
 		{
 			var section = new Element.Section(parent, name);
-			var h2 = new Element.H2(section);
 
 			if(data.alias) {
-				h2.value = data.alias;
+				section.value = data.alias;
 			}
 			else {
-				h2.value = name;
+				section.value = name;
+			}
+
+			if(data.open) {
+				section.open = data.open;
 			}
 			
 			return section;

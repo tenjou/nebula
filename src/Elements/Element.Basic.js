@@ -15,6 +15,7 @@ meta.class("Element.Basic",
 	{
 		this.domElement = document.createElement(this.elementTag);
 		this.domElement.holder = this;
+		this.contentHolder = this.domElement;
 
 		if(id) {
 			this.id = id;
@@ -38,11 +39,11 @@ meta.class("Element.Basic",
 	append: function(element) 
 	{
 		if(element instanceof Element.Basic) {
-			this.domElement.appendChild(element.domElement);
+			this.contentHolder.appendChild(element.domElement);
 			element.parent = this;
 		}
 		else {
-			this.domElement.appendChild(element);
+			this.contentHolder.appendChild(element);
 		}
 
 		if(!this.children) {
@@ -58,11 +59,11 @@ meta.class("Element.Basic",
 		if(element)
 		{
 			if(element instanceof Element.Basic) {
-				this.domElement.removeChild(element.domElement);
+				this.contentHolder.removeChild(element.domElement);
 				element.parent = null;
 			}
 			else {
-				this.domElement.removeChild(element);
+				this.contentHolder.removeChild(element);
 			}
 		}
 		else {
@@ -98,11 +99,11 @@ meta.class("Element.Basic",
 		}		
 
 		if(element instanceof Element.Basic) {
-			this.domElement.insertBefore(element.domElement, insertDomElement);
+			this.contentHolder.insertBefore(element.domElement, insertDomElement);
 			element.parent = this;
 		}
 		else {
-			this.domElement.insertBefore(element, insertDomElement);
+			this.contentHolder.insertBefore(element, insertDomElement);
 		}
 	},
 
@@ -326,6 +327,7 @@ meta.class("Element.Basic",
 
 	id: null,
 	domElement: null,
+	contentHolder: null,
 	elementTag: "div",
 
 	pickable: true,

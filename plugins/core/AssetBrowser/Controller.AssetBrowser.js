@@ -43,7 +43,7 @@ Editor.controller("AssetBrowser",
 		list.sort();
 		editor.saveCfg();
 
-		return data;
+		return item;
 	},
 
 	_addItem: function(list, info)

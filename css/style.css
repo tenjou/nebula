@@ -223,7 +223,12 @@ content container {
 	flex-direction: column;
 }
 
-content h2 {
+caret {
+	width: 12px;
+}
+
+content h2,
+content header {
 	display: block;
 	line-height: 22px;
 	padding-left: 10px;
@@ -233,6 +238,11 @@ content h2 {
 	color: #fff;
 	cursor: default;
 	background: #1D1D1D;
+}
+
+content header h2 {
+	display: inline;
+	padding-left: 0;
 }
 
 content span {

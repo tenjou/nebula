@@ -10,10 +10,10 @@ Editor.plugin("Inspect",
 				data: {
 					General: {
 						type: "section",
+						open: true,
 						content: {
 							Name: {
-								alias: "name",
-								type: "string"
+								type: "string",
 							}
 						}
 					}
@@ -27,6 +27,7 @@ Editor.plugin("Inspect",
 				data: {
 					Image: {
 						type: "section",
+						open: true,
 						content: {
 							Holder: "@image"
 						}
