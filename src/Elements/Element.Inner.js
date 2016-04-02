@@ -15,7 +15,7 @@ meta.class("Element.Inner", "Element.Basic",
 		this.roomToolbar = new Element.ToolbarRoom(this);	
 
 		this.rightToolbar = new Element.Toolbar(this);
-		this.rightToolbar.width = 270;
+		this.rightToolbar.width = 340;
 	},
 
 	//

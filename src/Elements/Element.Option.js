@@ -56,25 +56,34 @@ meta.class("Element.Option", "Element.Basic",
 
 	set value(value) 
 	{
-		if(!this._options) { return; }
-
-		if(this._select) 
-		{
-			if(value === this._select.innerHTML) { return; }
-
-			this._select.classList.remove("active");
+		if(!this._options) {
+			value = "";
+		}
+		else if(!value) {
+			value = this._value;
 		}
 
+		var newSelect = null;
 		for(var n = 0; n < this._options.length; n++) 
 		{
 			if(this._options[n] === value) {
-				this._select = this.children[n];
-				this._select.classList.add("active");
-				return;
+				newSelect = this.children[n];
+				break;
 			}
 		}
 
-		this._select = null;
+		if(newSelect !== this._select) 
+		{
+			if(this._select) {
+				this._select.classList.remove("active");
+			}
+
+			if(newSelect) {
+				newSelect.classList.add("active");
+			}
+
+			this._select = newSelect;
+		}
 	},
 
 	get value() {
@@ -85,4 +94,5 @@ meta.class("Element.Option", "Element.Basic",
 	elementTag: "options",
 	_options: null,
 	_select: null,
+	_default: ""
 });

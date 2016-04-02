@@ -9,14 +9,12 @@ Editor.controller("Inspect.Default",
 
 	onBindData: function()
 	{
-		this.content.get("General.Name").value = this.data.name;
+		this.content.get("General.Name").set(this.data.get("name"));
 	},
 
 	handleNameUpdate: function(event)
 	{
-		this.data.name = event.element.value;
-		this.content.emit("data-update");
+		this.data.set("name", event.element.value);
 		return true;
 	}
 });
-

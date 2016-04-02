@@ -42,13 +42,6 @@ meta.class("Element.String", "Element.Basic",
 		this.domElement.value = value;
 	},
 
-	get value() {
-		return this._value;
-	},
-
 	//
-	elementTag: "input",
-
-	_value: null,
-	prevValue: null
+	elementTag: "input"
 });

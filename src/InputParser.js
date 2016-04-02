@@ -82,8 +82,8 @@ meta.class("Editor.InputParser",
 			if(data.max !== void(0)) {
 				input.max = data.max;
 			}
-			if(data.value !== void(0)) {
-				input.value = data.value;
+			if(data.default !== void(0)) {
+				input.default = data.default;
 			}
 
 			return input;
@@ -113,7 +113,14 @@ meta.class("Editor.InputParser",
 		{
 			var section = new Element.Section(parent, name);
 			var h2 = new Element.H2(section);
-			h2.value = name;
+
+			if(data.alias) {
+				h2.value = data.alias;
+			}
+			else {
+				h2.value = name;
+			}
+			
 			return section;
 		},
 
@@ -157,6 +164,9 @@ meta.class("Editor.InputParser",
 			prop.value = name;
 
 			var option = new Element.Option(prop, name);
+			if(data.default !== void(0)) {
+				option.default = data.default;
+			}			
 			return option;
 		},
 
@@ -166,8 +176,8 @@ meta.class("Editor.InputParser",
 			prop.value = name;
 
 			var bool = new Element.Bool(prop, name);
-			if(data.value !== void(0)) {
-				bool.value = data.value;
+			if(data.default !== void(0)) {
+				bool.default = data.default;
 			}
 			return bool;
 		},
@@ -180,6 +190,12 @@ meta.class("Editor.InputParser",
 			var dropdown = new Element.Dropdown(prop, name);
 			dropdown.dataset = data.dataset;
 			dropdown.filterType = data.filterType;
+			if(data.sort !== void(0)) {
+				dropdown.sort = data.sort;
+			}
+			if(data.default !== void(0)) {
+				dropdown.default = data.default;
+			}
 			return dropdown;
 		},
 

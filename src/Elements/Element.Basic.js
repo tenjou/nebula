@@ -294,6 +294,20 @@ meta.class("Element.Basic",
 		return this._hidden;
 	},	
 
+	set default(value) {
+		this._default = value;
+	},
+
+	get default() {
+		return this._default;
+	},	
+
+	set: function(value) {
+		this.prevValue = this.default;
+		this._value = this.default;
+		this.value = value;
+	},		
+
 	Event: function() 
 	{
 		this.element = null;
@@ -316,7 +330,11 @@ meta.class("Element.Basic",
 
 	pickable: true,
 	_hidden: false,
-	_enabled: true
+	_enabled: true,
+
+	prevValue: null,
+	_value: null,
+	_default: null,
 });
 
 Element.prototype.holder = null;

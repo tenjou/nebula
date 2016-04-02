@@ -18,7 +18,7 @@ meta.class("Editor.Element.Tab", "Element.Basic",
 	},
 
 	empty: function() {
-		this.container.innerHTML = "";
+		this.container.removeAll();
 	},
 
 	handleClick: function(domEvent) {

@@ -50,26 +50,30 @@ meta.class("Element.Number", "Element.Basic",
 
 	handleOnChange: function(domEvent)
 	{
-		var value = parseFloat(domEvent.target.value);
-		if(isNaN(value)) {
-			value = "0";
-		}
-		else 
-		{
-			if(value < this._min) {
-				value = this._min;
-			}
-			else if(value > this._max) {
-				value = this._max;
-			}
+		var prevValue = this.value;
+		this.value = domEvent.target.value
 
-			domEvent.target.value = value;
+		if(prevValue !== this.value) {
+			this.emit("update");
 		}
-
-		this.emit("update");
 	},
 
-	set value(value) {
+	set value(value) 
+	{
+		var value = parseFloat(value);
+
+		if(isNaN(value) || value === void(0) || value === null) {
+			value = this._value;
+		}
+
+		if(value > this._max) {
+			value = this._max;
+		}
+		else if(value < this._min) {
+			value = this._min;
+		}
+
+		this.prevValue = this._value;
 		this._value = value;
 		this.domElement.value = value;
 	},
@@ -111,7 +115,9 @@ meta.class("Element.Number", "Element.Basic",
 	//
 	elementTag: "input",
 
+	prevValue: 0,
 	_value: 0,
+	_default: 0,
 	_min: Number.MIN_SAFE_INTEGER,
 	_max: Number.MAX_SAFE_INTEGER
 });

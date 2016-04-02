@@ -10,10 +10,12 @@ meta.class("Element.Dropdown", "Element.Basic",
 		this.input.setAttribute("type", "text");
 		this.input.onclick = this.handleClick.bind(this);
 		this.input.onchange = this.handleChange.bind(this);
+		this.input.onkeydown = this.handleKeyDown.bind(this);
 		this.append(this.input);
 
 		var icon = new Element.Icon(this);
 		icon.value = "fa-caret-down";
+		icon.domElement.onclick = this.handleClick.bind(this);
 
 		this.list = new Element.List(this);
 		this.list.hidden = true;
@@ -35,11 +37,14 @@ meta.class("Element.Dropdown", "Element.Basic",
 			this.items = this.items.concat(data.buffer);
 		}
 
-		this.items.sort(function(a, b) {
-			if(a < b) { return -1; }
-			if(a > b) { return 1; }
-			return 0;
-		});
+		if(this.sort)
+		{
+			this.items.sort(function(a, b) {
+				if(a < b) { return -1; }
+				if(a > b) { return 1; }
+				return 0;
+			});	
+		}
 
 		for(var n = 0; n < this.items.length; n++) {
 			this.list.createItem(this.items[n]);			
@@ -63,34 +68,17 @@ meta.class("Element.Dropdown", "Element.Basic",
 		}		
 	},
 
-	process: function()
+	process: function(value)
 	{
-		var newValue = this.input.value;
-		if(!newValue) { newValue = null; }
+		var prevValue = this.value;
+		this.value = value;
 
-		if(this._value === newValue) {
-			return;
-		}
+		if(prevValue !== this.value) {
+			this.emit("update");
+		}	
 
-		if(newValue !== null)
-		{
-			var found = false;
-			for(var n = 0; n < this.items.length; n++) 
-			{
-				if(newValue === this.items[n]) {
-					found = true;
-					break;
-				}
-			}
-
-			if(!found) { 
-				this.value = this.prevValue;
-				return;
-			}
-		}
-
-		this._value = newValue;
-		this.emit("update");		
+		this.input.blur();
+		this.hideList();
 	},
 
 	showList: function()
@@ -122,38 +110,62 @@ meta.class("Element.Dropdown", "Element.Basic",
 	},
 
 	handleChange: function(domEvent) {
-		this.process();
+		this.process(this.input.value);
 	},
 
-	handleClick: function(domEvent)
+	handleClick: function(domEvent) {
+		this.showList();
+	},
+
+	handleKeyDown: function(domEvent) 
 	{
-		if(domEvent.target === this.input) {
-			this.showList();
+		domEvent.preventDefault();
+		domEvent.stopPropagation();
+
+		var keyCode = domEvent.keyCode;
+		switch(keyCode)
+		{
+			case 27: { // Esc
+				domEvent.target.blur();
+				this.hideList();
+			} break;
 		}
 	},
 
 	handleItemClick: function(event) 
 	{
-		this.input.value = event.element.name;
-		
-		this.process();
-		this.hideList();
+		this.process(event.element.name);
 
 		return true;
 	},
 
 	set value(value)
 	{
-		if(!value) { value = null; }
+		if(!this.items) { 
+			this._value = this.default;
+			this.prevValue = this._value;
+		}
+		else
+		{
+			var found = false;
+			for(var n = 0; n < this.items.length; n++) 
+			{
+				if(value === this.items[n]) {
+					found = true;
+					break;
+				}
+			}
+		}
 
-		this._value = value;
-
-		if(value) {
-			this.input.value = value;
+		if(found) { 
+			this._value = value;
+			this.prevValue = this._value;
 		}
 		else {
-			this.input.value = "";
+			this._value = this.prevValue;
 		}
+
+		this.input.value = this._value;
 	},
 
 	get value() {
@@ -164,6 +176,7 @@ meta.class("Element.Dropdown", "Element.Basic",
 	{
 		this.datasetName = name;
 		this._dataset = editor.getDataset(name);
+		this.fill(this._dataset);
 	},
 
 	get dataset() {
@@ -178,19 +191,26 @@ meta.class("Element.Dropdown", "Element.Basic",
 		return this._filterType;
 	},
 
+	set sort(value) {
+		this._sort = value;
+	},
+
+	get sort() {
+		return this._sort;
+	},
+
 	//
 	elementTag: "dropdown",
 
 	input: null,
 	list: null,
 
-	prevValue: null,
-	_value: null,
 	items: null,
 
 	datasetName: null,
 	_dataset: null,
 	_filter: null,
+	_sort: false,
 
 	_cachedClickFunc: null
 });

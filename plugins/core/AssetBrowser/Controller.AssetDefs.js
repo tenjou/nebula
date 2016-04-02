@@ -53,9 +53,9 @@ Editor.controller("AssetDefs", "AssetBrowser",
 	{
 		var info = {
 			name: type,
-			path: list.path,
-			type: type,
-			lastModified: Date.now()
+			_type: type,
+			_path: list.path,
+			_lastModified: Date.now()
 		};
 
 		this.addItem(list, info);

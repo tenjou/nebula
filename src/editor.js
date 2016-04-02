@@ -173,6 +173,7 @@ meta.class("Editor",
 		this.db = {
 			name: this.projectName,
 			version: this.version,
+			mode: "editor",
 			plugins: {}
 		};
 

@@ -203,10 +203,10 @@ Editor.controller("AssetResources", "AssetBrowser",
 
 		var info = {
 			name: idName,
-			path: this.currList.path,
-			ext: ext,
-			type: editor.resourceMgr.getTypeFromExt(ext),
-			lastModified: file.lastModified
+			_path: this.currList.path,
+			_ext: ext,
+			_type: editor.resourceMgr.getTypeFromExt(ext),
+			_lastModified: file.lastModified
 		};
 		this.addItem(this.currList, info);
 
