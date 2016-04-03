@@ -149,10 +149,15 @@ meta.class("Element.ListItem", "Element.Basic",
 		if(value) {
 			this.domElement.setAttribute("class", "selected");
 			this.emit("select");
+			this.parent.cache.selectedItem = this;		
 		}
-		else {
+		else
+		{
 			this.domElement.setAttribute("class", "");
 			this.emit("unselect");
+			if(this.parent.cache.selectedItem === this) {
+				this.parent.cache.selectedItem = null;
+			}
 		}
 	},
 

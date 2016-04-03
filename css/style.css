@@ -325,7 +325,8 @@ content list item inner.drag-over {
 }
 content list item.selected > inner,
 content list item inner:hover {
-	background: #6e7d92;
+	background: #7AA25A;
+	text-shadow: 1px 1px #312E2E;
 }
 content list item icon,
 content list caret {
@@ -522,7 +523,8 @@ context-menu item icon {
 	width: 19px;
 }
 context-menu item:hover {
-	background: #6385BB;
+	background: #7AA25A;
+	text-shadow: 1px 1px #312E2E;	
 }
 
 context-menu icon.float-right {

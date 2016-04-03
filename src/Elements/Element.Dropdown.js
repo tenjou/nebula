@@ -8,6 +8,7 @@ meta.class("Element.Dropdown", "Element.Basic",
 
 		this.input = document.createElement("input");
 		this.input.setAttribute("type", "text");
+		this.input.setAttribute("readonly", "");
 		this.input.onclick = this.handleClick.bind(this);
 		this.input.onchange = this.handleChange.bind(this);
 		this.input.onkeydown = this.handleKeyDown.bind(this);
@@ -49,19 +50,23 @@ meta.class("Element.Dropdown", "Element.Basic",
 		for(var n = 0; n < this.items.length; n++) {
 			this.list.createItem(this.items[n]);			
 		}
+
+		window.drop = this;
 	},
 
 	_fill_content: function(data)
 	{
+		if(!data) { return; }
+
 		for(var n = 0; n < data.length; n++)
 		{
 			var dataItem = data[n];
-			if(dataItem.type === "folder") {
+			if(dataItem._type === "folder") {
 				this._fill_content(dataItem.content);
 			}
 			else 
 			{
-				if(!this._filterType || this._filterType === dataItem.type) {
+				if(!this._filterType || this._filterType === dataItem._type) {
 					this.items.push(dataItem.name);
 				}
 			}

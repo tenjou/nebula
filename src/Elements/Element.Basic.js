@@ -73,7 +73,8 @@ meta.class("Element.Basic",
 		if(this.children) 
 		{
 			var index = this.children.indexOf(element);
-			this.children = this.children.splice(index, 1);
+			this.children[index] = this.children[this.children.length - 1];
+			this.children.pop();
 		}
 	},
 
@@ -81,8 +82,8 @@ meta.class("Element.Basic",
 	{
 		if(!this.children) { return; }
 
-		for(var n = 0; n < this.children.length; n++) {
-			this.remove(this.children[n]);
+		while(this.children.length > 0) {
+			this.remove(this.children[0]);
 		}
 
 		this.children.length = 0;

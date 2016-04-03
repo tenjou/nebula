@@ -221,6 +221,10 @@ meta.class("Editor.InputParser",
 			prop.value = name;
 
 			var color = new Element.Color(prop, name);
+			if(data.default !== void(0)) {
+				color.default = data.default;
+			}
+			
 			return color;
 		},
 	}

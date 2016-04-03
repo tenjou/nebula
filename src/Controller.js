@@ -41,6 +41,23 @@ meta.class("Editor.Controller",
 
 	onBindData: null,
 
+	genUpdateFunc: function(attrib, cb) 
+	{
+		var self = this;
+		return function(event) {
+			self.handleUpdate(attrib, event, cb);
+		}
+	},
+
+	handleUpdate: function(attrib, event, cb)
+	{
+		this.data.set(attrib, event.element.value);
+		if(cb) {
+			cb();
+		}
+		return true;
+	},		
+
 	//
 	content: null,
 	data: null

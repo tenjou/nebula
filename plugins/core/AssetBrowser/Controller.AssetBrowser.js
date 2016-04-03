@@ -69,7 +69,8 @@ Editor.controller("AssetBrowser",
 			name: "Folder",
 			_path: list.path,
 			_type: "folder",
-			_lastModified: Date.now()
+			_lastModified: Date.now(),
+			content: []
 		};
 
 		var item = this.addItem(list, info);

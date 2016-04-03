@@ -37,13 +37,13 @@ meta.class("Element.List", "Element.Basic",
 	selectItem: function(event)
 	{
 		if(!this.cache.selectable) { return; }
+		if(this.cache.selectedItem === event.element) { return; }
 
 		if(this.cache.selectedItem) {
 			this.cache.selectedItem.select = false;
 		}
 
-		this.cache.selectedItem = event.element;
-		this.cache.selectedItem.select = true;
+		event.element.select = true;
 	},
 
 	handleDragEnter: function(domEvent) 
@@ -139,6 +139,7 @@ meta.class("Element.List", "Element.Basic",
 
 		this.items.length = 0;
 		this.info = this.infoTxt;
+		this.cache.selectedItem = null;
 	},
 
 	sort: function()
