@@ -89,6 +89,30 @@ meta.class("Editor.InputParser",
 			return input;
 		},
 
+		taggedNumber: function(parent, name, data) 
+		{
+			var element = new Element.TaggedNumber(parent);
+			element.id = name;
+			element.tag = name;
+
+			if(data.color) {
+				element.color = data.color;
+			}
+
+			if(data.min !== void(0)) {
+				element.min = data.min;
+			}
+			if(data.max !== void(0)) {
+				element.max = data.max;
+			}
+			if(data.default !== void(0)) {
+				element.default = data.default;
+			}
+
+
+			return element;
+		},
+
 		string: function(parent, name, data) 
 		{
 			var prop = new Element.Property(parent, name);
@@ -145,8 +169,23 @@ meta.class("Editor.InputParser",
 		slot: function(parent, name, data)
 		{
 			var slot = new Element.Slot(parent, name);
+			if(data.slot) {
+				var content = editor.createContent(data.slot);
+				if(content) {
+					slot.append(content);
+				}
+			}
 			return slot;
 		},	
+
+		vgroup: function(parent, name, data)
+		{
+			var prop = new Element.Property(parent, name);
+			prop.value = name;
+
+			var vgroup = new Element.VGroup(prop, name);
+			return vgroup;
+		},
 
 		button: function(parent, name, data)
 		{

@@ -47,9 +47,10 @@ Editor.plugin("ContextMenu",
 
 		while(translatedBuffer.length > 0) 
 		{
-			item = translatedBuffer.shift();
+			item = translatedBuffer.pop();
 			if(item.func) {
 				item.func(item, translatedBuffer);
+				break;
 			}
 		}
 

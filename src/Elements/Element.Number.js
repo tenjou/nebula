@@ -2,11 +2,18 @@
 
 meta.class("Element.Number", "Element.Basic",
 {
-	onCreate: function() {
-		this.domElement.setAttribute("type", "text");
-		this.domElement.value = "0";
-		this.domElement.onkeydown = this.handleOnKeyDown.bind(this);
-		this.domElement.onchange = this.handleOnChange.bind(this);
+	onCreate: function() 
+	{
+		this.input = this.domElement;
+		this._onCreate();
+	},
+
+	_onCreate: function() 
+	{
+		this.input.setAttribute("type", "text");
+		this.input.value = "0";
+		this.input.onkeydown = this.handleOnKeyDown.bind(this);
+		this.input.onchange = this.handleOnChange.bind(this);
 	},
 
 	handleOnKeyDown: function(domEvent) 
@@ -75,7 +82,7 @@ meta.class("Element.Number", "Element.Basic",
 
 		this.prevValue = this._value;
 		this._value = value;
-		this.domElement.value = value;
+		this.input.value = value;
 	},
 
 	get value() {
@@ -114,6 +121,7 @@ meta.class("Element.Number", "Element.Basic",
 
 	//
 	elementTag: "input",
+	input: null,
 
 	prevValue: 0,
 	_value: 0,

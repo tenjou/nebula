@@ -284,7 +284,7 @@ meta.class("Editor",
 			content.addCtrl(contentInfo.ctrl);
 		}
 		
-		meta.appendObject(contentData, contentInfo.data);
+		meta.appendObject(contentData, contentInfo.data);	
 
 		content.data = contentData;
 		this.contentsCached[contentInfo.__index] = content;
