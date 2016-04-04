@@ -48,16 +48,15 @@ meta.appendObject = function(target, src)
 			{
 				targetValue = target[key];
 				if(!targetValue) {
-					target[key] = src[key];
+					targetValue = {};
+					target[key] = targetValue;
 				}
-				else 
-				{
-					if(typeof(targetValue) === "object") {
-						meta.appendObject(targetValue, value);
-					}
-					else {
-						console.warn("(meta.mergeAppend) Incompatible types for '" + key + "' key");
-					}
+
+				if(typeof(targetValue) === "object") {
+					meta.appendObject(targetValue, value);
+				}
+				else {
+					console.warn("(meta.mergeAppend) Incompatible types for '" + key + "' key");
 				}
 			}
 			else {
