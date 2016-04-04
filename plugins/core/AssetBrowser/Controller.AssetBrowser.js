@@ -2,6 +2,11 @@
 
 Editor.controller("AssetBrowser", 
 {
+	onCreate: function() 
+	{
+		this.watchItemFunc = this.watchItem.bind(this);
+	},
+
 	onBindData: function()
 	{
 		editor.registerDataset(this.name, this.data, "content");
@@ -46,21 +51,23 @@ Editor.controller("AssetBrowser",
 		return item;
 	},
 
-	_addItem: function(list, info)
+	_addItem: function(list, data)
 	{
-		var typeInfo = editor.resourceMgr.types[info.get("_type")];
+		var typeInfo = editor.resourceMgr.types[data.get("_type")];
 		if(!typeInfo) {
 			typeInfo = editor.resourceMgr.types.unknown;
 		}
 
-		var item = list.createItem(info.get("name"));
-		item.tag = info.get("_ext");
-		item.type = typeInfo;
-		item.info = info;
+		var element = list.createItem(data.get("name"));
+		element.tag = data.get("_ext");
+		element.type = typeInfo;
+		element.info = data;
 
-		this.dbLookup[info.get("name")] = info;
+		data.element = element;
+		data.watch(this.watchItemFunc);
+		this.dbLookup[data.get("name")] = data;
 
-		return item;
+		return element;
 	},	
 
 	addFolder: function(list)
@@ -93,30 +100,41 @@ Editor.controller("AssetBrowser",
 		return item;
 	},	
 
+	watchItem: function(item, key)
+	{
+		if(key === "name") 
+		{
+			var element = item.element;
+			if(!this.renameItem(element)) {
+				element.revert();
+			}
+		}
+	},
+
 	handleRenameItem: function(event)
 	{
-		var element = event.element;
-		var item = element.parent.parent;
+		var nameElement = event.element;
+		var itemElement = nameElement.parent.parent;
 
-		var prevName = element.prevValue;
-		item.info.set("name", element.value);
+		itemElement.info.data.name = nameElement.value;
 
-		if(!this.renameItem(item, prevName)) {
+		if(!this.renameItem(itemElement)) {
 			element.revert();
 		}
 	},
 
-	renameItem: function(item, prevName)
+	renameItem: function(element)
 	{
-		var info = item.info;
+		var info = element.info;
+		var prevName = element._name.prevValue;
 
 		if(this.dbLookup[info.get("name")]) {
-			info.set("name", prevName);
+			info.data.name = prevName;
 			this.inspectItem();
 			return false;
 		}
 
-		if(item.folder)
+		if(element.folder)
 		{
 			editor.fileSystem.moveToDir(
 				info.get("_path") + prevName,
@@ -131,11 +149,13 @@ Editor.controller("AssetBrowser",
 				this.inspectItem.bind(this));
 		}
 
+		element.name = info.get("name");
+
 		delete this.dbLookup[prevName];
 		this.dbLookup[info.get("name")] = info;
 		info.lastModified = Date.now();
 
-		item.parent.sort();
+		element.parent.sort();
 		editor.saveCfg();
 
 		return true;
@@ -310,5 +330,7 @@ Editor.controller("AssetBrowser",
 	dbLookup: null,
 
 	currItem: null,
-	currList: null	
+	currList: null,
+
+	watchItemFunc: null
 });

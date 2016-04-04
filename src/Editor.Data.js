@@ -18,7 +18,7 @@ Editor.Data.prototype =
 		this.data[key] = value;
 
 		editor.saveCfg();
-		this.emit("update");
+		this.emit("update", key);
 	},
 
 	get: function(key, value)
@@ -44,10 +44,13 @@ Editor.Data.prototype =
 		}
 	},
 
-	emit: function(event) 
+	emit: function(event, key) 
 	{
 		for(var n = 0; n < this.watchers.length; n++) {
-			this.watchers[n]();
+			this.watchers[n](this, key);
 		}
-	}
+	},
+
+	//
+	element: null
 };

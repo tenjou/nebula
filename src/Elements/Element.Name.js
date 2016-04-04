@@ -52,6 +52,8 @@ meta.class("Element.Name", "Element.Basic",
 		else if(this.domElement.innerHTML !== this._value) {
 			this.value = this.domElement.innerHTML;
 		}
+
+		this.emit("update");
 	},
 
 	_handleOnKeyDown: function(domEvent)
@@ -107,7 +109,6 @@ meta.class("Element.Name", "Element.Basic",
 			this.prevValue = this._value;
 			this._value = str;
 			this.domElement.innerHTML = str;			
-			this.emit("update");
 		}
 	},
 
@@ -117,6 +118,5 @@ meta.class("Element.Name", "Element.Basic",
 
 	//
 	elementTag: "name",
-	_value: "",
-	prevValue: null
+	_value: ""
 });
