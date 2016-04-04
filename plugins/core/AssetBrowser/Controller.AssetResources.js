@@ -201,6 +201,7 @@ Editor.controller("AssetResources", "AssetBrowser",
 
 		var fullPath = editor.fileSystem.fullPath + idName + "." + ext;
 
+		var currList = this.currList;
 		var info = {
 			name: idName,
 			_path: this.currList.path,
@@ -208,14 +209,18 @@ Editor.controller("AssetResources", "AssetBrowser",
 			_type: editor.resourceMgr.getTypeFromExt(ext),
 			_lastModified: file.lastModified
 		};
-		this.addItem(this.currList, info);
-
+		
+		var self = this;
 		var blob = dataURItoBlob(fileResult.target.result, file.type);
-		editor.fileSystem.writeBlob(this.currList.path + info.name + "." + ext, blob, this._handleOnFileLoad.bind(this));		
+		editor.fileSystem.writeBlob(this.currList.path + info.name + "." + ext, blob, function(path) {
+			self._handleOnFileLoad(path, currList, info);
+		});		
 	},
 
-	_handleOnFileLoad: function(path)
+	_handleOnFileLoad: function(path, currList, info)
 	{
+		this.addItem(currList, info);
+
 		this.numItemsLoading--;
 		if(this.numItemsLoading === 0) {
 			editor.saveCfg();

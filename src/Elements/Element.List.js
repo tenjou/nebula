@@ -118,6 +118,10 @@ meta.class("Element.List", "Element.Basic",
 
 	removeItem: function(item) 
 	{
+		if(this.cache.selectedItem === item) {
+			item.select = false;
+		}
+		
 		this.remove(item);
 
 		var index = this.items.indexOf(item);
@@ -133,13 +137,16 @@ meta.class("Element.List", "Element.Basic",
 
 	removeAll: function()
 	{
+		if(this.cache.selectedItem) {
+			this.cache.selectedItem.select = false;
+		}
+
 		for(var n = 0; n < this.items.length; n++) {
 			this.remove(this.items[n]);
 		}
 
 		this.items.length = 0;
 		this.info = this.infoTxt;
-		this.cache.selectedItem = null;
 	},
 
 	sort: function()

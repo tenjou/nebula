@@ -36,6 +36,8 @@ Editor.controller("AssetBrowser",
 		list.sort();	
 	},
 
+	onAdd: null,
+
 	addItem: function(list, info)
 	{
 		var data = new Editor.Data(info);
@@ -47,6 +49,10 @@ Editor.controller("AssetBrowser",
 		list.db.push(info);
 		list.sort();
 		editor.saveCfg();
+
+		if(this.onAdd) {
+			this.onAdd(info);
+		}
 
 		return item;
 	},

@@ -38,12 +38,20 @@ meta.class("Element.Basic",
 
 	append: function(element) 
 	{
+		var parentElement;
+		if(this.contentHolder instanceof Element.Basic) {
+			parentElement = this.contentHolder.domElement;
+		}
+		else {
+			parentElement = this.contentHolder
+		}
+		
 		if(element instanceof Element.Basic) {
-			this.contentHolder.appendChild(element.domElement);
+			parentElement.appendChild(element.domElement);
 			element.parent = this;
 		}
 		else {
-			this.contentHolder.appendChild(element);
+			parentElement.appendChild(element);
 		}
 
 		if(!this.children) {
@@ -56,14 +64,22 @@ meta.class("Element.Basic",
 
 	remove: function(element)
 	{
+		var parentElement;
+		if(this.contentHolder instanceof Element.Basic) {
+			parentElement = this.contentHolder.domElement;
+		}
+		else {
+			parentElement = this.contentHolder
+		}
+
 		if(element)
 		{
 			if(element instanceof Element.Basic) {
-				this.contentHolder.removeChild(element.domElement);
+				parentElement.removeChild(element.domElement);
 				element.parent = null;
 			}
 			else {
-				this.contentHolder.removeChild(element);
+				parentElement.removeChild(element);
 			}
 		}
 		else {
