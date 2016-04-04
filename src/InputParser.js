@@ -199,6 +199,10 @@ meta.class("Editor.InputParser",
 			if(data.default !== void(0)) {
 				dropdown.default = data.default;
 			}
+			if(data.emptyOption !== void(0)) {
+				dropdown.emptyOption = data.emptyOption;
+			}
+
 			return dropdown;
 		},
 

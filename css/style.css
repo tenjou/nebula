@@ -315,6 +315,7 @@ content list info {
 content list item inner {
 	display: block;
 	padding: 1px;
+	height: 19px;
 	color: #fff;
 	font-size: 11px;
 	cursor: pointer;

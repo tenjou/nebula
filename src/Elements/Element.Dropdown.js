@@ -31,6 +31,10 @@ meta.class("Element.Dropdown", "Element.Basic",
 
 		if(!data) { return; }
 
+		if(this.emptyOption) {
+			this.items.push("");
+		}
+		
 		if(data.type === "content") {
 			this._fill_content(data.buffer);
 		}
@@ -196,14 +200,6 @@ meta.class("Element.Dropdown", "Element.Basic",
 		return this._filterType;
 	},
 
-	set sort(value) {
-		this._sort = value;
-	},
-
-	get sort() {
-		return this._sort;
-	},
-
 	//
 	elementTag: "dropdown",
 
@@ -215,7 +211,8 @@ meta.class("Element.Dropdown", "Element.Basic",
 	datasetName: null,
 	_dataset: null,
 	_filter: null,
-	_sort: false,
+	sort: false,
+	emptyOption: false,
 
 	_cachedClickFunc: null
 });
