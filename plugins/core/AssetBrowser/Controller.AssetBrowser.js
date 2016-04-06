@@ -19,17 +19,22 @@ Editor.controller("AssetBrowser",
 
 	_loadFolder: function(list, db)
 	{
-		var item, folder;
+		var data, dbData, item, folder;
 		var num = db.length;
 		for(var n = 0; n < num; n++)
 		{
-			item = new Editor.Data(db[n]);
-			if(item.content) {
-				folder = this._addFolder(list, item);
-				this._loadFolder(folder.list, item.content);
+			dbData = db[n];
+			data = new Editor.Data(dbData);
+			if(dbData._type === "folder") {
+				folder = this._addFolder(list, data);
+				folder.folder = true;
+				this._loadFolder(folder.list, dbData.content);
 			}
+			// else if(dbData.content) {
+			// 	item = this._addItem(list, data);
+			// }
 			else {
-				this._addItem(list, item);
+				this._addItem(list, data);
 			}
 		}	
 
@@ -59,6 +64,14 @@ Editor.controller("AssetBrowser",
 
 	_addItem: function(list, data)
 	{
+		var dataType = data.get("_type");
+		if(dataType === "unknown") {
+			dataType = editor.resourceMgr.getTypeFromExt(data.get("_ext"));
+			if(dataType !== "unknown") {
+				data.set("_type", dataType);
+			}
+		}
+
 		var typeInfo = editor.resourceMgr.types[data.get("_type")];
 		if(!typeInfo) {
 			typeInfo = editor.resourceMgr.types.unknown;
@@ -125,7 +138,7 @@ Editor.controller("AssetBrowser",
 		itemElement.info.data.name = nameElement.value;
 
 		if(!this.renameItem(itemElement)) {
-			element.revert();
+			nameElement.revert();
 		}
 	},
 
@@ -231,6 +244,38 @@ Editor.controller("AssetBrowser",
 		var info = item.info;
 		var db = list.db;
 
+		if(this.name === "Resources") 
+		{
+			var self = this;
+			var func = function(data) 
+			{
+				if(!data) { return; }
+				self._removeItem(list, item);
+			};
+
+			var fileName = info.get("_path") + info.get("name");
+			if(info.get("_type") === "folder") {
+				editor.fileSystem.removeDir(fileName, func);
+			}
+			else {
+				fileName += "." + info.get("_ext");
+				editor.fileSystem.remove(fileName, func);
+			}
+		}
+		else {
+			this._removeItem(list, item);
+		}
+	},
+
+	_removeItem: function(list, item)
+	{
+		var info = item.info;
+		var db = list.db;
+
+		if(item.select) {
+			editor.plugins.Inspect.empty();
+		}
+
 		list.removeItem(item);
 
 		delete this.dbLookup[info.get("name")];
@@ -239,22 +284,9 @@ Editor.controller("AssetBrowser",
 		if(index > -1) {
 			db[index] = db[db.length - 1];
 			db.pop();
-		}
+		}	
 
-		var fileName = info.get("_path") + info.get("name");
-		if(item.folder) {
-			editor.fileSystem.removeDir(fileName);
-		}
-		else {
-			fileName += "." + info.get("_ext");
-			editor.fileSystem.remove(fileName);
-		}
-
-		editor.saveCfg();
-
-		if(item.select) {
-			editor.plugins.Inspect.empty();
-		}		
+		editor.saveCfg();		
 	},
 
 	handleSelect: function(event) 

@@ -9,6 +9,8 @@ meta.class("Editor.ResourceManager",
 		{
 			typeInfo = this.types[typeName];
 			exts = typeInfo.ext;
+			if(!exts) { continue; }
+			
 			num = exts.length;
 			for(var n = 0; n < num; n++) 
 			{
@@ -62,6 +64,10 @@ meta.class("Editor.ResourceManager",
 		sound: {
 			ext: [ "mp3", "m4a", "ogg", "wav" ],
 			icon: "fa-music"
+		},
+		video: {
+			ext: [ "m4v" ],
+			icon: "fa-video-camera"
 		},
 		text: {
 			ext: [ "txt", "json" ],

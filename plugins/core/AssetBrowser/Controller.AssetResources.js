@@ -210,11 +210,22 @@ Editor.controller("AssetResources", "AssetBrowser",
 			_lastModified: file.lastModified
 		};
 		
+		var filePath = this.currList.path + info.name + "." + ext;
 		var self = this;
-		var blob = dataURItoBlob(fileResult.target.result, file.type);
-		editor.fileSystem.writeBlob(this.currList.path + info.name + "." + ext, blob, function(path) {
-			self._handleOnFileLoad(path, currList, info);
-		});		
+
+		if(editor.electron)
+		{
+			editor.fileSystem.writeBase64(filePath, fileResult.target.result, function(path) {
+				self._handleOnFileLoad(path, currList, info);
+			});	
+		}
+		else
+		{
+			var blob = dataURItoBlob(fileResult.target.result, file.type);
+			editor.fileSystem.writeBlob(filePath, blob, function(path) {
+				self._handleOnFileLoad(path, currList, info);
+			});				
+		}	
 	},
 
 	_handleOnFileLoad: function(path, currList, info)
@@ -223,7 +234,6 @@ Editor.controller("AssetResources", "AssetBrowser",
 
 		this.numItemsLoading--;
 		if(this.numItemsLoading === 0) {
-			editor.saveCfg();
 		}
 	},	
 

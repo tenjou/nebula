@@ -4,6 +4,10 @@ meta.class("Editor",
 {
 	init: function()
 	{		
+		if(window.process && window.process.versions["electron"]) {
+			this.electron = true;
+		}
+
 		this.eventBuffer = {};
 		this.ctrls = {};
 		this.datasets = {};
@@ -20,8 +24,14 @@ meta.class("Editor",
 
 	prepare: function()
 	{
-		this.fileSystem = new Editor.FileSystem();
-		this.fileSystem.onReady.add(this.handleFileSystemReady, this);
+		if(this.electron) {
+			this.fileSystem = new Editor.FileSystemLocal();
+			this.handleFileSystemReady();
+		}
+		else {
+			this.fileSystem = new Editor.FileSystem();
+			this.fileSystem.onReady.add(this.handleFileSystemReady, this);
+		}
 	},
 
 	handleFileSystemReady: function(data, event)
@@ -145,17 +155,32 @@ meta.class("Editor",
 
 	loadProject: function(name)
 	{
-		document.title = name + " - META Editor";
+		if(this.electron) 
+		{
+			var index = name.lastIndexOf("\\");
+			this.projectName = name.slice(index + 1);
 
+			if(name[name.length - 1] !== "\\") {
+				name += "\\";
+			}
+			editor.fileSystem.rootDir = name;
+			editor.fileSystem.fullPath = name;
+		}
+		else
+		{
+			this.projectName = name;
+			this.fileSystem.rootDir = name + "/";
+			this.fileSystem.fullPath = "filesystem:http://" + window.location.hostname + "/persistent/" + editor.fileSystem.rootDir;			
+		}
+
+		this.fileSystem.read("db.json", this._handleReadDb.bind(this));	
+		
 		this.onSplashEnd();
 
 		this.info.enable = true;
 		this.info.value = "Loading Project";
 
-		this.projectName = name;
-		this.fileSystem.rootDir = name + "/";
-		this.fileSystem.fullPath = "filesystem:http://" + window.location.hostname + "/persistent/" + editor.fileSystem.rootDir;
-		this.fileSystem.read("db.json", this._handleReadDb.bind(this));	
+		document.title = this.projectName + " - META Editor";
 	},
 
 	_handleReadDb: function(data)
@@ -378,6 +403,7 @@ meta.class("Editor",
 	//
 	db: null,
 	version: "0.1",
+	electron: false,
 	
 	eventBuffer: null,
 

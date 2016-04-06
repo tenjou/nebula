@@ -144,7 +144,7 @@ meta.class("Editor.InputParser",
 				section.value = name;
 			}
 
-			if(data.open) {
+			if(data.open !== void(0)) {
 				section.open = data.open;
 			}
 			
@@ -169,10 +169,24 @@ meta.class("Editor.InputParser",
 		slot: function(parent, name, data)
 		{
 			var slot = new Element.Slot(parent, name);
-			if(data.slot) {
+			if(data.slot) 
+			{
 				var content = editor.createContent(data.slot);
-				if(content) {
-					slot.append(content);
+				if(content) 
+				{
+					var children = content.children;
+					for(var n = 0; n < children.length; n++) {
+						slot.append(content.children[n]);
+					}
+
+					var parentCtrls = parent.ctrls;
+					var ctrls = content.ctrls;
+					if(ctrls && parentCtrls) 
+					{
+						for(var n = 0; n < ctrls.length; n++) {
+							parentCtrls.push(ctrls[n]);
+						}
+					}
 				}
 			}
 			return slot;

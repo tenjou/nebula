@@ -13,21 +13,29 @@ Editor.plugin("ProjectWindow",
 			return list;
 		};
 
+		var projectContent = {
+			Browser: {
+				type: "container",
+				content: {
+					List: "@projectList"
+				}
+			}	
+		};
+
+		if(editor.electron) {
+			projectContent.Open = "@button";
+		}
+		else {
+			projectContent.Create = "@button";
+		}
+
 		editor.addContent("ProjectWindow", 
 			{
 				ctrl: "ProjectWindow",
 				data: {
 					Projects: {
 						type: "containerNamed",
-						content: {
-							Browser: {
-								type: "container",
-								content: {
-									List: "@projectList"
-								}
-							},
-							Create: "@button"
-						}
+						content: projectContent
 					}	
 				}
 			});		
@@ -35,7 +43,12 @@ Editor.plugin("ProjectWindow",
 
 	onSplashStart: function() 
 	{
-		editor.fileSystem.readDir("", this.loadProjects.bind(this));
+		if(editor.electron) {
+			this.loadProjects({});
+		}
+		else {
+			editor.fileSystem.readDir("", this.loadProjects.bind(this));
+		}
 	},
 
 	onSplashEnd: function() 

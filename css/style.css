@@ -34,6 +34,7 @@ wrapper {
 	height: 100%;
 	color: white;	
 	background-color: #343536;
+	overflow: hidden;
 }
 
 button {
@@ -149,7 +150,7 @@ toolbar:last-child {
 	margin-right: 0;
 }
 toolbar > holder {
-	position: absolute;
+	flex: 1 1 100%;
 	width: 100%;
 	height: 100%;
 	display: flex;
@@ -223,7 +224,7 @@ content container {
 	flex-direction: column;
 }
 
-caret {
+section caret {
 	width: 12px;
 }
 

@@ -12,10 +12,10 @@ meta.class("Element.Inner", "Element.Basic",
 		this.leftToolbar = new Element.Toolbar(this);
 		this.leftToolbar.width = 270;
 
-		this.roomToolbar = new Element.ToolbarRoom(this);	
+		this.roomToolbar = new Element.ToolbarRoom(this);
 
 		this.rightToolbar = new Element.Toolbar(this);
-		this.rightToolbar.width = 330;
+		this.rightToolbar.width = 340;
 	},
 
 	//

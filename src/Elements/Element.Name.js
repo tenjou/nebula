@@ -51,6 +51,7 @@ meta.class("Element.Name", "Element.Basic",
 		}
 		else if(this.domElement.innerHTML !== this._value) {
 			this.value = this.domElement.innerHTML;
+			this.emit("update");
 		}
 	},
 
@@ -81,7 +82,6 @@ meta.class("Element.Name", "Element.Basic",
 		}
 		// Enter
 		else if(keyCode === 13) {
-			this.emit("update");
 			this.domElement.blur();
 		}
 

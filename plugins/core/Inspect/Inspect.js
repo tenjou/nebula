@@ -43,29 +43,25 @@ Editor.plugin("Inspect",
 
 	show: function(typeName, data, cb)
 	{
-		var content = editor.createContent("inspect." + typeName);
-		if(!content) {
-			content = editor.createContent("inspect.default");
+		this.content = editor.createContent("inspect." + typeName);
+		if(!this.content) {
+			this.content = editor.createContent("inspect.default");
 		}
 
-		content.bindData(data);
-		content.on("data-update", this.handleContentUpdate.bind(this));
+		this.content.bindData(data);
+		data.watch(this.handleContentUpdate.bind(this));
 
 		this.cb = cb ? cb : null;
-		this.tab.content = content;	
+		this.tab.content = this.content;	
 	},
 
 	empty: function() {
 		this.tab.empty();
 	},
 
-	handleContentUpdate: function(event)
+	handleContentUpdate: function(data)
 	{	
-		if(this.cb) {
-			this.cb();
-		}
-
-		editor.saveCfg();
+		this.content.bindData(data);
 	},
 
 	//

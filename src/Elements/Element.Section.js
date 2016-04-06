@@ -9,14 +9,13 @@ meta.class("Element.Section", "Element.Basic",
 		this.domElement.appendChild(header);
 
 		this.caret = new Element.Caret(header);
-		this.caret.open = false;
+		this.caret.open = true;
 		this.caret.on("update", this.handleCaretUpdate.bind(this));
 
 		this.h2 = document.createElement("h2");
 		header.appendChild(this.h2);
 
 		this.contentHolder = document.createElement("content");
-		this.contentHolder.classList.add("hidden");
 		this.domElement.appendChild(this.contentHolder);
 	},
 

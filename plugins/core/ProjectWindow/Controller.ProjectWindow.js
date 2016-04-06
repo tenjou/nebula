@@ -25,6 +25,7 @@ Editor.controller("ProjectWindow",
 		this.list.on("menu", "item", this.openMenu.bind(this));
 
 		this.content.on("click", "Projects.Create", this.createProject.bind(this));
+		this.content.on("click", "Projects.Open", this.chooseProject.bind(this));
 		this.content.on("dbClick", "Projects.List.item", this.openProject.bind(this));
 		this.content.on("update", "Projects.List.item.name", this.renameProject.bind(this));				
 	},
@@ -57,6 +58,17 @@ Editor.controller("ProjectWindow",
 		this.data[name] = {};
 
 		editor.fileSystem.createDir(name);
+	},
+
+	chooseProject: function(event)
+	{
+		var dialog = require("electron").remote.dialog;
+		dialog.showOpenDialog({ properties: [ "openDirectory" ]}, 
+			function(fileNames) 
+			{
+				if(fileNames && fileNames.length > 0)
+				editor.loadProject(fileNames[0]);
+			}); 
 	},
 
 	openProject: function(event)
