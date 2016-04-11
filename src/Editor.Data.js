@@ -14,11 +14,13 @@ Editor.Data.prototype =
 
 	set: function(key, value)
 	{
-		if(this.data[key] === value) { return; }
+		var prevValue = this.data[key];
+		if(prevValue === value) { return; }
+		
 		this.data[key] = value;
 
 		editor.saveCfg();
-		this.emit("update", key);
+		this.emit("update", key, prevValue);
 	},
 
 	get: function(key, value)
@@ -44,10 +46,10 @@ Editor.Data.prototype =
 		}
 	},
 
-	emit: function(event, key) 
+	emit: function(event, key, prevValue) 
 	{
 		for(var n = 0; n < this.watchers.length; n++) {
-			this.watchers[n](this, key);
+			this.watchers[n](this, key, prevValue);
 		}
 	},
 

@@ -308,7 +308,7 @@ meta.class("Editor.FileSystem",
 					function() 
 					{
 						if(cb) {
-							cb(dirEntryEntry.toURL());
+							cb(dirEntry.toURL());
 						}
 					},
 					function(fileError) {

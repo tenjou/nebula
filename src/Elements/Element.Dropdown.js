@@ -54,8 +54,6 @@ meta.class("Element.Dropdown", "Element.Basic",
 		for(var n = 0; n < this.items.length; n++) {
 			this.list.createItem(this.items[n]);			
 		}
-
-		window.drop = this;
 	},
 
 	_fill_content: function(data)
@@ -70,8 +68,23 @@ meta.class("Element.Dropdown", "Element.Basic",
 			}
 			else 
 			{
-				if(!this._filterType || this._filterType === dataItem._type) {
-					this.items.push(dataItem.name);
+				if(this._filterType) 
+				{
+					if(this._filterType instanceof Array)
+					{
+						for(var i = 0; i < this._filterType.length; i++) {
+							if(this._filterType[i] === dataItem._type) {
+								this.items.push(dataItem.id);
+								break;
+							}
+						}
+					}
+					else if(this._filterType === dataItem._type) {
+						this.items.push(dataItem.id);
+					}
+				}
+				else {
+					this.items.push(dataItem.id);
 				}
 			}
 		}		
@@ -156,6 +169,8 @@ meta.class("Element.Dropdown", "Element.Basic",
 		}
 		else
 		{
+			this.fill(this._dataset);
+			
 			var found = false;
 			for(var n = 0; n < this.items.length; n++) 
 			{
@@ -211,6 +226,7 @@ meta.class("Element.Dropdown", "Element.Basic",
 	datasetName: null,
 	_dataset: null,
 	_filter: null,
+	_filterType: null,
 	sort: false,
 	emptyOption: false,
 

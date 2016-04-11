@@ -59,9 +59,11 @@ Editor.plugin("Inspect",
 		this.tab.empty();
 	},
 
-	handleContentUpdate: function(data)
+	handleContentUpdate: function(data, key)
 	{	
-		this.content.bindData(data);
+		if(key === "name") {
+			this.content.bindData(data);
+		}
 	},
 
 	//

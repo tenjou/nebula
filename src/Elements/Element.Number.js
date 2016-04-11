@@ -21,11 +21,23 @@ meta.class("Element.Number", "Element.Basic",
 		if(domEvent.ctrlKey) { return; }
 
 		var keyCode = domEvent.keyCode;
+
+		// If arrows:
+		if(keyCode >= 37 && keyCode <= 40) {
+			return;
+		}
+
+		// If numpad:
+		if(keyCode >= 96 && keyCode <= 105) {
+			keyCode -= 48;
+		}
+
 		var value = domEvent.target.value;
 
 		switch(keyCode)
 		{
 			case 8: // Backspace
+			case 46: // Delete
 				return;
 
 			case 27: // Esc
@@ -35,7 +47,7 @@ meta.class("Element.Number", "Element.Basic",
 			case 187: // +
 			case 189: // -
 			{
-				if(value.length !== 0) {
+				if(domEvent.target.selectionStart !== 0 && value.length !== 0) {
 					domEvent.preventDefault();
 				}
 			} return;
@@ -50,7 +62,8 @@ meta.class("Element.Number", "Element.Basic",
 		}
 
 		var key = String.fromCharCode(keyCode)
-		if(isNaN(key)) {
+		if(isNaN(key)) 
+		{
 			domEvent.preventDefault();
 		}
 	},
@@ -68,7 +81,6 @@ meta.class("Element.Number", "Element.Basic",
 	set value(value) 
 	{
 		var value = parseFloat(value);
-
 		if(isNaN(value) || value === void(0) || value === null) {
 			value = this._value;
 		}

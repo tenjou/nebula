@@ -59,7 +59,7 @@ meta.class("Element.Option", "Element.Basic",
 		if(!this._options) {
 			value = "";
 		}
-		else if(!value) {
+		else if(value === void(0) || value === null) {
 			value = this._value;
 		}
 

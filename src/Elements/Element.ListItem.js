@@ -9,6 +9,7 @@ meta.class("Element.ListItem", "Element.Basic",
 		this._name = new Element.Name(this._inner);
 
 		this.domElement.setAttribute("draggable", "true");
+		this.domElement.setAttribute("tabindex", "1");
 
 		this.domElement.onclick = this.handleClick.bind(this);
 		this.domElement.oncontextmenu = this.handleContextMenu.bind(this);
@@ -17,6 +18,7 @@ meta.class("Element.ListItem", "Element.Basic",
 		this.domElement.ondragend = this.handleDragEnd.bind(this);
 		this.domElement.ondragenter = this.handleDragEnter.bind(this);
 		this.domElement.ondragleave = this.handleDragLeave.bind(this);
+		this.domElement.onkeyup = this.handleKeyUp.bind(this);
 		this.domElement.addEventListener("drop", this.handleDrop.bind(this), false);
 	},
 
@@ -56,14 +58,14 @@ meta.class("Element.ListItem", "Element.Basic",
 		}
 
 		this.preDragParent = this.parent;
-		this.parent.cache.dragItem = this;
+		this.parent.internalCache.dragItem = this;
 	},
 
 	handleDragEnd: function(domEvent) 
 	{
 		domEvent.stopPropagation();
 
-		this.parent.cache.dragItem = null;
+		this.parent.internalCache.dragItem = null;
 
 		this.hideDragStyle();
 
@@ -79,15 +81,22 @@ meta.class("Element.ListItem", "Element.Basic",
 
 		this.showDragStyle();
 
-		var dragItem = this.parent.cache.dragItem;
+		var dragItem = this.parent.internalCache.dragItem;
 		if(!dragItem) { return; }
 		if(dragItem === this) { return; }
-		
-		if(this.folder)
-		{
-			this.list.append(dragItem);
-		}
 
+		var typeInfo = editor.resourceMgr.types[this.info.data._type];
+		if(!typeInfo.content) { return; }
+		
+		dragItem.parent.removeItem(dragItem);
+
+		if(this instanceof Element.List) {
+			this.addItem(dragItem);
+		}
+		else if(this instanceof Element.ListItem) {
+			this.folder = true;
+			this.list.addItem(dragItem);
+		}
 		
 		// else
 		// {
@@ -115,7 +124,8 @@ meta.class("Element.ListItem", "Element.Basic",
 		// }
 	},
 
-	handleDragLeave: function(domEvent) {
+	handleDragLeave: function(domEvent) 
+	{
 		domEvent.stopPropagation();
 		this.hideDragStyle();
 	},
@@ -127,6 +137,14 @@ meta.class("Element.ListItem", "Element.Basic",
 		
 		this.hideDragStyle();
 		this.emit("drop", domEvent);
+	},
+
+	handleKeyUp: function(domEvent)
+	{
+		domEvent.stopPropagation();
+		domEvent.preventDefault();
+		
+		this.emit("keyup", domEvent);
 	},
 
 	showDragStyle: function() {

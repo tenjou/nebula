@@ -75,7 +75,7 @@ meta.class("Editor.InputParser",
 			var prop = new Element.Property(parent, name);
 			prop.value = name;
 
-			var input = new Element.Number(prop);
+			var input = new Element.Number(prop, name);
 			if(data.min !== void(0)) {
 				input.min = data.min;
 			}

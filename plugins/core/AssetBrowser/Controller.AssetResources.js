@@ -63,6 +63,78 @@ Editor.controller("AssetResources", "AssetBrowser",
 		this.upload.on("update", this.handleUploadUpdate.bind(this));
 	},
 
+	updateItemDeps: function(newId, prevId, info) 
+	{
+		var lookup, item;
+		var plugin = editor.plugins.AssetBrowser;
+
+		if(info._type === "mesh") 
+		{
+			lookup = plugin.contentDefs.ctrls[0].dbLookup;
+			for(var key in lookup) 
+			{
+				item = lookup[key];
+				if(item.data._type !== "entityPrefab") { continue; }
+
+				if(item.data.mesh === prevId) {
+					item.data.mesh = newId;
+				}
+			}
+		}
+		else if(info._type === "texture" || info._type === "video") 
+		{
+			lookup = plugin.contentDefs.ctrls[0].dbLookup;
+			for(var key in lookup) 
+			{
+				item = lookup[key];
+				if(item.data._type !== "material") { continue; }
+
+				if(item.data.map === prevId) {
+					item.data.map = newId;
+				}
+				if(item.data.aoMap === prevId) {
+					item.data.aoMap = newId;
+				}	
+				if(item.data.alphaMap === prevId) {
+					item.data.alphaMap = newId;
+				}									
+				if(item.data.envMap === prevId) {
+					item.data.envMap = newId;
+				}
+				if(item.data.specularMap === prevId) {
+					item.data.specularMap = newId;
+				}		
+			}
+
+			lookup = plugin.contentResources.ctrls[0].dbLookup;
+			for(var key in lookup) 
+			{
+				item = lookup[key];
+				if(item.data._type !== "cubemap") { continue; }
+
+				if(item.data.nx === prevId) {
+					item.data.nx = newId;
+				}
+				if(item.data.ny === prevId) {
+					item.data.ny = newId;
+				}
+				if(item.data.nz === prevId) {
+					item.data.nz = newId;
+				}
+				if(item.data.px === prevId) {
+					item.data.px = newId;
+				}
+				if(item.data.py === prevId) {
+					item.data.py = newId;
+				}
+				if(item.data.pz === prevId) {
+					item.data.pz = newId;
+				}																				
+			}			
+		}
+
+	},
+
 	menu_Upload: function() {
 		this.upload.open();
 	},
@@ -204,14 +276,17 @@ Editor.controller("AssetResources", "AssetBrowser",
 		var currList = this.currList;
 		var info = {
 			name: idName,
-			_path: this.currList.path,
+			id: idName,
 			_ext: ext,
 			_type: editor.resourceMgr.getTypeFromExt(ext),
 			_lastModified: file.lastModified
 		};
-		
-		var filePath = this.currList.path + info.name + "." + ext;
+
+		// TODO: Correct name should be known before writting.
+		this.makeNameUnique(info);
+
 		var self = this;
+		var filePath = info.name + "." + ext;		
 
 		if(editor.electron)
 		{

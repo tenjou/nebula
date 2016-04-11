@@ -12,29 +12,22 @@ Editor.controller("AssetBrowser",
 		editor.registerDataset(this.name, this.data, "content");
 
 		this.dbLookup = {};
-		this.list.db = this.data;
 
-		this._loadFolder(this.list, this.data);
+		this._loadContent(this.list, this.data);
 	},
 
-	_loadFolder: function(list, db)
+	_loadContent: function(list, db)
 	{
-		var data, dbData, item, folder;
+		var data, dbData, item;
 		var num = db.length;
 		for(var n = 0; n < num; n++)
 		{
 			dbData = db[n];
 			data = new Editor.Data(dbData);
-			if(dbData._type === "folder") {
-				folder = this._addFolder(list, data);
-				folder.folder = true;
-				this._loadFolder(folder.list, dbData.content);
-			}
-			// else if(dbData.content) {
-			// 	item = this._addItem(list, data);
-			// }
-			else {
-				this._addItem(list, data);
+			item = this._addItem(list, data);
+			if(dbData.content && dbData.content.length > 0) {
+				item.folder = true;
+				this._loadContent(item.list, dbData.content);
 			}
 		}	
 
@@ -50,9 +43,35 @@ Editor.controller("AssetBrowser",
 		this.makeNameUnique(info);
 
 		var item = this._addItem(list, data);
-
-		list.db.push(info);
+		item.select = true;
 		list.sort();
+		item._name.focus();	
+
+		var db;
+		var parent = list.parent;
+		if(parent instanceof Element.ListItem) {
+			db = parent.info.data.content;
+			if(!db) {
+				db = [];
+				parent.info.data.content = db;
+			}
+			info.id = parent.info.data.id + "/" + info.name;
+		}
+		else {
+			db = this.data;
+			info.name = info.name;
+		}	
+
+		db.push(info);
+		
+		
+		if(this.name === "Resources") 
+		{
+			if(!info._ext) {
+				editor.fileSystem.createDir(info.id);
+			}
+		}
+
 		editor.saveCfg();
 
 		if(this.onAdd) {
@@ -64,59 +83,39 @@ Editor.controller("AssetBrowser",
 
 	_addItem: function(list, data)
 	{
-		var dataType = data.get("_type");
+		var props = data.data;
+
+		var dataType = props._type;
 		if(dataType === "unknown") {
-			dataType = editor.resourceMgr.getTypeFromExt(data.get("_ext"));
+			dataType = editor.resourceMgr.getTypeFromExt(props._ext);
 			if(dataType !== "unknown") {
-				data.set("_type", dataType);
+				props._type = dataType;
 			}
 		}
 
-		var typeInfo = editor.resourceMgr.types[data.get("_type")];
+		var typeInfo = editor.resourceMgr.types[props._type];
 		if(!typeInfo) {
 			typeInfo = editor.resourceMgr.types.unknown;
 		}
 
-		var element = list.createItem(data.get("name"));
-		element.tag = data.get("_ext");
+		var element = list.createItem(props.name);
+		element.tag = props._ext;
 		element.type = typeInfo;
 		element.info = data;
 
+		var parent = list.parent;
+		if(parent instanceof Element.ListItem) {
+			props.id = parent.info.data.id + "/" + props.name;
+		}
+		else {
+			props.id = props.name;
+		}
+
 		data.element = element;
 		data.watch(this.watchItemFunc);
-		this.dbLookup[data.get("name")] = data;
+		this.dbLookup[props.id] = data;
 
 		return element;
-	},	
-
-	addFolder: function(list)
-	{
-		var info = {
-			name: "Folder",
-			_path: list.path,
-			_type: "folder",
-			_lastModified: Date.now(),
-			content: []
-		};
-
-		var item = this.addItem(list, info);
-		item.folder = true;
-		item.list.path = list.path + info.name + "/";
-		item.list.db = info.content;
-
-		editor.fileSystem.createDir(item.list.path);
-
-		return item;
-	},
-
-	_addFolder: function(list, info) 
-	{
-		var item = this._addItem(list, info);
-		item.folder = true;
-		item.list.path = list.path + info.name + "/";
-		item.list.db = info.content;
-
-		return item;
 	},	
 
 	watchItem: function(item, key)
@@ -145,34 +144,50 @@ Editor.controller("AssetBrowser",
 	renameItem: function(element)
 	{
 		var info = element.info;
-		var prevName = element._name.prevValue;
 
-		if(this.dbLookup[info.get("name")]) {
-			info.data.name = prevName;
+		var newId;
+		var parent = element.parent.parent;
+		if(parent instanceof Element.ListItem) {
+			newId = parent.info.data.id + "/" + info.data.name;
+		}
+		else {
+			newId = info.data.name;
+		}
+
+		if(this.dbLookup[newId]) {
+			var id = info.data.id;
+			info.data.name = id.slice(id.lastIndexOf("/") + 1);
 			this.inspectItem();
 			return false;
 		}
 
-		if(element.folder)
+		this.updateItemDeps(newId, info.data.id, info.data);
+		
+		if(this.name === "Resources")
 		{
-			editor.fileSystem.moveToDir(
-				info.get("_path") + prevName,
-				info.get("_path") + info.get("name"),
-				this.inspectItem.bind(this));
-		}
-		else
-		{
-			editor.fileSystem.moveTo(
-				info.get("_path") + prevName + "." + info.get("_ext"), 
-				info.get("_path") + info.get("name") + "." + info.get("_ext"),
-				this.inspectItem.bind(this));
+			if(info.data._type !== "cubemap")
+			{
+				if(info.data._ext)
+				{
+					editor.fileSystem.moveTo(
+						info.data.id + "." + info.data._ext,
+						newId + "." + info.data._ext,
+						this.inspectItem.bind(this));
+				}
+				else {
+					editor.fileSystem.moveToDir(info.data.id, newId, this.inspectItem.bind(this));
+				}
+			}
 		}
 
-		element.name = info.get("name");
+		if(element.list) {
+			this.updateItemInfo(element.list.items, newId);
+		}		
 
-		delete this.dbLookup[prevName];
-		this.dbLookup[info.get("name")] = info;
-		info.lastModified = Date.now();
+		delete this.dbLookup[info.data.id];
+		this.dbLookup[newId] = info;
+		info.data._lastModified = Date.now();
+		info.set("id", newId);
 
 		element.parent.sort();
 		editor.saveCfg();
@@ -180,39 +195,89 @@ Editor.controller("AssetBrowser",
 		return true;
 	},	
 
+	updateItemInfo: function(items, path)
+	{
+		var item, prevId;
+		for(var n = 0; n < items.length; n++) 
+		{
+			item = items[n];
+
+			prevId = item.info.data.id;
+			item.info.data.id = path + "/" + item.name;
+			this.updateItemDeps(item.info.data.id, prevId, item.info.data);
+
+			if(item.list) {
+				this.updateItemInfo(item.list.items, item.info.data.id);
+			}
+		}
+	},
+
 	handleMoveItem: function(event)
 	{
+		// TODO: check if moved item is unique.
 		var element = event.element;
 		var info = element.info;
+
+		// Remove from previous content db:
+		var db;
+		var parent = element.preDragParent.parent;
+		if(parent instanceof Element.ListItem) {
+			db = parent.info.data.content;
+		}
+		else {
+			db = this.data;
+		}	
 		
-		var db = element.preDragParent.db;
-		var index = db.indexOf(info);
+		var index = db.indexOf(info.data);
 		if(index > -1) {
 			db[index] = db[db.length - 1];
 			db.pop();
 		}
 
-		db = element.parent.db;
-		db.push(element.info);
-		info.path = element.parent.path;
-		info.lastModified = Date.now();
-
-		var fileName = info.name;
-		if(element.folder)
+		// Add to new content db:
+		var prevId = info.data.id;
+		parent = element.parent.parent;
+		if(parent instanceof Element.ListItem) 
 		{
-			editor.fileSystem.moveToDir(
-				element.preDragParent.path + fileName,
-				element.parent.path + fileName);
-
-			this._updateMoveItemDb(element.info.content, element.parent.path + fileName + "/");
+			db = parent.info.data.content;
+			if(!db) {
+				db = [];
+				parent.info.data.content = db;
+			}
+			info.data.id = parent.info.data.id + "/" + info.data.name;
 		}
-		else
-		{
-			fileName += "." + info.ext;
+		else {
+			db = this.data;
+			info.data.id = info.data.name;
+		}		
 
-			editor.fileSystem.moveTo(
-				element.preDragParent.path + fileName,
-				element.parent.path + fileName);
+		delete this.dbLookup[prevId];
+
+		this.makeNameUnique(info.data);
+		element.name = info.data.name;
+		info.data._lastModified = Date.now();
+
+		db.push(element.info.data);
+		this.dbLookup[info.data.id] = info;
+
+		this.updateItemDeps(info.data.id, prevId, info.data);
+
+		if(this.name === "Resources")
+		{
+			if(info.data._ext)
+			{
+				editor.fileSystem.moveTo(
+					prevId + "." + info.data._ext,
+					info.data.id + "." + info.data._ext);
+			}
+			else {
+				editor.fileSystem.moveToDir(prevId, info.data.id);
+			}
+		}
+
+		if(element.info.data.content) 
+		{
+			this._updateMoveItemDb(element.info.data);
 		}
 		
 		element.parent.sort();
@@ -224,17 +289,23 @@ Editor.controller("AssetBrowser",
 		}
 	},
 
-	_updateMoveItemDb: function(db, path)
+	_updateMoveItemDb: function(data)
 	{
-		var item;
+		var db = data.content;
+
+		var item, prevId;
 		var num = db.length;
 		for(var n = 0; n < num; n++)
 		{
 			item = db[n];
-			item.path = path;
 
-			if(item.folder) {
-				this._updateMoveItemDb(item.info.content, path + item.info.name + "/");
+			prevId = item.id;
+			item.id = data.id + "/" + item.name;
+
+			this.updateItemDeps(item.id, prevId, item);
+
+			if(item.content) {
+				this._updateMoveItemDb(item);
 			}
 		}
 	},
@@ -242,24 +313,19 @@ Editor.controller("AssetBrowser",
 	removeItem: function(list, item)
 	{
 		var info = item.info;
-		var db = list.db;
 
 		if(this.name === "Resources") 
 		{
 			var self = this;
-			var func = function(data) 
-			{
-				if(!data) { return; }
+			var func = function(data) {
 				self._removeItem(list, item);
 			};
 
-			var fileName = info.get("_path") + info.get("name");
-			if(info.get("_type") === "folder") {
-				editor.fileSystem.removeDir(fileName, func);
+			if(info.data._ext) {
+				editor.fileSystem.remove(info.data.id + "." + info.data._ext, func);
 			}
 			else {
-				fileName += "." + info.get("_ext");
-				editor.fileSystem.remove(fileName, func);
+				editor.fileSystem.removeDir(info.data.id, func);
 			}
 		}
 		else {
@@ -270,7 +336,15 @@ Editor.controller("AssetBrowser",
 	_removeItem: function(list, item)
 	{
 		var info = item.info;
-		var db = list.db;
+
+		var db;
+		var parent = item.parent.parent;
+		if(parent instanceof Element.ListItem) {
+			db = parent.info.data.content;
+		}
+		else {
+			db = this.data;
+		}	
 
 		if(item.select) {
 			editor.plugins.Inspect.empty();
@@ -278,7 +352,7 @@ Editor.controller("AssetBrowser",
 
 		list.removeItem(item);
 
-		delete this.dbLookup[info.get("name")];
+		delete this.dbLookup[info.data.id];
 
 		var index = db.indexOf(info.data);
 		if(index > -1) {
@@ -297,6 +371,7 @@ Editor.controller("AssetBrowser",
 		}
 
 		plugin.selectedItem = event.element;
+		plugin.selectedCtrl = this;
 
 		this.inspectItem();
 	},
@@ -332,32 +407,71 @@ Editor.controller("AssetBrowser",
 		}
 	},	
 
-	menu_Folder: function() {
-		this.addFolder(this.currList, this.currItem);
+	menu_Folder: function() 
+	{
+		var info = {
+			name: "folder",
+			_type: "folder",
+			_lastModified: Date.now(),
+			content: []
+		};
+
+		this.addItem(this.currList, info);
 	},
 
 	menu_Delete: function() {
 		this.removeItem(this.currList, this.currItem);
-	},		
+	},
 
 	makeNameUnique: function(info)
 	{
-		var index = 2;
-		var newName = info.name;
-
-		for(;;)
-		{
-			if(this.dbLookup[newName]) {
-				newName = info.name + "." + index;
-				index++;
-				continue;
-			}
-
-			info.name = newName;
-			return newName;
+		if(!info.id) {
+			info.id = info.name;
 		}
 
-		return name;
+		if(!this.dbLookup[info.id]) {
+			return;
+		}
+
+		var preIdIndex = info.id.lastIndexOf("/");
+		var preId = info.id.slice(0, preIdIndex);
+		var name = info.id.slice(preIdIndex + 1);
+
+		var index;
+		var numIndex = name.lastIndexOf("-");
+		if(numIndex > -1) {
+			index = parseInt(name.slice(numIndex + 1));
+			if(isNaN(index)) {
+				index = 2;
+			}
+			else {
+				name = name.slice(0, numIndex);
+				index++;
+			}
+		}
+		else {
+			index = 2;
+		}
+
+		var newId;
+		for(;;)
+		{
+			if(preId) {
+				newId = preId + "/" + name + "-" + index;
+			}
+			else {
+				newId = name + "-" + index;
+			}
+
+			if(!this.dbLookup[newId]) {
+				break;
+			}
+
+			index++;
+		}
+
+		info.id = newId;
+		info.name = name + "-" + index;
 	},		
 
 	//

@@ -54,11 +54,3 @@ meta.class("Element.TaggedNumber", "Element.Number",
 
 	_color: null
 });
-
-
-    // position: absolute;
-    // left: 118px;
-    // top: 10px;
-    // border-radius: 2px;
-    // background: #D04031;
-    // color: white;

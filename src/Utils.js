@@ -47,13 +47,39 @@ meta.appendObject = function(target, src)
 			if(typeof(value) === "object") 
 			{
 				targetValue = target[key];
-				if(!targetValue) {
-					targetValue = {};
+
+				if(!targetValue) 
+				{
+					if(value instanceof Array) {
+						targetValue = [].concat(value);
+					}
+					else {
+						targetValue = {};
+						meta.appendObject(targetValue, value);	
+					}	
+									
 					target[key] = targetValue;
 				}
-
-				if(typeof(targetValue) === "object") {
-					meta.appendObject(targetValue, value);
+				else if(typeof(targetValue) === "object")
+				{
+					if(value instanceof Array) 
+					{
+						if(targetValue instanceof Array) {
+							target[key] = targetValue.concat(value);
+						}
+						else {
+							console.warn("(meta.mergeAppend) Incompatible types for '" + key + "' key");
+						}
+					}
+					else 
+					{
+						if(targetValue instanceof Array) {
+							console.warn("(meta.mergeAppend) Incompatible types for '" + key + "' key");
+						}
+						else {
+							meta.appendObject(targetValue, value);		
+						}
+					}
 				}
 				else {
 					console.warn("(meta.mergeAppend) Incompatible types for '" + key + "' key");

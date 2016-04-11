@@ -9,7 +9,7 @@ Editor.plugin("ProjectWindow",
 		editor.inputParser.types.projectList = function(parent, name, data) 
 		{
 			var list = new Element.List(parent, name);
-			list.info = "No projects found";
+			list.infoTxt = "No projects found";
 			return list;
 		};
 

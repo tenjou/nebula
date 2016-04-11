@@ -100,6 +100,13 @@ meta.class("Element.List", "Element.Basic",
 		var item = new this.itemCls();
 		item.name = name;
 
+		this.addItem(item, insertBefore)
+
+		return item;
+	},
+
+	addItem: function(item, insertBefore)
+	{
 		if(insertBefore) {
 			this.insertBefore(item, insertBefore);
 		}
@@ -112,8 +119,6 @@ meta.class("Element.List", "Element.Basic",
 		}
 
 		this.items.push(item);
-
-		return item;
 	},
 
 	removeItem: function(item) 
@@ -126,12 +131,18 @@ meta.class("Element.List", "Element.Basic",
 
 		var index = this.items.indexOf(item);
 		if(index > -1) {
+			console.log("REMOVE")
 			this.items[index] = this.items[this.items.length - 1];
 			this.items.pop();
 		}
 
+		if(this.items.length === 0) {
+			console.log("NO FOLDER")
+			this.folder = false;
+		}
+
 		if(this.domElement.childNodes.length === 0) {
-			this.info = this.infoTxt;
+			this.info = this._infoTxt;
 		}
 	},
 
@@ -146,8 +157,19 @@ meta.class("Element.List", "Element.Basic",
 		}
 
 		this.items.length = 0;
-		this.info = this.infoTxt;
+		this.info = this._infoTxt;
 	},
+
+	sortFunc: function(a, b)
+	{
+		// if(a.info.data._type !== "folder") { return 1; }
+		// if(a.info.data._type > b.info.data._type) { return 1; }
+
+		if(a.name < b.name) { return -1; }
+		if(a.name > b.name) { return 1; }
+		
+		return 0;
+	},	
 
 	sort: function()
 	{
@@ -164,9 +186,9 @@ meta.class("Element.List", "Element.Basic",
 
 	filterFunc: null,
 
-	set info(str) 
+	set infoTxt(str) 
 	{
-		this.infoTxt = str;
+		this._infoTxt = str;
 
 		if(!this._info) {
 			this._info = new Element.Info(this);	
@@ -178,8 +200,8 @@ meta.class("Element.List", "Element.Basic",
 		this._info.value = str;
 	},
 
-	get info() {
-		return this._info.value;
+	get infoTxt() {
+		return this._infoTxt;
 	},
 
 	set selectable(value) 
@@ -212,5 +234,5 @@ meta.class("Element.List", "Element.Basic",
 	},
 
 	_info: null,
-	infoTxt: null
+	_infoTxt: null
 });

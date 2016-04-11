@@ -73,7 +73,7 @@ meta.class("Editor.Element.Tab", "Element.Basic",
 	},
 
 	set content(content) {
-		this.container.domElement.innerHTML = "";
+		this.container.removeAll();
 		this.container.append(content);	
 	},
  

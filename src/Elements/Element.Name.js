@@ -83,6 +83,7 @@ meta.class("Element.Name", "Element.Basic",
 		// Enter
 		else if(keyCode === 13) {
 			this.domElement.blur();
+			this.domElement.scrollIntoView(true);
 		}
 
 		domEvent.preventDefault();
@@ -98,6 +99,11 @@ meta.class("Element.Name", "Element.Basic",
 	set value(str) 
 	{
 		if(str === this._value) { return; }
+
+		if(str[0] === "<") {
+			str = str.slice(0, str.lastIndexOf("<"));
+			str = str.slice(str.lastIndexOf(">") + 1);
+		}
 
 		if(this.prevValue === null) {
 			this.prevValue = str;
@@ -117,5 +123,6 @@ meta.class("Element.Name", "Element.Basic",
 
 	//
 	elementTag: "name",
-	_value: ""
+	_value: "",
+	_parseElement: document.createElement("span")
 });

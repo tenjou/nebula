@@ -144,13 +144,12 @@ toolbar {
 }
 toolbar:first-child {
 	margin-left: 0;
-    overflow-x: hidden;
 }
 toolbar:last-child {
 	margin-right: 0;
 }
 toolbar > holder {
-	flex: 1 1 100%;
+	position: absolute;
 	width: 100%;
 	height: 100%;
 	display: flex;
@@ -314,6 +313,9 @@ content list info {
 	color: #C3C2C2;
 	font-size: 11px;
 }
+content list item {
+	outline: none;
+}
 content list item inner {
 	display: block;
 	padding: 1px;
@@ -384,6 +386,7 @@ content dropdown list {
     display: block;
     position: absolute;
     width: 100%;
+	max-height: 250px;
     background: rgba(19, 18, 18, 0.97);
     left: 0;
     top: 21px;
@@ -522,7 +525,7 @@ context-menu context-menu {
 	margin-top: -5px;
 	opacity: 0;
 	pointer-events: none;
-    max-height: 600px;
+    max-height: 250px;
     overflow: auto;		
 }
 context-menu item:hover > context-menu {

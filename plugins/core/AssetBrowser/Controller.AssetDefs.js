@@ -49,6 +49,39 @@ Editor.controller("AssetDefs", "AssetBrowser",
 		this.list.on("menu", this.openMenu.bind(this));	
 	},	
 
+	updateItemDeps: function(newId, prevId, info) 
+	{
+		var lookup, item;
+		var plugin = editor.plugins.AssetBrowser;
+
+		if(info._type === "material") 
+		{
+			lookup = plugin.contentDefs.ctrls[0].dbLookup;
+			for(var key in lookup) 
+			{
+				item = lookup[key];
+				if(item.data._type !== "entityPrefab") { continue; }
+
+				if(item.data.material === prevId) {
+					item.data.material = newId;
+				}
+			}
+		}
+		else if(info._type === "entityPrefab") 
+		{
+			lookup = plugin.contentHierarchy.ctrls[0].dbLookup;
+			for(var key in lookup) 
+			{
+				item = lookup[key];
+				if(item.data._type !== "entity") { continue; }
+
+				if(item.data.prefab === prevId) {
+					item.data.prefab = newId;
+				}
+			}
+		}	
+	},
+
 	createPrefab: function(list, type)
 	{
 		var info = {
