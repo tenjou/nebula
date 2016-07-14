@@ -1,106 +1,77 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" manifest="manifest.appcache">
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
-		<title>META Editor</title>
+		<title>Nebula</title>
 
 		<link href="css/fonts.css" rel="stylesheet">
-		<link href="css/style.css" rel="stylesheet">
+		<link href="css/style_new.css" rel="stylesheet">
 		<link href="css/font-awesome.min.css" rel="stylesheet">
-		
-		<script src="lib/meta.utils.js"></script>
 
-		<script src="src/InputParser.js"></script>
-		<script src="src/Elements/Element.Basic.js"></script>
-		<script src="src/Elements/Element.WrappedElement.js"></script>
-		<script src="src/Elements/Element.Wrapper.js"></script>
-		<script src="src/Elements/Element.Top.js"></script>
-		<script src="src/Elements/Element.Inner.js"></script>
-		<script src="src/Elements/Element.Bottom.js"></script>
-		<script src="src/Elements/Element.Tabs.js"></script>
-		<script src="src/Elements/Element.Tab.js"></script>
-		<script src="src/Elements/Element.Slot.js"></script>
-		<script src="src/Elements/Element.Content.js"></script>
-		<script src="src/Elements/Element.CanvasContent.js"></script>
-		<script src="src/Elements/Element.Toolbar.js"></script>
-		<script src="src/Elements/Element.ToolbarRoom.js"></script>
-		<script src="src/Elements/Element.Section.js"></script>
-		<script src="src/Elements/Element.Property.js"></script>
-		<script src="src/Elements/Element.Number.js"></script>
-		<script src="src/Elements/Element.TaggedNumber.js"></script>
-		<script src="src/Elements/Element.String.js"></script>
-		<script src="src/Elements/Element.H2.js"></script>
-		<script src="src/Elements/Element.Container.js"></script>
-		<script src="src/Elements/Element.Name.js"></script>
-		<script src="src/Elements/Element.Tag.js"></script>
-		<script src="src/Elements/Element.Icon.js"></script>
-		<script src="src/Elements/Element.Caret.js"></script>
-		<script src="src/Elements/Element.Close.js"></script>
-		<script src="src/Elements/Element.Button.js"></script>
-		<script src="src/Elements/Element.Window.js"></script>
-		<script src="src/Elements/Element.List.js"></script>
-		<script src="src/Elements/Element.ListItem.js"></script>
-		<script src="src/Elements/Element.Info.js"></script>
-		<script src="src/Elements/Element.Option.js"></script>
-		<script src="src/Elements/Element.Bool.js"></script>
-		<script src="src/Elements/Element.Image.js"></script>
-		<script src="src/Elements/Element.Dropdown.js"></script>
-		<script src="src/Elements/Element.IFrame.js"></script>
-		<script src="src/Elements/Element.Upload.js"></script>
-		<script src="src/Elements/Element.Color.js"></script>
-		<script src="src/Elements/Element.VGroup.js"></script>
+		<script src="src/wabi/src/wabi.js"></script>
+		<script src="src/wabi/src/event.js"></script>
+		<script src="src/wabi/src/data.js"></script>
+		<script src="src/wabi/src/elements/basic.js"></script>
+		<script src="src/wabi/src/elements/button.js"></script>
+		<script src="src/wabi/src/elements/caret.js"></script>
+		<script src="src/wabi/src/elements/checkbox.js"></script>
+		<script src="src/wabi/src/elements/content.js"></script>
+		<script src="src/wabi/src/elements/dropdown.js"></script>
+		<script src="src/wabi/src/elements/desc.js"></script>
+		<script src="src/wabi/src/elements/error.js"></script>
+		<script src="src/wabi/src/elements/header.js"></script>
+		<script src="src/wabi/src/elements/headerEx.js"></script>
+		<script src="src/wabi/src/elements/html.js"></script>
+		<script src="src/wabi/src/elements/icon.js"></script>
+		<script src="src/wabi/src/elements/iframe.js"></script>
+		<script src="src/wabi/src/elements/input.js"></script>
+		<script src="src/wabi/src/elements/label.js"></script>
+		<script src="src/wabi/src/elements/loader.js"></script>
+		<script src="src/wabi/src/elements/menubar.js"></script>
+		<script src="src/wabi/src/elements/number.js"></script>
+		<script src="src/wabi/src/elements/list.js"></script>
+		<script src="src/wabi/src/elements/panel.js"></script>
+		<script src="src/wabi/src/elements/row.js"></script>
+		<script src="src/wabi/src/elements/tag.js"></script>
+		<script src="src/wabi/src/elements/text.js"></script>
+		<script src="src/wabi/src/elements/word.js"></script>
+		<script src="src/wabi/src/elements/wrapped.js"></script>
+
+		<script src="lib/meta.utils.js"></script>
+		<script src="src/editor.js"></script>
+		<script src="src/server.js"></script>
 		<script src="src/FileSystem.js"></script>
 		<script src="src/FileSystemLocal.js"></script>
 		<script src="src/ResourceManager.js"></script>
-		<script src="src/Editor.js"></script>
-		<script src="src/Editor.Data.js"></script>
-		<script src="src/Controller.js"></script>
-		<script src="src/Plugin.js"></script>
+		<script src="src/plugin.js"></script>
 		<script src="src/Utils.js"></script>
-		<script src="src/main.js"></script>	
+		<script src="config.js"></script>
+		<script src="src/main.js"></script>
 
-		<script src="plugins/core/ProjectWindow/ProjectWindow.js"></script>
-		<script src="plugins/core/ProjectWindow/Controller.ProjectWindow.js"></script>
+		<script src="plugins/core/login/login.js"></script>
+		<script src="plugins/core/layout/layout.js"></script>
+		<script src="plugins/core/layout/elements/toolbar.js"></script>
+		<script src="plugins/core/layout/elements/tabs.js"></script>
+		<script src="plugins/core/contextmenu/contextmenu.js"></script>
+		<script src="plugins/core/projects/projects.js"></script>
+		<script src="plugins/core/menubar/menubar.js"></script>
+		<script src="plugins/core/menubar/elements/menuitem.js"></script>
+		<script src="plugins/core/contextmenu/contextmenu.js"></script>
+		<script src="plugins/core/contextmenu/elements/contextmenu.js"></script>
+		<script src="plugins/core/browser/browser.js"></script>
+		<script src="plugins/core/inspect/inspect.js"></script>
+		<script src="plugins/core/inspect/elements/labelCheckbox.js"></script>
+		<script src="plugins/core/inspect/elements/labelDropdown.js"></script>
+		<script src="plugins/core/inspect/elements/labelName.js"></script>
+		<script src="plugins/core/inspect/elements/image.js"></script>
+		<script src="plugins/core/inspect/elements/section.js"></script>
+		<script src="plugins/core/inspect/elements/taggedNumber.js"></script>
+		<script src="plugins/core/resources/resources.js"></script>
 
-		<script src="plugins/core/ContextMenu/ContextMenu.js"></script>
-		<script src="plugins/core/ContextMenu/Element.ContextMenu.js"></script>
-		<script src="plugins/core/ContextMenu/Element.ContextMenuItem.js"></script>
-		<script src="plugins/core/ContextMenu/Element.ContextMenuCategory.js"></script>
-
-		<script src="plugins/core/Inspect/Inspect.js"></script>
-		<script src="plugins/core/Inspect/Controller.Inspect.Default.js"></script>
-		<script src="plugins/core/Inspect/Controller.Inspect.Texture.js"></script>
-
-		<script src="plugins/core/AssetBrowser/AssetBrowser.js"></script>
-		<script src="plugins/core/AssetBrowser/Controller.AssetBrowser.js"></script>	
-		<script src="plugins/core/AssetBrowser/Controller.AssetDefs.js"></script>	
-		<script src="plugins/core/AssetBrowser/Controller.AssetResources.js"></script>
-		<script src="plugins/core/AssetBrowser/Controller.AssetHierarchy.js"></script>
-		<script src="plugins/core/AssetBrowser/Element.List_Asset.js"></script>	
-		<script src="plugins/core/AssetBrowser/Element.ListItem_Asset.js"></script>	
-
-		<script src="plugins/store/Support/Support.js"></script>
-		<script src="plugins/store/Support/Controller.Scene.js"></script>
-		<script src="plugins/store/Inspect/Inspect.js"></script>
-		<script src="plugins/store/Inspect/Controller.Inspect.Entity.js"></script>
-		<script src="plugins/store/Inspect/Controller.Inspect.EntityPrefab.js"></script>
-		<script src="plugins/store/Inspect/Controller.Inspect.Material.js"></script>
-		<script src="plugins/store/Inspect/Controller.Inspect.MeshMaterial.js"></script>
-		<script src="plugins/store/Inspect/Controller.Inspect.MeshBasicMaterial.js"></script>
-		<script src="plugins/store/Inspect/Controller.Inspect.MeshPhongMaterial.js"></script>
-		<script src="plugins/store/Inspect/Controller.Inspect.MeshLambertMaterial.js"></script>
-		<script src="plugins/store/Inspect/Controller.Inspect.Transparency.js"></script>
-		<script src="plugins/store/Inspect/Controller.Inspect.Blending.js"></script>
-		<script src="plugins/store/Inspect/Controller.Inspect.EnvMap.js"></script>
-		<script src="plugins/store/Inspect/Controller.Inspect.PolygonOffset.js"></script>
-		<script src="plugins/store/Inspect/Controller.Inspect.Wireframe.js"></script>
-		<script src="plugins/store/Inspect/Controller.Inspect.Cubemap.js"></script>
-
-<!-- 		<script src="plugins/meta2d/Support/Support.js"></script>	
-		<script src="plugins/meta2d/Support/Controller.Scene.js"></script>	 -->
+		<script src="plugins/meta2d/meta2d/meta2d.js"></script>
 	</head>
 
 	<body>

@@ -1,29 +1,16 @@
 "use strict";
 
-meta.class("Editor", 
+var editor = 
 {
-	init: function()
-	{		
+	prepare: function()
+	{
 		if(window.process && window.process.versions["electron"]) {
 			this.electron = true;
 		}
-
-		this.eventBuffer = {};
-		this.ctrls = {};
-		this.datasets = {};
-
-		this.inputParser = new Editor.InputParser();
+		
 		this.resourceMgr = new Editor.ResourceManager();
 		this.resources = this.resourceMgr;
 
-		this.contents = {};
-		this.contentsCached = [];
-
-		window.addEventListener("click", this.handleClick.bind(this));
-	},
-
-	prepare: function()
-	{
 		if(this.electron) {
 			this.fileSystem = new Editor.FileSystemLocal();
 			this.handleFileSystemReady();
@@ -32,6 +19,9 @@ meta.class("Editor",
 			this.fileSystem = new Editor.FileSystem();
 			this.fileSystem.onReady.add(this.handleFileSystemReady, this);
 		}
+
+		this.server.on("openProject", this.openProject, this);
+		this.data = this.server.data;
 	},
 
 	handleFileSystemReady: function(data, event)
@@ -39,19 +29,8 @@ meta.class("Editor",
 		this.prepareUI();
 		this.createPlugins();
 
-		this.info.enable = false;
-
-		this.onSplashStart();
+		this.loadProjectInfo();
 	},
-
-	prepareUI: function()
-	{
-		this.wrapper = new Element.Wrapper(document.body);
-
-		this.overlay = new Element.WrappedElement("overlay", document.body);		
-		this.info = new Element.Info(this.overlay);
-		this.info.value = "Initializing";
-	},	
 
 	onSplashStart: function()
 	{
@@ -89,55 +68,71 @@ meta.class("Editor",
 		}
 	},	
 
+	prepareUI: function()
+	{
+		this.wrapperElement = wabi.createElement("wrapped", document.body, "wrapper");
+		this.overlayElement = wabi.createElement("wrapped", document.body, "overlay");
+
+		this.info = wabi.createElement("text", this.overlayElement);
+		this.info.state = "Initializing";
+	},	
+
 	createPlugins: function()
 	{
 		this.plugins = {};
 
-		for(var key in Editor.Plugin) {
-			this.createPlugin(key);
-		}
+		this.loadPlugin("resources");
+		this.loadPlugin("contextmenu");
+		this.loadPlugin("login");
+		// this.loadPlugin("menubar");
+		this.loadPlugin("projects");
 	},
 
-	createPlugin: function(name)
+	loadPlugin: function(name)
 	{
 		if(this.plugins[name]) {
-			console.error("(Editor.createPlugin) There is already installed plugin '" + name + "'");
+			console.error("(editor.installPlugin) There is already installed plugin - '" + name + "'");
 			return;
 		}
 
-		var plugin = new Editor.Plugin[name]();
-		
+		var pluginCls = this.plugin[name];
+		if(!pluginCls) {
+			console.error("(editor.installPlugin) No such plugin registered - '" + name + "'");
+			return;
+		}
+
+		var plugin = new pluginCls();
 		this.plugins[name] = plugin;
 	},
 
-	installPlugins: function()
-	{
-		for(var key in Editor.Plugin) 
-		{
-			if(!this.db.plugins[key]) {
-				this.installPlugin(key);
-			}
-		}
-	},
+	// installPlugins: function()
+	// {
+	// 	for(var key in Editor.Plugin) 
+	// 	{
+	// 		if(!this.db.plugins[key]) {
+	// 			this.installPlugin(key);
+	// 		}
+	// 	}
+	// },
 
-	installPlugin: function(name) 
-	{
-		if(this.db.plugins[name]) {
-			console.warn("(Editor.installPlugin) Plugin is already installed: " + name);
-			return;
-		}
+	// installPlugin: function(name) 
+	// {
+	// 	if(this.db.plugins[name]) {
+	// 		console.warn("(Editor.installPlugin) Plugin is already installed: " + name);
+	// 		return;
+	// 	}
 
-		var plugin = this.plugins[name];
-		if(!plugin) {
-			console.warn("(Editor.installPlugin) There is no such plugin available: " + name);
-		}
+	// 	var plugin = this.plugins[name];
+	// 	if(!plugin) {
+	// 		console.warn("(Editor.installPlugin) There is no such plugin available: " + name);
+	// 	}
 
-		if(plugin.install) {
-			plugin.install(this.db);
-		}
+	// 	if(plugin.install) {
+	// 		plugin.install(this.db);
+	// 	}
 
-		this.db.plugins[name] = {};
-	},
+	// 	this.db.plugins[name] = {};
+	// },
 
 	loadPlugins: function()
 	{
@@ -153,35 +148,100 @@ meta.class("Editor",
 		}
 	},
 
-	loadProject: function(name)
+	loadProjectInfo: function()
 	{
-		if(this.electron) 
-		{
-			var index = name.lastIndexOf("\\");
-			this.projectName = name.slice(index + 1);
-
-			if(name[name.length - 1] !== "\\") {
-				name += "\\";
-			}
-			editor.fileSystem.rootDir = name;
-			editor.fileSystem.fullPath = name;
+		if(this.electron) {
+			this.handleLoadedProjectInfo({});
 		}
-		else
-		{
-			this.projectName = name;
-			this.fileSystem.rootDir = name + "/";
-			this.fileSystem.fullPath = "filesystem:http://" + window.location.hostname + "/persistent/" + editor.fileSystem.rootDir;			
+		else {
+			editor.fileSystem.readDir("", this.handleLoadedProjectInfo.bind(this));
+		}
+	},
+
+	handleLoadedProjectInfo: function(dirs)
+	{
+		var num = dirs.length;
+		var buffer = new Array(num);
+		for(var n = 0; n < num; n++) {
+			buffer[n] = dirs[n].name;
 		}
 
-		this.fileSystem.read("db.json", this._handleReadDb.bind(this));	
-		
+		this.datasets.projects = new wabi.data({ projects: buffer });
+
+		this.info.state.enable = false;
+		this.plugins.login.show();
+	},		
+
+	login: function() {
+		this.plugins.login.hide();
+		this.onSplashStart();
+	},
+
+	loadProject: function(data)
+	{
 		this.onSplashEnd();
 
-		this.info.enable = true;
-		this.info.value = "Loading Project";
+		this.loadPlugin("layout");
+		this.loadPlugin("browser");
+		this.loadPlugin("inspect");
+		this.loadPlugin("meta2d");
 
-		document.title = this.projectName + " - META Editor";
+		this.info.state.value = "Loading project";
+		this.info.state.enable = true;
+
+		this.server.emit({
+			type: "openProject",
+			value: data
+		});
+
+		//this.server
+		// if(this.electron) 
+		// {
+		// 	var index = name.lastIndexOf("\\");
+		// 	this.projectName = name.slice(index + 1);
+
+		// 	if(name[name.length - 1] !== "\\") {
+		// 		name += "\\";
+		// 	}
+		// 	editor.fileSystem.rootDir = name;
+		// 	editor.fileSystem.fullPath = name;
+		// }
+		// else
+		// {
+		// 	this.projectName = name;
+		// 	this.fileSystem.rootDir = name + "/";
+		// 	this.fileSystem.fullPath = "filesystem:http://" + window.location.hostname + "/persistent/" + editor.fileSystem.rootDir;			
+		// }
+
+		// this.fileSystem.read("db.json", this._handleReadDb.bind(this));	
+		
+		
+		// this.onStart();
+
+		// this.info.enable = true;
+		// this.info.value = "Loading Project";
 	},
+
+	openProject: function(serverData)
+	{
+		this.server.applyData(serverData.data);
+
+		this.project = serverData.value;
+		this.projectPath = this.config.httpUrl + "/" + this.project.name + "/";
+
+		this.info.state.enable = false;
+
+		document.title = serverData.value.value + " - " + this.config.titlePrefix;
+
+		this.onStart();
+	},
+
+	createProject: function(name)
+	{
+		//var name = this.getUniqueProjectName(name);
+
+		editor.datasets.projects.add("projects", name);	
+	},	
 
 	_handleReadDb: function(data)
 	{
@@ -239,91 +299,13 @@ meta.class("Editor",
 		console.log("db-saved");
 	},
 
-	// CONTENT:
-	addContent: function(name, info)
-	{
-		var buffer = name.split(".");
-		var contentInfo = editor.getContentInfoFromBuffer(buffer);
-		if(contentInfo) {
-			console.warn("(Editor.addContent) There is already a content with such name: " + name);
-			return null;
-		}
-
-		info.__index = this.currContentIndex++;
-
-		var item;
-		var scope = this.contents;
-		var num = buffer.length;
-		for(var n = 0; n < num; n++) 
-		{
-			item = scope[buffer[n]];
-			if(!item) 
-			{
-				item = {
-					info: null,
-					content: {}
-				};
-				scope[buffer[n]] = item;
-			}
-				
-			scope = item.content;
-		}
-
-		scope.info = info;
-	},
-
-	createContent: function(name)
-	{
-		var contentInfo = this.getContentInfo(name);
-		if(!contentInfo) {
-			console.warn("(Editor.addContent) No content info found for: " + name);
-			return null;			
-		}
-
-		var content = this.contentsCached[contentInfo.__index];
-		if(content) {
-			return content;
-		}
-
-		content = new Element.Content();
-
-		var contentData = {};
-		var extendBuffer = contentInfo.extend;
-		if(extendBuffer && extendBuffer.length > 0) 
-		{
-			var extendContentInfo;
-			for(var n = 0; n < extendBuffer.length; n++) 
-			{
-				extendContentInfo = this.getContentInfo(extendBuffer[n]);
-				if(!extendContentInfo) { continue; }
-
-				if(extendContentInfo.ctrl) {
-					content.addCtrl(extendContentInfo.ctrl);
-				}
-				
-				meta.appendObject(contentData, extendContentInfo.data);
-			}
-		}
-
-		if(contentInfo.ctrl) {
-			content.addCtrl(contentInfo.ctrl);
-		}
-		
-		meta.appendObject(contentData, contentInfo.data);	
-
-		content.data = contentData;
-		this.contentsCached[contentInfo.__index] = content;
-
-		return content;
-	},
-
 	getContentInfo: function(name)
 	{
 		var buffer = name.split(".");
 		return this.getContentInfoFromBuffer(buffer);
 	},
 
-	getContentInfoFromBuffer: function(buffer)
+	getContentProps: function(buffer)
 	{
 		var obj = this.contents;
 		var num = buffer.length;
@@ -370,6 +352,10 @@ meta.class("Editor",
 		this.emit("click", domEvent);
 	},
 
+	handleContextMenu: function(domEvent) {
+		domEvent.preventDefault();
+	},
+
 	on: function(event, cb) 
 	{
 		var buffer = this.eventBuffer[event];
@@ -400,29 +386,76 @@ meta.class("Editor",
 		}
 	},
 
+	plugin: function(name, props) 
+	{
+		function plugin() {
+			editor.plugin.basic.call(this);
+		};
+
+		plugin.prototype = Object.create(this.plugin.basic.prototype);
+		plugin.prototype.constructor = plugin;
+		plugin.prototype.$name = name;
+
+		var proto = plugin.prototype;
+		var fnTest = /\b_super\b/;
+
+		// Copy properties:
+		for(var key in props)
+		{
+			var p = Object.getOwnPropertyDescriptor(props, key);
+			if(p.get || p.set) {
+				Object.defineProperty(proto, key, p);
+				continue;
+			}
+
+			if(typeof(props[key]) == "function"
+				&& fnTest.test(props[key]))
+			{
+				proto[key] = (function(key, fn)
+				{
+					return function(a, b, c, d, e, f)
+					{
+						var tmp = this._super;
+						this._super = extendProto[key];
+						this._fn = fn;
+						var ret = this._fn(a, b, c, d, e, f);
+
+						this._super = tmp;
+
+						return ret;
+					};
+				})(key, props[key]);
+				continue;
+			}
+
+			proto[key] = props[key];
+		}
+
+		this.plugin[name] = plugin;
+	},	
+
 	//
 	db: null,
 	version: "0.1",
 	electron: false,
 	
-	eventBuffer: null,
+	eventBuffer: {},
 
 	fileSystem: null,
 	inputParser: null,
 	resourceMgr: null,
 	resources: null,
 
-	plugins: null,
-	ctrls: null,
-	datasets: null,
+	project: null,
+	projectPath: null,
 
-	wrapper: null,
+	plugins: null,
+	ctrls: {},
+	datasets: {},
+
+	wrapperElement: null,
+	overlayElement: null,
 	top: null,
 	inner: null,
-	bottom: null,
-	overlay: null,
-
-	contentsCached: null,
-	contents: null,
-	currContentIndex: 0
-});
+	bottom: null
+};

@@ -1,6 +1,6 @@
 "use strict";
 
-function dataURItoBlob(dataURI, type) 
+function dataURItoBlob(dataURI, type)
 {
 	var binary = atob(dataURI.split(",")[1]);
 	var length = binary.length;
@@ -13,7 +13,7 @@ function dataURItoBlob(dataURI, type)
 	return new Blob([ array ], { type: type });
 }
 
-meta.selectElementContents = function(element) 
+meta.selectElementContents = function(element)
 {
 	var range = document.createRange();
 	range.selectNodeContents(element);
@@ -41,28 +41,28 @@ meta.appendObject = function(target, src)
 	var value, targetValue;
 	for(var key in src)
 	{
-		if(src.hasOwnProperty(key)) 
+		if(src.hasOwnProperty(key))
 		{
 			value = src[key];
-			if(typeof(value) === "object") 
+			if(typeof(value) === "object")
 			{
 				targetValue = target[key];
 
-				if(!targetValue) 
+				if(!targetValue)
 				{
 					if(value instanceof Array) {
 						targetValue = [].concat(value);
 					}
 					else {
 						targetValue = {};
-						meta.appendObject(targetValue, value);	
-					}	
-									
+						meta.appendObject(targetValue, value);
+					}
+
 					target[key] = targetValue;
 				}
 				else if(typeof(targetValue) === "object")
 				{
-					if(value instanceof Array) 
+					if(value instanceof Array)
 					{
 						if(targetValue instanceof Array) {
 							target[key] = targetValue.concat(value);
@@ -71,13 +71,13 @@ meta.appendObject = function(target, src)
 							console.warn("(meta.mergeAppend) Incompatible types for '" + key + "' key");
 						}
 					}
-					else 
+					else
 					{
 						if(targetValue instanceof Array) {
 							console.warn("(meta.mergeAppend) Incompatible types for '" + key + "' key");
 						}
 						else {
-							meta.appendObject(targetValue, value);		
+							meta.appendObject(targetValue, value);
 						}
 					}
 				}

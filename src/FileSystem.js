@@ -1,6 +1,6 @@
 "use strict";
 
-meta.class("Editor.FileSystem", 
+meta.class("Editor.FileSystem",
 {
 	init: function()
 	{
@@ -8,13 +8,13 @@ meta.class("Editor.FileSystem",
 
 		var self = this;
 
-		navigator.webkitPersistentStorage.requestQuota(64 * 1024 * 1024, 
-			function(grantedBytes) 
+		navigator.webkitPersistentStorage.requestQuota(64 * 1024 * 1024,
+			function(grantedBytes)
 			{
-				requestFileSystem(PERSISTENT, grantedBytes, 
+				requestFileSystem(PERSISTENT, grantedBytes,
 					function(fs) {
 						self.handleFileSystemSuccess(fs);
-					}, 
+					},
 					function(fileError) {
 						self.handleError(fileError, "init");
 					});
@@ -29,7 +29,7 @@ meta.class("Editor.FileSystem",
 		this.fs = fs.root;
 		this.ready = true;
 		this.onReady.emit(this, true);
-	},	
+	},
 
 	create: function(filename, cb)
 	{
@@ -38,12 +38,12 @@ meta.class("Editor.FileSystem",
 		this.fs.getFile(this.rootDir + filename, {
 				create: true
 			},
-			function(fileEntry) 
+			function(fileEntry)
 			{
 				self.handleCreateDone(fileEntry);
 				if(cb) {
 					cb();
-				}				
+				}
 			},
 			function(fileError) {
 				self.handleError(fileError, cb, "create", filename);
@@ -51,7 +51,7 @@ meta.class("Editor.FileSystem",
 	},
 
 	handleCreateDone: function(fileEntry) {},
- 
+
 	read: function(filename, cb)
 	{
 		var self = this;
@@ -65,15 +65,15 @@ meta.class("Editor.FileSystem",
 			});
 	},
 
-	handleReadDone: function(fileEntry, cb) 
+	handleReadDone: function(fileEntry, cb)
 	{
 		var self = this;
 
 		fileEntry.file(
-			function(file) 
+			function(file)
 			{
 				var reader = new FileReader();
-				reader.onload = function() 
+				reader.onload = function()
 				{
 					if(cb) {
 						cb(this.result);
@@ -85,7 +85,7 @@ meta.class("Editor.FileSystem",
 			function(fileError) {
 				self.handleError(fileError, cb, "read", fileError.name);
 			});
-	},	
+	},
 
 	write: function(filename, contents, cb)
 	{
@@ -105,22 +105,22 @@ meta.class("Editor.FileSystem",
 		var self = this;
 
 		fileEntry.createWriter(
-			function(fileWritter) 
+			function(fileWritter)
 			{
-				fileWritter.onwriteend = function() 
+				fileWritter.onwriteend = function()
 				{
-					fileWritter.onwriteend = function() 
+					fileWritter.onwriteend = function()
 					{
 						if(cb) {
 							cb(contents);
-						}						
+						}
 					}
 
 					var blob = new Blob([ contents ], { type: "text/plain" });
 					fileWritter.write(blob);
 				};
 
-				fileWritter.onerror = function() 
+				fileWritter.onerror = function()
 				{
 					console.error("(FileSystem::write) Could not write in " + fileEntry.name);
 					if(cb) {
@@ -153,21 +153,21 @@ meta.class("Editor.FileSystem",
 		var self = this;
 
 		fileEntry.createWriter(
-			function(fileWritter) 
+			function(fileWritter)
 			{
-				fileWritter.onwriteend = function() 
+				fileWritter.onwriteend = function()
 				{
-					fileWritter.onwriteend = function() 
+					fileWritter.onwriteend = function()
 					{
 						if(cb) {
 							cb(fileEntry.toURL());
-						}						
+						}
 					}
 
 					fileWritter.write(blob);
 				};
 
-				fileWritter.onerror = function() 
+				fileWritter.onerror = function()
 				{
 					console.error("(FileSystem::writeBlob) Could not write blob in " + fileEntry.name);
 					if(cb) {
@@ -180,17 +180,17 @@ meta.class("Editor.FileSystem",
 			function(fileError) {
 				self.handleError(fileError, cb, "createWritter", filename);
 			});
-	},	
+	},
 
 	remove: function(filename, cb)
 	{
 		var self = this;
 
 		this.fs.getFile(this.rootDir + filename, { create: false },
-			function(fileEntry) 
+			function(fileEntry)
 			{
 				fileEntry.remove(
-					function() 
+					function()
 					{
 						if(cb) {
 							cb(fileEntry.toURL());
@@ -212,13 +212,13 @@ meta.class("Editor.FileSystem",
 		var targetPathIndex = targetPath.lastIndexOf("/") + 1;
 
 		this.fs.getFile(this.rootDir + path, {},
-			function(fileEntry) 
+			function(fileEntry)
 			{
 				self.fs.getDirectory(self.rootDir + targetPath.substr(0, targetPathIndex), {},
 					function(dirEntry)
 					{
 						fileEntry.moveTo(dirEntry, targetPath.substr(targetPathIndex),
-							function(fileEntry) 
+							function(fileEntry)
 							{
 								if(cb) {
 									cb(fileEntry.toURL());
@@ -242,7 +242,7 @@ meta.class("Editor.FileSystem",
 		var self = this;
 
 		this.fs.getDirectory(this.rootDir + name, {},
-			function(dirEntry) 
+			function(dirEntry)
 			{
 				if(cb) {
 					cb(dirEntry.toURL());
@@ -258,13 +258,13 @@ meta.class("Editor.FileSystem",
 		var self = this;
 
 		this.fs.getDirectory(this.rootDir + name, {},
-			function(dirEntry) 
+			function(dirEntry)
 			{
 				var dirReader = dirEntry.createReader();
 				var entries = [];
 
 				dirReader.readEntries(
-					function(results) 
+					function(results)
 					{
 						if(results.length) {
 							entries = entries.concat(results);
@@ -272,7 +272,7 @@ meta.class("Editor.FileSystem",
 
 						if(cb) {
 							cb(entries);
-						}						
+						}
 					},
 					function(fileError) {
 						self.handleError(fileError, cb, "readDir", name);
@@ -288,7 +288,7 @@ meta.class("Editor.FileSystem",
 		var self = this;
 
 		this.fs.getDirectory(this.rootDir + name, { create: true },
-			function(dirEntry) 
+			function(dirEntry)
 			{
 				if(cb) {
 					cb(dirEntry.toURL());
@@ -305,7 +305,7 @@ meta.class("Editor.FileSystem",
 			function(dirEntry)
 			{
 				dirEntry.removeRecursively(
-					function() 
+					function()
 					{
 						if(cb) {
 							cb(dirEntry.toURL());
@@ -319,7 +319,7 @@ meta.class("Editor.FileSystem",
 				self.handleError(fileError, cb, "removeDir", name);
 			});
 	},
-	
+
 	moveToDir: function(path, targetPath, cb)
 	{
 		var self = this;
@@ -327,13 +327,13 @@ meta.class("Editor.FileSystem",
 		var targetPathIndex = targetPath.lastIndexOf("/") + 1;
 
 		this.fs.getDirectory(this.rootDir + path, {},
-			function(parentDirEntry) 
+			function(parentDirEntry)
 			{
 				self.fs.getDirectory(self.rootDir + targetPath.substr(0, targetPathIndex), {},
 					function(dirEntry)
 					{
 						parentDirEntry.moveTo(dirEntry, targetPath.substr(targetPathIndex),
-							function(newDirEntry) 
+							function(newDirEntry)
 							{
 								if(cb) {
 									cb(newDirEntry.toURL());
@@ -352,7 +352,7 @@ meta.class("Editor.FileSystem",
 			});
 	},
 
-	handleError: function(fileError, cb, type, filename) 
+	handleError: function(fileError, cb, type, filename)
 	{
 		if(type === "read" && fileError.name !== "NotFoundError")
 		{
@@ -361,12 +361,12 @@ meta.class("Editor.FileSystem",
 			}
 			else {
 				console.error("(FileSystem::" + type + ")", fileError.name);
-			}	
+			}
 		}
 
 		if(cb) {
 			cb(null);
-		}		
+		}
 	},
 
 	//

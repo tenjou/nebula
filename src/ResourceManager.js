@@ -10,9 +10,9 @@ meta.class("Editor.ResourceManager",
 			typeInfo = this.types[typeName];
 			exts = typeInfo.ext;
 			if(!exts) { continue; }
-			
+
 			num = exts.length;
-			for(var n = 0; n < num; n++) 
+			for(var n = 0; n < num; n++)
 			{
 				if(ext === exts[n]) {
 					return typeName;
@@ -32,7 +32,7 @@ meta.class("Editor.ResourceManager",
 			typeInfo = this.types[typeName];
 			exts = typeInfo.ext;
 			num = exts.length;
-			for(var n = 0; n < num; n++) 
+			for(var n = 0; n < num; n++)
 			{
 				if(ext === exts[n]) {
 					return typeInfo.icon ? typeInfo.icon : "fa-question";

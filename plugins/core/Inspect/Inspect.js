@@ -1,74 +1,55 @@
 "use strict";
 
-Editor.plugin("Inspect",
+editor.plugin("inspect",
 {
-	onLoad: function()
+	create: function()
 	{
-		editor.addContent("inspect.default", 
-			{
-				ctrl: "Inspect.Default",
-				data: {
-					General: {
-						type: "section",
-						open: true,
-						content: {
-							Name: {
-								type: "string",
-							}
-						}
-					}
-				}
-			});
+		wabi.addFragment("inspect-general",
+		{
+			type: "section",
+			name: "General",
+			value: [
+				{
+					type: "labelName",
+					bind: "value",
+					name: "Name"
+				}						
+			]
+		});
 
-		editor.addContent("inspect.texture", 
-			{
-				ctrl: "Inspect.Texture",
-				extend: [ "inspect.default" ],
-				data: {
-					Image: {
-						type: "section",
-						open: true,
-						content: {
-							Holder: "@image"
-						}
-					}
+		wabi.addFragment("inspect-texture", "inspect-general",
+		{
+			type: "section",
+			name: "Texture",
+			value: [
+				{
+					type: "image",
+					bind: "id",
 				}
-			});	
+			]
+		});
 	},
 
-	onStart: function() 
+	onStart: function()
 	{
-		this.tab = editor.inner.rightToolbar.createTab("Inspect");
+		var toolbarContent = editor.plugins.layout.toolbarInspect.$elements.content;
+
+		this.content = wabi.createElement("content");
+		this.content.appendTo(toolbarContent);
 	},
 
-	show: function(typeName, data, cb)
+	show: function(data)
 	{
-		this.content = editor.createContent("inspect." + typeName);
-		if(!this.content) {
-			this.content = editor.createContent("inspect.default");
+		var props = wabi.getFragment("inspect-" + data.get("type"));
+		if(!props) {
+			props = wabi.getFragment("inspect-general");
 		}
 
-		this.content.bindData(data);
-		data.watch(this.handleContentUpdate.bind(this));
-
-		this.cb = cb ? cb : null;
-		this.tab.content = this.content;	
-	},
-
-	empty: function() {
-		this.tab.empty();
-	},
-
-	handleContentUpdate: function(data, key)
-	{	
-		if(key === "name") {
-			this.content.bindData(data);
-		}
+		this.content.value = props;
+		this.content.data = data;
 	},
 
 	//
-	tab: null,
-	cb: null
+	content: null,
+	toolbarContent: null
 });
-
-

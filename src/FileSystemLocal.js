@@ -4,15 +4,15 @@ meta.class("Editor.FileSystemLocal",
 {
 	init: function()
 	{
-		this.fs = require("fs");	
+		this.fs = require("fs");
 	},
 
 	read: function(path, cb)
 	{
-		this.fs.readFile(this.rootDir + path, 
-			function(error, data) 
+		this.fs.readFile(this.rootDir + path,
+			function(error, data)
 			{
-				if(error) 
+				if(error)
 				{
 					if(cb) {
 						cb(null);
@@ -33,7 +33,7 @@ meta.class("Editor.FileSystemLocal",
 
 		var fullPath = this.rootDir + path;
 		this.fs.writeFile(fullPath, "",
-			function(error) 
+			function(error)
 			{
 				if(error) {
 					self.handleError("create", error, cb);
@@ -52,7 +52,7 @@ meta.class("Editor.FileSystemLocal",
 
 		var fullPath = this.rootDir + path;
 		this.fs.writeFile(fullPath, content,
-			function(error) 
+			function(error)
 			{
 				if(error) {
 					self.handleError("write", error, cb);
@@ -75,8 +75,8 @@ meta.class("Editor.FileSystemLocal",
 		var binaryData = new Buffer(base64Data, "base64").toString("binary");
 
 		var fullPath = this.rootDir + path;
-		this.fs.writeFile(fullPath, binaryData, "binary", 
-			function(error) 
+		this.fs.writeFile(fullPath, binaryData, "binary",
+			function(error)
 			{
 				if(error) {
 					self.handleError("write64", error, cb);
@@ -86,15 +86,15 @@ meta.class("Editor.FileSystemLocal",
 				if(cb) {
 					cb(path);
 				}
-			});		
+			});
 	},
 
 	remove: function(path, cb)
 	{
 		var self = this;
 
-		this.fs.unlink(this.rootDir + path, 
-			function(error) 
+		this.fs.unlink(this.rootDir + path,
+			function(error)
 			{
 				if(error) {
 					self.handleError("remove", error, cb);
@@ -112,7 +112,7 @@ meta.class("Editor.FileSystemLocal",
 		var self = this;
 
 		this.fs.rename(this.rootDir + path, this.rootDir + targetPath,
-			function(error) 
+			function(error)
 			{
 				if(error) {
 					self.handleError("moveTo", error, cb);
@@ -129,8 +129,8 @@ meta.class("Editor.FileSystemLocal",
 	{
 		var self = this;
 
-		this.fs.exists(this.rootDir + path, 
-			function(error) 
+		this.fs.exists(this.rootDir + path,
+			function(error)
 			{
 				if(error) {
 					self.handleError("checkDir", error, cb);
@@ -139,7 +139,7 @@ meta.class("Editor.FileSystemLocal",
 
 				if(cb) {
 					cb(fullPath);
-				}			
+				}
 			});
 	},
 
@@ -148,7 +148,7 @@ meta.class("Editor.FileSystemLocal",
 		var self = this;
 
 		this.fs.readdir(this.rootDir + path,
-			function(error, files) 
+			function(error, files)
 			{
 				if(error) {
 					self.handleError("readDir", error, cb);
@@ -166,15 +166,15 @@ meta.class("Editor.FileSystemLocal",
 		var self = this;
 
 		var fullPath = this.rootDir + path;
-		this.fs.exists(fullPath, 
-			function(error) 
+		this.fs.exists(fullPath,
+			function(error)
 			{
 				if(error) {
 					self.handleError("createDir", "There is already folder with in: " + fullPath, cb);
 					return;
 				}
-	
-				self.fs.mkdir(fullPath, 
+
+				self.fs.mkdir(fullPath,
 					function(error)
 					{
 						if(error) {
@@ -187,14 +187,14 @@ meta.class("Editor.FileSystemLocal",
 						}
 					});
 			});
-	},	
+	},
 
 	removeDir: function(path, cb)
 	{
 		var self = this;
 
-		this.fs.readdir(this.rootDir + path, 
-			function(error, files) 
+		this.fs.readdir(this.rootDir + path,
+			function(error, files)
 			{
 				if(error) {
 					self.handleError("removeDir", error, cb);
@@ -203,13 +203,13 @@ meta.class("Editor.FileSystemLocal",
 
 				var wait = files.length;
 				var count = 0;
-				var folderDone = function(error) 
+				var folderDone = function(error)
 				{
 					count++;
-					if(count >= wait || error) 
+					if(count >= wait || error)
 					{
-						self.fs.rmdir(self.rootDir + path, 
-							function(error) 
+						self.fs.rmdir(self.rootDir + path,
+							function(error)
 							{
 								if(error) {
 									self.handleError("removeDir", error, cb);
@@ -230,11 +230,11 @@ meta.class("Editor.FileSystemLocal",
 
 				path = path.replace(/\/+$/,"");
 				files.forEach(
-					function(file) 
+					function(file)
 					{
 						var currPath = path + "/" + file;
-						self.fs.lstat(self.rootDir + currPath, 
-							function(error, stats) 
+						self.fs.lstat(self.rootDir + currPath,
+							function(error, stats)
 							{
 								if(error) {
 									self.handleError("removeDir", error, cb);
@@ -243,13 +243,13 @@ meta.class("Editor.FileSystemLocal",
 
 								if(stats.isDirectory()) {
 									self.removeDir(currPath, folderDone);
-								} 
+								}
 								else {
 									self.fs.unlink(self.rootDir + currPath, folderDone);
 								}
 							});
 					});
-		});		
+		});
 	},
 
 	moveToDir: function(path, targetPath, cb)
@@ -257,7 +257,7 @@ meta.class("Editor.FileSystemLocal",
 		var self = this;
 
 		this.fs.rename(this.rootDir + path, this.rootDir + targetPath,
-			function(error) 
+			function(error)
 			{
 				if(error) {
 					self.handleError("moveToDir", error, cb);

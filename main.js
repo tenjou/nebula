@@ -6,14 +6,14 @@ const BrowserWindow = electron.BrowserWindow;
 
 var mainWindow = null;
 
-app.on("window-all-closed", function() 
+app.on("window-all-closed", function()
 {
 	if(process.platform !== "darwin") {
 		app.quit();
 	}
 });
 
-app.on("ready", function() 
+app.on("ready", function()
 {
 	mainWindow = new BrowserWindow({ width: 1500, height: 700, maximizable: true });
 	mainWindow.maximize();
