@@ -506,6 +506,8 @@ var wabi =
 	},
 
 	//
+	data: {},
+
 	elements: {},
 	elementsCached: {},
 	datasets: {},

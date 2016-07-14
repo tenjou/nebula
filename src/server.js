@@ -226,9 +226,7 @@ editor.server =
 	connection: null,
 	open: false,
 	callbacks: {},
-	__callback: null,
-
-	data: new wabi.data()
+	__callback: null
 };
 
 editor.server.init();

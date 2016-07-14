@@ -4,6 +4,9 @@ var editor =
 {
 	prepare: function()
 	{
+		this.data = new wabi.data({});
+		wabi.data = this.data;
+
 		if(window.process && window.process.versions["electron"]) {
 			this.electron = true;
 		}
@@ -21,7 +24,6 @@ var editor =
 		}
 
 		this.server.on("openProject", this.openProject, this);
-		this.data = this.server.data;
 	},
 
 	handleFileSystemReady: function(data, event)
@@ -439,6 +441,7 @@ var editor =
 	version: "0.1",
 	electron: false,
 	
+	data: null,
 	eventBuffer: {},
 
 	fileSystem: null,
