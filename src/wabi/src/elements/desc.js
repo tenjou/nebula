@@ -2,14 +2,14 @@
 
 wabi.element("desc",
 {
-	content: {
+	elements: {
 		content: {
 			type: "content",
-			link: "content"
+			link: "value"
 		},
 		name: {
 			type: "text",
-			link: "value"
+			link: "name"
 		}
 	}
 });

@@ -11,19 +11,13 @@ wabi.element("row",
 		for(var n = 0; n < value.length; n++)
 		{
 			var elementCfg = value[n];
-			if(!elementCfg.type) {
-				console.warn("(wabi.element.container) Undefined element type");
+
+			var element = wabi.createElement(elementCfg.type, this);
+			if(!element) {
 				continue;
 			}
 
-			var elementCls = wabi.element[elementCfg.type];
-			if(!elementCls) {
-				console.warn("(wabi.element.container) Undefined element type: " + elementCfg.type);
-				continue;
-			}
-
-			var element = new elementCls(this);
-			element.cfg = elementCfg;
+			element.state = elementCfg;
 		}	
 	}
 });

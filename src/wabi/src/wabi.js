@@ -506,7 +506,7 @@ var wabi =
 	},
 
 	//
-	data: {},
+	globalData: {},
 
 	elements: {},
 	elementsCached: {},

@@ -57,7 +57,9 @@ editor.plugin("projects",
 			editor.plugins.contextmenu.show("projectItem", event.x, event.y);
 		});
 
-		this.data = editor.server.get("projects", this.handleData, this);
+		editor.offline = true;
+
+		this.data = editor.server.get("private.projects", this.handleData, this, true);
 		this.template.data = this.data;
 
 		this.template.appendTo(editor.overlayElement);

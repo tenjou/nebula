@@ -71,7 +71,28 @@ wabi.data.prototype =
 			value = new wabi.data(value, key, this);
 		}
 
-		this.raw[key] = value;
+		var index = key.indexOf(".");
+		if(index === -1) {
+			this.raw[key] = value;
+		}
+		else
+		{
+			var data = this;
+			var buffer = key.split(".");
+			for(var n = 0; n < buffer.length - 1; n++) 
+			{
+				var id = buffer[n];
+				var currData = data.get(id);
+				if(!currData) {
+					currData = new wabi.data({}, id, data);
+					data[id] = currData;
+				}
+
+				data = currData;
+			}
+
+			data.raw[buffer[n]] = value;
+		}
 
 		if(this.watchers) 
 		{

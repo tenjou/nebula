@@ -24,7 +24,7 @@ wabi.element("content",
 					var state = value[n];
 					if(typeof(state) === "string") 
 					{
-						var template = wabi.getTemplate(state);
+						var template = wabi.getFragment(state);
 						this.$loadValue(template);
 					}
 					else {
@@ -38,7 +38,7 @@ wabi.element("content",
 		}
 		else 
 		{
-			var template = wabi.getTemplate(value);
+			var template = wabi.getFragment(value);
 			this.$loadValue(template);
 		}		
 	},

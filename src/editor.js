@@ -4,8 +4,13 @@ var editor =
 {
 	prepare: function()
 	{
-		this.data = new wabi.data({});
-		wabi.data = this.data;
+		this.data = new wabi.data({
+			public: {},
+			private: {}
+		});
+		this.dataPublic = this.data.get("public");
+		this.dataPrivate = this.data.get("private");
+		wabi.globalData = this.dataPublic;
 
 		if(window.process && window.process.versions["electron"]) {
 			this.electron = true;
@@ -76,7 +81,7 @@ var editor =
 		this.overlayElement = wabi.createElement("wrapped", document.body, "overlay");
 
 		this.info = wabi.createElement("text", this.overlayElement);
-		this.info.state = "Initializing";
+		this.info.value = "Initializing";
 	},	
 
 	createPlugins: function()
@@ -170,7 +175,7 @@ var editor =
 
 		this.datasets.projects = new wabi.data({ projects: buffer });
 
-		this.info.state.enable = false;
+		this.info.enable = false;
 		this.plugins.login.show();
 	},		
 
@@ -188,8 +193,8 @@ var editor =
 		this.loadPlugin("inspect");
 		this.loadPlugin("meta2d");
 
-		this.info.state.value = "Loading project";
-		this.info.state.enable = true;
+		this.info.value = "Loading project";
+		this.info.enable = true;
 
 		this.server.emit({
 			type: "openProject",
@@ -439,9 +444,13 @@ var editor =
 	//
 	db: null,
 	version: "0.1",
+	offline: false,
 	electron: false,
 	
 	data: null,
+	dataPublic: null,
+	dataPrivate: null,
+
 	eventBuffer: {},
 
 	fileSystem: null,

@@ -3,6 +3,6 @@
 wabi.element("loader", 
 {
 	setup: function() {
-		this.state.hidden = true;
+		this.hidden = true;
 	}
 });

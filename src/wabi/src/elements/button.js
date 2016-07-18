@@ -12,5 +12,6 @@ wabi.element("button",
 		}
 	},
 
+	//
 	width: 0
 });

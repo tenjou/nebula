@@ -4,112 +4,11 @@ editor.plugin("login",
 {
 	create: function()
 	{
-		wabi.addTemplate("loginScreen", {
-			type: "panel",
-			header: "Login",
-			width: 300
-		});
-
-		wabi.addFragment("loginScreen.error", {
-			type: "error",
-			bind: "error",
-			types: {
-				AccountExist: "There is already an account registered with that name.",
-				RequiredFields: "All fields must be filled.",
-				NoServer: "Could not connect to server.",
-				Wrong: "Wrong username or password."
-			}
-		});
-
-		wabi.addFragment("loginScreen.login", [
-			{
-				type: "input",
-				bind: "username",
-				inputType: "name",
-				placeholder: "Username"
-			},
-			{
-				type: "input",
-				bind: "password",
-				inputType: "password",
-				placeholder: "Password"
-			},
-			{
-				type: "content",
-				value: [
-					{
-						type: "desc",
-						value: "Remember Me",
-						content: [
-							{
-								type: "checkbox",
-								bind: "remember"
-							}
-						]
-					}						
-				],
-				padding: 2
-			},
-			"loginScreen.error",		
-			{
-				type: "row",
-				value: [
-					{
-						id: "register",
-						type: "button",
-						value: "Register"
-					},
-					{
-						id: "login",
-						type: "button",
-						value: "Login"
-					}
-				]
-			},
-			{
-				id: "loader",
-				type: "loader"
-			}			
-		]);
-
-		wabi.addFragment("loginScreen.register", [
-			{
-				type: "input",
-				bind: "username",
-				inputType: "name",
-				placeholder: "Username"
-			},
-			{
-				type: "input",
-				bind: "password",
-				inputType: "password",
-				placeholder: "Password"
-			},
-			"loginScreen.error",
-			{
-				type: "row",
-				value: [
-					{
-						id: "back",
-						type: "button",
-						value: "Back"
-					},				
-					{
-						id: "register",
-						type: "button",
-						value: "Register"
-					}
-				]
-			},
-			{
-				id: "loader",
-				type: "loader"
-			}			
-		]);
+		this.registerTemplates();
 
 		// Load user data:
+		var userData;
 		var localUserData = localStorage.getItem("user");
-		var userData = null;
 		if(localUserData) {
 			userData = JSON.parse(localUserData);
 		}
@@ -121,10 +20,10 @@ editor.plugin("login",
 			};
 		}
 
-		this.userData = new wabi.data(userData, "user");
+		editor.dataPrivate.set("user", userData);
+		this.userData = editor.dataPrivate.get("user");
 		this.userData.watch(this.onDataChange, this);
-		
-		this.registerData = new wabi.data("user");		
+		this.registerData = new wabi.data({});
 	},
 
 	onDataChange: function(action, key, value, index, data)
@@ -141,7 +40,6 @@ editor.plugin("login",
 		editor.server.on("login", this.onServer_login, this);
 
 		this.loginScreen = wabi.createTemplate("loginScreen");
-		this.loginScreen.data = this.userData;
 		this.loginScreen.appendTo(editor.overlayElement);
 		this.showLogin(true);
 	},
@@ -268,14 +166,126 @@ editor.plugin("login",
 	{
 		if(!editor.server.open)
 		{
-			editor.server.connect(
+			editor.server.websocket.connect(
 				function() {
-					editor.server.emit(data);	
+					editor.server.websocket.emit(data);	
 				});
 		}
 		else {
-			editor.server.emit(data);	
+			editor.server.websocket.emit(data);	
 		}		
+	},
+
+	registerTemplates: function()
+	{
+		wabi.addTemplate("loginScreen", {
+			id: "loginScreen",
+			type: "panel",
+			header: "Login",
+			width: 300
+		});
+
+		wabi.addFragment("loginScreen.error", {
+			type: "error",
+			bind: "error",
+			types: {
+				AccountExist: "There is already an account registered with that name.",
+				RequiredFields: "All fields must be filled.",
+				NoServer: "Could not connect to server.",
+				Wrong: "Wrong username or password."
+			}
+		});
+
+		wabi.addFragment("loginScreen.login", [
+			{
+				type: "input",
+				bind: "username",
+				inputType: "name",
+				placeholder: "Username"
+			},
+			{
+				type: "input",
+				bind: "password",
+				inputType: "password",
+				placeholder: "Password"
+			},
+			{
+				type: "content",
+				value: [
+					{
+						type: "desc",
+						name: "Remember Me",
+						value: [
+							{
+								type: "checkbox",
+								bind: "remember"
+							}
+						]
+					}						
+				],
+				padding: 2
+			},
+			"loginScreen.error",		
+			{
+				type: "row",
+				value: [
+					{
+						type: "button",
+						value: "Guest"
+					},					
+					{
+						id: "register",
+						type: "button",
+						value: "Register"
+					},
+					{
+						id: "login",
+						type: "button",
+						value: "Login"
+					},
+
+				]
+			},
+			{
+				id: "loader",
+				type: "loader"
+			}			
+		]);
+
+		wabi.addFragment("loginScreen.register", [
+			{
+				type: "input",
+				bind: "username",
+				inputType: "name",
+				placeholder: "Username"
+			},
+			{
+				type: "input",
+				bind: "password",
+				inputType: "password",
+				placeholder: "Password"
+			},
+			"loginScreen.error",
+			{
+				type: "row",
+				value: [
+					{
+						id: "back",
+						type: "button",
+						value: "Back"
+					},				
+					{
+						id: "register",
+						type: "button",
+						value: "Register"
+					}
+				]
+			},
+			{
+				id: "loader",
+				type: "loader"
+			}			
+		]);
 	},
 
 	//
