@@ -170,13 +170,13 @@ var editor =
 	{
 		this.onSplashEnd();
 
+		this.info.value = "Loading project";
+		this.info.enable = true;
+
 		this.loadPlugin("layout");
 		this.loadPlugin("browser");
 		this.loadPlugin("inspect");
 		this.loadPlugin("meta2d");
-
-		this.info.value = "Loading project";
-		this.info.enable = true;
 
 		this.server.emit({
 			type: "openProject",

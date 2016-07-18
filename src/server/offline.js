@@ -27,9 +27,19 @@ editor.server.offline =
 
 	emit: function(data)
 	{
-		var editorData = editor.data.get(data.id);
-		if(data.id.indexOf("private.projects") > -1) {
-			this.processProjects(editorData, data);
+		switch(data.type)
+		{
+			case "data":
+			{
+				var editorData = editor.data.get(data.id);
+				if(data.id.indexOf("private.projects") > -1) {
+					this.processProjects(editorData, data);
+				}
+			} break;
+
+			case "openProject":
+				this.openProject(data);
+				break;
 		}
 	},
 
@@ -74,6 +84,7 @@ editor.server.offline =
 		var data = {};
 		var output = {
 			id: "private.projects",
+			type: "data",
 			action: "set",
 			value: data
 		};
@@ -100,8 +111,9 @@ editor.server.offline =
 
 		editor.fs.write("db.json", JSON.stringify(this.db));
 
-		editor.fs.createDir(projectId, function() {
-			editor.fs.write(projectPath + "/db.json", JSON.stringify("{}"));
+		editor.fs.createDir(projectPath, function(dir) {
+			console.log(dir)
+			editor.fs.write(projectPath + "/db.json", JSON.stringify({}), function(path) { console.log("created", path); });
 		});
 		
 		editorData.performAddKey(projectId, projectData);
@@ -119,6 +131,46 @@ editor.server.offline =
 		editor.fs.write("db.json", JSON.stringify(this.db));
 
 		editorData.performSetKey("value", data.value);
+	},
+
+	removeProject: function()
+	{
+		console.log("todo");
+	},
+
+	openProject: function(data)
+	{
+		var projectId = data.value.id;
+		var project = this.db.projects[projectId];
+		if(!project) {
+			console.warn("(editor.server.offline.openProject) Project does not exist: " + projectId);
+			return;
+		}
+
+		var projectPath = "projects/" + projectId;
+		editor.fs.checkDir(projectPath, function(path) 
+		{
+			if(!path) {
+				console.warn("(editor.server.offline.openProject) Project directory does not exist: " + projectPath);
+				return;
+			}
+
+			editor.fs.read(projectPath + "/db.json", function(content) 
+			{
+				if(!content) 
+				{
+					project.db = {};
+					editor.fs.write(projectPath + "/db.json", JSON.parse(project.db), function() {
+						editor.openProject(project.db);
+					});
+				}
+				else
+				{
+					project.db = JSON.parse(content);
+					editor.openProject(project.db);
+				}
+			});
+		});		
 	},
 
 	removeProjects: function()

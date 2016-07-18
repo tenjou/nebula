@@ -59,7 +59,7 @@ editor.plugin("projects",
 
 		editor.offline = true;
 
-		this.data = editor.server.get("private.projects", this.handleData, this, true);
+		this.data = editor.server.get("private.projects", this.handleData, this);
 		this.template.data = this.data;
 
 		this.template.appendTo(editor.overlayElement);
@@ -79,8 +79,12 @@ editor.plugin("projects",
 		editor.loadProject(data);
 	},
 
-	deleteProject: function(event) {
-		this.template.get("#projects-list").select.remove();
+	deleteProject: function(event) 
+	{
+		var selectedItem = this.template.get("#projects-list").select;
+		if(!selectedItem) { return; }
+		
+		selectedItem.remove();
 	},
 
 	handleData: function(action, key, value, data)

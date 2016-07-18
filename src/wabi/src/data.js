@@ -7,7 +7,13 @@ if(!window.wabi) {
 wabi.data = function(raw, id, parent) 
 {
 	this.raw = raw ? raw : {};
-	this.id = id ? id : "";
+
+	if(id !== undefined) {
+		this.id = id;
+	}
+	else {
+		this.id = "";
+	}
 
 	if(parent) {
 		this.parent = parent;
