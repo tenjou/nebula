@@ -67,21 +67,24 @@ wabi.data.prototype =
 
 	performSetKey: function(key, value) 
 	{
-		if(value instanceof Object && !(value instanceof wabi.data)) {
-			value = new wabi.data(value, key, this);
-		}
-
 		var index = key.indexOf(".");
-		if(index === -1) {
+		if(index === -1) 
+		{
+			if(value instanceof Object && !(value instanceof wabi.data)) {
+				value = new wabi.data(value, key, this);
+			}
+
 			this.raw[key] = value;
 		}
 		else
 		{
+			var id;
 			var data = this;
 			var buffer = key.split(".");
 			for(var n = 0; n < buffer.length - 1; n++) 
 			{
-				var id = buffer[n];
+				id = buffer[n];
+
 				var currData = data.get(id);
 				if(!currData) {
 					currData = new wabi.data({}, id, data);
@@ -91,7 +94,13 @@ wabi.data.prototype =
 				data = currData;
 			}
 
-			data.raw[buffer[n]] = value;
+			id = buffer[n];
+
+			if(value instanceof Object && !(value instanceof wabi.data)) {
+				value = new wabi.data(value, id, data);
+			}
+
+			data.raw[id] = value;
 		}
 
 		if(this.watchers) 
@@ -102,6 +111,8 @@ wabi.data.prototype =
 				info.func.call(info.owner, "set", key, value, 0, this);
 			}
 		}
+
+		return value;
 	},
 
 	setKeys: function(value)
@@ -172,7 +183,8 @@ wabi.data.prototype =
 
 			this.raw.push(value);
 		}
-		else {
+		else 
+		{
 			console.warn("(wabi.data.performAdd) Can peform add only to Array");
 			return;
 		}
@@ -189,15 +201,19 @@ wabi.data.prototype =
 
 	performAddKey: function(key, value)
 	{
-		var buffer = this.raw[key];
-		if(buffer === void(0)) { return; }
+		if(this.raw instanceof Object) 
+		{
+			if(value instanceof Object && !(value instanceof wabi.data)) {
+				value = new wabi.data(value, key, this);
+			}
 
-		if(buffer instanceof Array) {
-			buffer.push(value);
+			this.raw[key] = value;
 		}
-		else if(buffer instanceof Object) {
-			buffer[key] = value;
-		}
+		else 
+		{
+			console.warn("(wabi.data.performAddKey) Can peform add only to Object");
+			return;
+		}		
 
 		if(this.watchers) 
 		{

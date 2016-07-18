@@ -21,7 +21,6 @@ editor.server.websocket =
 	handleOpen: function()
 	{
 		this.open = true;
-		wabi.dataProxy = this.emit.bind(this);
 
 		if(this.$callback) {
 			this.$callback();
@@ -74,38 +73,6 @@ editor.server.websocket =
 		console.log("sent:", data);
 
 		this.connection.send(JSON.stringify(data));
-	},
-
-	get: function(id, func, owner, privateData)
-	{
-		privateData = privateData || false;
-
-		var data = editor.data.get(id);
-		if(!data)
-		{
-			data = new wabi.data(null, id);
-			if(func) {
-				data.watch(func, owner);
-			}
-
-			data.sync();
-
-			editor.data.performSetKey(id, data);
-
-			this.emit({
-				id: id,
-				type: "data",
-				action: "get"
-			});
-		}
-		else
-		{
-			if(func) {
-				data.watch(func, owner);
-			}
-		}
-
-		return data;
 	},
 
 	//

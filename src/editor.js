@@ -27,12 +27,18 @@ var editor =
 		this.fs.init();
 	},
 
-	handleFsReady: function(data, event)
+	handleFsReady: function()
+	{
+		this.server.init();
+	},
+
+	handleServerReady: function() 
 	{
 		this.prepareUI();
 		this.createPlugins();
 
-		this.loadProjectInfo();
+		this.info.enable = false;
+		this.plugins.login.show();
 	},
 
 	onSplashStart: function()
@@ -149,34 +155,14 @@ var editor =
 		for(var key in this.plugins) {
 			this.plugins[key].start();
 		}
-	},
+	},	
 
-	loadProjectInfo: function()
+	login: function() 
 	{
-		if(this.electron) {
-			this.handleLoadedProjectInfo({});
-		}
-		else {
-			editor.fileSystem.readDir("", this.handleLoadedProjectInfo.bind(this));
-		}
-	},
-
-	handleLoadedProjectInfo: function(dirs)
-	{
-		var num = dirs.length;
-		var buffer = new Array(num);
-		for(var n = 0; n < num; n++) {
-			buffer[n] = dirs[n].name;
-		}
-
-		this.datasets.projects = new wabi.data({ projects: buffer });
-
 		this.info.enable = false;
-		this.plugins.login.show();
-	},		
-
-	login: function() {
 		this.plugins.login.hide();
+		this.server.load();
+
 		this.onSplashStart();
 	},
 
@@ -237,58 +223,6 @@ var editor =
 		document.title = serverData.value.value + " - " + this.config.titlePrefix;
 
 		this.onStart();
-	},
-
-	createProject: function(name)
-	{
-		//var name = this.getUniqueProjectName(name);
-
-		editor.datasets.projects.add("projects", name);	
-	},	
-
-	_handleReadDb: function(data)
-	{
-		if(!data) {
-			this.fileSystem.create("db.json", this._handleCreateDb.bind(this));
-		}
-		else {
-			this._handleLoadDb(data);
-		}
-	},	
-
-	_handleCreateDb: function()
-	{
-		this.db = {
-			name: this.projectName,
-			version: this.version,
-			mode: "editor",
-			plugins: {}
-		};
-
-		this.installPlugins();
-
-		this.needSave = false;
-		this.fileSystem.write("db.json", JSON.stringify(this.db), this._handleLoadDb.bind(this));
-	},	
-
-	_handleLoadDb: function(json)
-	{
-		this.db = JSON.parse(json);
-		this.projectName = this.db.name;
-
-		this.info.enable = false;
-
-		//this.top = new Element.Top(this.wrapper);
-		this.inner = new Element.Inner(this.wrapper);
-		//this.bottom = new Element.Bottom(this.wrapper);
-
-		this.installPlugins();
-		this.loadPlugins();
-		this.startPlugins();
-
-		if(this.needSave) {
-			this.saveCfg();
-		}
 	},
 
 	saveCfg: function() 

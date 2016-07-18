@@ -2,6 +2,17 @@
 
 editor.server =
 {
+	init: function() 
+	{
+		this.offline.init();
+		this.websocket.init();
+	},
+
+	load: function()
+	{
+		wabi.dataProxy = this.emit.bind(this);
+	},
+
 	on: function(type, func, owner)
 	{
 		var watcher = new wabi.Watcher(owner, func);
@@ -49,14 +60,22 @@ editor.server =
 		}
 	},
 
-	get: function(id, func, owner, privateData)
+	get: function(id, func, owner)
 	{
-		if(editor.offline) {
-			return this.offline.get(id, func, owner, privateData);
+		var data = editor.data.performSetKey(id, {});
+		data.sync();
+
+		if(func) {
+			data.watch(func, owner);
 		}
-		else {
-			return this.websocket.get(id, func, owner, privateData);
-		}
+
+		this.emit({
+			id: id,
+			type: "data",
+			action: "get"
+		});
+
+		return data;
 	},
 
 	handleServerData: function(serverData)
@@ -111,7 +130,7 @@ editor.server =
 
 	//
 	callbacks: {},
-	
+
 	offline: null,
 	websocket: null
 };

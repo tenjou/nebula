@@ -38,7 +38,6 @@ editor.fileSystem =
 			},
 			function(fileEntry)
 			{
-				self.handleCreateDone(fileEntry);
 				if(cb) {
 					cb();
 				}
@@ -47,8 +46,6 @@ editor.fileSystem =
 				self.handleError(fileError, cb, "create", filename);
 			});
 	},
-
-	handleCreateDone: function(fileEntry) {},
 
 	read: function(filename, cb)
 	{
@@ -85,20 +82,20 @@ editor.fileSystem =
 			});
 	},
 
-	write: function(filename, contents, cb)
+	write: function(filename, content, cb)
 	{
 		var self = this;
 
 		this.fs.getFile(this.rootDir + filename, { create: true },
 			function(fileEntry) {
-				self.handleWriteDone(fileEntry, contents, cb);
+				self.writeContent(fileEntry, content, cb);
 			},
 			function(fileError) {
 				self.handleError(fileError, cb, "write", filename);
 			});
 	},
 
-	handleWriteDone: function(fileEntry, contents, cb)
+	writeContent: function(fileEntry, content, cb)
 	{
 		var self = this;
 
@@ -110,11 +107,11 @@ editor.fileSystem =
 					fileWritter.onwriteend = function()
 					{
 						if(cb) {
-							cb(contents);
+							cb(content);
 						}
 					}
 
-					var blob = new Blob([ contents ], { type: "text/plain" });
+					var blob = new Blob([ content ], { type: "text/plain" });
 					fileWritter.write(blob);
 				};
 

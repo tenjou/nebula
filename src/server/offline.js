@@ -2,47 +2,35 @@
 
 editor.server.offline =
 {
+	init: function()
+	{
+		editor.fs.read("db.json", function(result) 
+		{
+			if(!result) 
+			{
+				editor.server.offline.db = {
+					projects: [],
+					lastProjectId: 0
+				};
+
+				editor.fs.write("db.json", JSON.stringify(editor.server.offline.db), function() {
+					editor.handleServerReady();
+				});
+			}
+			else 
+			{
+				editor.server.offline.db = JSON.parse(result);
+				editor.handleServerReady();
+			}
+		});		
+	},
+
 	emit: function(data)
 	{
 		var editorData = editor.data.get(data.id);
-		if(editorData.id === "projects") {
+		if(data.id.indexOf("private.projects") > -1) {
 			this.processProjects(editorData, data);
 		}
-	},
-
-	get: function(id, func, owner, privateData)
-	{
-		privateData = privateData || false;
-
-		var data = editor.data.get(id);
-		if(!data)
-		{
-			var index = id.lastIndexOf(".");
-			var idLastPart = id.slice(index + 1);
-
-			data = new wabi.data(null, idLastPart);
-			if(func) {
-				data.watch(func, owner);
-			}
-
-			data.sync();
-
-			editor.data.performSetKey(id, data);
-
-			this.emit({
-				id: id,
-				type: "data",
-				action: "get"
-			});
-		}
-		else
-		{
-			if(func) {
-				data.watch(func, owner);
-			}
-		}
-
-		return data;
 	},
 
 	processProjects: function(editorData, data)
@@ -50,14 +38,98 @@ editor.server.offline =
 		switch(data.action)
 		{
 			case "get":
-			{
 				this.readProjects();
-			} break;
+				break;
+
+			case "add": 
+				this.createProject(editorData, data);
+				break;
+
+			case "set":
+				this.renameProject(editorData, data);
+				break;
 		}
 	},
 
 	readProjects: function()
 	{
+		var self = this;
+
+		editor.fs.checkDir("projects", function(dirExists) 
+		{
+			if(!dirExists) 
+			{
+				editor.fs.createDir("projects", function() {
+					self.processDirs(self.db.projects);
+				});
+			}
+			else {
+				self.processDirs(self.db.projects);
+			}
+		});
+	},
+
+	processDirs: function(dirs)
+	{
+		var data = {};
+		var output = {
+			id: "private.projects",
+			action: "set",
+			value: data
+		};
+
+		for(var key in dirs)
+		{
+			var dir = dirs[key];
+			data[key] = {
+				value: dir.value
+			};
+		}
+
+		editor.server.handleServerData(output);
+	},
+
+	createProject: function(editorData, data)
+	{
+		var projectData = {
+			value: "Untitled"
+		};
+		var projectId = this.db.lastProjectId++;
+		var projectPath = "projects/" + projectId;
+		this.db.projects[projectId] = projectData;
+
+		editor.fs.write("db.json", JSON.stringify(this.db));
+
+		editor.fs.createDir(projectId, function() {
+			editor.fs.write(projectPath + "/db.json", JSON.stringify("{}"));
+		});
 		
-	}
+		editorData.performAddKey(projectId, projectData);
+	},
+
+	renameProject: function(editorData, data)
+	{
+		var project = this.db.projects[editorData.id];
+		if(!project) {
+			console.warn("(editor.server.offline.renameProject) Project does not exist: " + editorData.id);
+			return;
+		}
+
+		project.value = data.value;
+		editor.fs.write("db.json", JSON.stringify(this.db));
+
+		editorData.performSetKey("value", data.value);
+	},
+
+	removeProjects: function()
+	{
+		editor.fs.remove("db.json");
+
+		editor.fs.removeDir("projects", function(dir) {
+			console.log("Offline projects removed");
+		});
+	},
+
+	//
+	db: null
 };

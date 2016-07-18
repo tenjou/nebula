@@ -432,11 +432,13 @@ wabi.element("basic",
 		if(enable) 
 		{
 			if(this.$flags & this.Flag.ENABLED) { return; }
+			this.$flags |= this.Flag.ENABLED;
 			this.$parent.$domElement.appendChild(this.$domElement);
 		}
 		else 
 		{
 			if((this.$flags & this.Flag.ENABLED) === 0) { return; }
+			this.$flags &= ~this.Flag.ENABLED;
 			this.$parent.$domElement.removeChild(this.$domElement);
 		}
 	},
@@ -856,5 +858,4 @@ wabi.element("basic",
 	value: null
 });
 
-wabi.elements.basic.prototype.$flags |= wabi.elements.basic.prototype.Flag.ENABLED;
 Element.prototype.holder = null;
