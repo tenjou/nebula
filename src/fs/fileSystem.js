@@ -1,11 +1,9 @@
 "use strict";
 
-meta.class("Editor.FileSystem",
+editor.fileSystem =
 {
 	init: function()
 	{
-		this.onReady = meta.createChannel("fileSystem_onReady");
-
 		var self = this;
 
 		navigator.webkitPersistentStorage.requestQuota(64 * 1024 * 1024,
@@ -28,7 +26,7 @@ meta.class("Editor.FileSystem",
 	{
 		this.fs = fs.root;
 		this.ready = true;
-		this.onReady.emit(this, true);
+		editor.handleFsReady();
 	},
 
 	create: function(filename, cb)
@@ -357,10 +355,10 @@ meta.class("Editor.FileSystem",
 		if(type === "read" && fileError.name !== "NotFoundError")
 		{
 			if(filename) {
-				console.error("(FileSystem::" + type + ")", "[" + filename + "]", fileError.name);
+				console.error("(editor.fileSystem) [" + type + "]", "[" + filename + "]", fileError.name);
 			}
 			else {
-				console.error("(FileSystem::" + type + ")", fileError.name);
+				console.error("(editor.fileSystem) [" + type + "]", fileError.name);
 			}
 		}
 
@@ -370,11 +368,9 @@ meta.class("Editor.FileSystem",
 	},
 
 	//
-	ready: false,
-
 	fs: null,
-	onReady: null,
 
 	rootDir: "",
-	fullPath: ""
-});
+	fullPath: "",
+	ready: false
+};

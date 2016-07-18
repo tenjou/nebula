@@ -15,23 +15,19 @@ var editor =
 		if(window.process && window.process.versions["electron"]) {
 			this.electron = true;
 		}
-		
-		this.resourceMgr = new Editor.ResourceManager();
-		this.resources = this.resourceMgr;
-
-		if(this.electron) {
-			this.fileSystem = new Editor.FileSystemLocal();
-			this.handleFileSystemReady();
-		}
-		else {
-			this.fileSystem = new Editor.FileSystem();
-			this.fileSystem.onReady.add(this.handleFileSystemReady, this);
-		}
 
 		this.server.on("openProject", this.openProject, this);
+
+		if(this.electron) {
+			this.fs = editor.fileSystemLocal;
+		}
+		else {
+			this.fs = editor.fileSystem;
+		}
+		this.fs.init();
 	},
 
-	handleFileSystemReady: function(data, event)
+	handleFsReady: function(data, event)
 	{
 		this.prepareUI();
 		this.createPlugins();

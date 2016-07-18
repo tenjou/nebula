@@ -1,10 +1,10 @@
 "use strict";
 
-meta.class("Editor.FileSystemLocal",
+editor.fileSystemLocal = 
 {
-	init: function()
-	{
+	init: function() {
 		this.fs = require("fs");
+		editor.handleFsReady();
 	},
 
 	read: function(path, cb)
@@ -272,7 +272,7 @@ meta.class("Editor.FileSystemLocal",
 
 	handleError: function(type, error, cb)
 	{
-		console.error("(Editor.FileSystemLocal." + type + ")", error);
+		console.error("(editor.fileSystemLocal." + type + ")", error);
 		if(cb) {
 			cb("");
 		}
@@ -281,4 +281,4 @@ meta.class("Editor.FileSystemLocal",
 	//
 	rootDir: "",
 	fullPath: ""
-});
+};
