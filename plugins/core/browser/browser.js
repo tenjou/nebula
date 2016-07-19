@@ -80,6 +80,15 @@ editor.plugin("browser",
 		]);
 	},
 
+	install: function()
+	{
+		editor.dataPublic.setKeys({
+			hierarchy: {},
+			resources: {},
+			defs: {}
+		});
+	},
+
 	onStart: function()
 	{
 		this.loadData();
@@ -133,9 +142,9 @@ editor.plugin("browser",
 
 	loadData: function()
 	{
-		this.hierarchy = editor.data.get("hierarchy");
-		this.resources = editor.data.get("resources");
-		this.defs = editor.data.get("defs");
+		this.hierarchy = editor.dataPublic.get("hierarchy");
+		this.resources = editor.dataPublic.get("resources");
+		this.defs = editor.dataPublic.get("defs");
 
 		this.updateIcons(this.hierarchy.raw);
 		//this.updateType(this.data.get("resources"));

@@ -17,6 +17,7 @@ var editor =
 		}
 
 		this.server.on("openProject", this.openProject, this);
+		this.server.on("installPlugins", this.onInstallPlugins, this);
 
 		if(this.electron) {
 			this.fs = editor.fileSystemLocal;
@@ -65,6 +66,52 @@ var editor =
 		}
 	},	
 
+	installPlugins: function()
+	{
+		this.info.value = "Installing plugins";
+
+		var plugins = this.dataPublic.get("plugins");
+		var pluginData = {};
+		var added = false;
+
+		for(var key in this.plugins) 
+		{
+			var plugin = this.plugins[key];
+
+			var pluginCfg = plugins.getItem(key);
+			if(!pluginCfg) {
+				pluginData[key] = {};
+				added = true;
+			}
+		}
+
+		if(!added) {
+			this.onStart();
+			return;
+		}
+
+		editor.server.emit({
+			type: "installPlugins",
+			data: pluginData
+		});
+	},
+
+	onInstallPlugins: function(serverData)
+	{
+		var data = serverData.data;
+		for(var key in data) 
+		{
+			this.dataPublic.performSetKey(key, data[key]);
+
+			var plugin = this.plugins[key];
+			if(plugin.install) {
+				plugin.install();
+			}
+		}
+
+		this.onStart();
+	},
+
 	onStart: function()
 	{
 		var plugin;
@@ -75,7 +122,9 @@ var editor =
 				plugin.onStart();
 			}
 		}
-	},	
+
+		this.info.enable = false;
+	},
 
 	prepareUI: function()
 	{
@@ -216,13 +265,11 @@ var editor =
 		this.server.applyData(serverData.data);
 
 		this.project = serverData.value;
-		this.projectPath = this.config.httpUrl + "/" + this.project.name + "/";
+		this.projectPath = serverData.path;
 
-		this.info.state.enable = false;
+		document.title = serverData.value + " - " + this.config.titlePrefix;
 
-		document.title = serverData.value.value + " - " + this.config.titlePrefix;
-
-		this.onStart();
+		this.installPlugins();
 	},
 
 	saveCfg: function() 
@@ -372,8 +419,6 @@ var editor =
 	},	
 
 	//
-	db: null,
-	version: "0.1",
 	offline: false,
 	electron: false,
 	

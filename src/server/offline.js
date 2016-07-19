@@ -35,10 +35,17 @@ editor.server.offline =
 				if(data.id.indexOf("private.projects") > -1) {
 					this.processProjects(editorData, data);
 				}
+				else {
+					editor.server.handleServerData(data);
+				}
 			} break;
 
 			case "openProject":
 				this.openProject(data);
+				break;
+
+			case "installPlugins":
+				this.installPlugins(data);
 				break;
 		}
 	},
@@ -103,8 +110,12 @@ editor.server.offline =
 	createProject: function(editorData, data)
 	{
 		var projectData = {
-			value: "Untitled"
+			value: "Untitled",
+			data: {
+				plugins: {}
+			}
 		};
+
 		var projectId = this.db.lastProjectId++;
 		var projectPath = "projects/" + projectId;
 		this.db.projects[projectId] = projectData;
@@ -112,8 +123,7 @@ editor.server.offline =
 		editor.fs.write("db.json", JSON.stringify(this.db));
 
 		editor.fs.createDir(projectPath, function(dir) {
-			console.log(dir)
-			editor.fs.write(projectPath + "/db.json", JSON.stringify({}), function(path) { console.log("created", path); });
+			editor.fs.write(projectPath + "/db.json", JSON.stringify(projectData.data), function(path) { console.log("created", path); });
 		});
 		
 		editorData.performAddKey(projectId, projectData);
@@ -148,6 +158,8 @@ editor.server.offline =
 		}
 
 		var projectPath = "projects/" + projectId;
+		project.path = projectPath;
+
 		editor.fs.checkDir(projectPath, function(path) 
 		{
 			if(!path) {
@@ -157,9 +169,15 @@ editor.server.offline =
 
 			editor.fs.read(projectPath + "/db.json", function(content) 
 			{
+				editor.server.offline.project = project;
+
 				if(!content) 
 				{
-					project.db = {};
+					project.db = {
+						version: editor.version,
+						plugins: {}
+					};
+
 					editor.fs.write(projectPath + "/db.json", JSON.parse(project.db), function() {
 						editor.openProject(project.db);
 					});
@@ -167,7 +185,11 @@ editor.server.offline =
 				else
 				{
 					project.db = JSON.parse(content);
-					editor.openProject(project.db);
+					editor.openProject({
+						value: project.value,
+						data: project.db,
+						path: "filesystem:" + editor.config.httpUrl + "/persistent/" + projectPath + "/"
+					});
 				}
 			});
 		});		
@@ -182,6 +204,15 @@ editor.server.offline =
 		});
 	},
 
+	installPlugins: function(data)
+	{
+		Object.assign(this.project.data.plugins, data.data);
+		editor.fs.write(this.project.path + "/db.json", JSON.stringify(this.project.data), function() {
+			editor.onInstallPlugins(data);
+		});
+	},
+
 	//
+	project: null,
 	db: null
 };

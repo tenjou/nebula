@@ -368,6 +368,5 @@ editor.fileSystem =
 	fs: null,
 
 	rootDir: "",
-	fullPath: "",
 	ready: false
 };

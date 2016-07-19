@@ -121,10 +121,10 @@ editor.server =
 
 	applyData: function(data)
 	{
-		var data = editor.data;
+		var editorData = editor.dataPublic;
 
 		for(var key in data) {
-			data.performSetKey(key, data[key]);
+			editorData.performSetKey(key, data[key]);
 		}
 	},
 

@@ -11,11 +11,6 @@ editor.plugin.basic.prototype =
 {
 	create: null,
 
-	install: function()
-	{
-
-	},
-
 	onSplashStart: null,
 
 	onSplashEnd: null
