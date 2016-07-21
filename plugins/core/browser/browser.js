@@ -145,15 +145,6 @@ editor.plugin("browser",
 		this.hierarchy = editor.dataPublic.get("hierarchy");
 		this.resources = editor.dataPublic.get("resources");
 		this.defs = editor.dataPublic.get("defs");
-
-		this.updateIcons(this.hierarchy.raw);
-		//this.updateType(this.data.get("resources"));
-		this.updateIcons(this.resources.raw);
-		this.updateIcons(this.defs.raw);
-
-		wabi.addDataset("hierarchy", this.hierarchy);
-		wabi.addDataset("resources", this.resources);
-		wabi.addDataset("defs", this.defs);
 	},
 
 	updateIcons: function(buffer)
@@ -271,52 +262,15 @@ editor.plugin("browser",
 
 	handleFileOnLoad: function(file, fileResult)
 	{
+		var self = this;
+
 		editor.writeFile(file, fileResult, function(hash, filename, ext) {
-			editor.dataPublic.get("resources").add(hash, {
+			self.resources.add(hash, {
 				value: filename,
-				tag: ext
+				ext: ext,
+				type: editor.plugins.resources.getTypeFromExt(ext)
 			});
-
-			console.log(hash, filename, ext);
 		});
-
-		
-
-		// meta.ajax({
-		// 	url: "/upload",
-		// 	type: "POST",
-
-		// })
-		// var fullPath = editor.fileSystem.fullPath + idName + "." + ext;
-
-		// var currList = this.currList;
-		// var info = {
-		// 	name: idName,
-		// 	id: idName,
-		// 	_ext: ext,
-		// 	_type: editor.resourceMgr.getTypeFromExt(ext),
-		// 	_lastModified: file.lastModified
-		// };
-
-		// // TODO: Correct name should be known before writting.
-		// this.makeNameUnique(info);
-
-		// var self = this;
-		// var filePath = info.name + "." + ext;
-
-		// if(editor.electron)
-		// {
-		// 	editor.fileSystem.writeBase64(filePath, fileResult.target.result, function(path) {
-		// 		self._handleOnFileLoad(path, currList, info);
-		// 	});
-		// }
-		// else
-		// {
-		// 	var blob = dataURItoBlob(fileResult.target.result, file.type);
-		// 	editor.fileSystem.writeBlob(filePath, blob, function(path) {
-		// 		self._handleOnFileLoad(path, currList, info);
-		// 	});
-		// }
 	},
 
 	_handleOnFileLoad: function(path, currList, info)

@@ -48,11 +48,6 @@ editor.plugin("resources",
 		}
 	},
 
-	addDataset: function(name, props)
-	{
-
-	},
-
 	getIconFromExt: function(ext)
 	{
 		if(!ext) {
@@ -106,7 +101,7 @@ editor.plugin("resources",
 			for(var n = 0; n < exts.length; n++)
 			{
 				if(extName === exts[n]) {
-					return type.icon ? type.icon : "fa-question";
+					return typeName;
 				}
 			}
 		}
