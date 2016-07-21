@@ -10,8 +10,7 @@ editor.connection.offline =
 			{
 				editor.connection.offline.db = {
 					projects: [],
-					lastProjectId: 0,
-					lastResourceId: 0
+					lastProjectId: 0
 				};
 
 				editor.fs.write("db.json", JSON.stringify(editor.connection.offline.db), function() {
@@ -23,7 +22,9 @@ editor.connection.offline =
 				editor.connection.offline.db = JSON.parse(result);
 				editor.handleServerReady();
 			}
-		});		
+		});
+
+		editor.fs.createDir("projects");
 
 		editor.on("update", this.handleUpdate, this);
 	},
@@ -74,20 +75,24 @@ editor.connection.offline =
 
 	readProjects: function()
 	{
-		var self = this;
+		var data = {};
+		var output = {
+			id: "private.projects",
+			type: "data",
+			action: "set",
+			value: data
+		};
 
-		editor.fs.checkDir("projects", function(dirExists) 
+		var projects = this.db.projects;
+		for(var n = 0; n < projects.length; n++)
 		{
-			if(!dirExists) 
-			{
-				editor.fs.createDir("projects", function() {
-					self.processDirs(self.db.projects);
-				});
-			}
-			else {
-				self.processDirs(self.db.projects);
-			}
-		});
+			var project = projects[n];
+			data[n] = {
+				value: project.value
+			};
+		}
+
+		editor.connection.handleServerData(output);
 	},
 
 	processDirs: function(dirs)
@@ -111,26 +116,37 @@ editor.connection.offline =
 		editor.connection.handleServerData(output);
 	},
 
-	createProject: function(editorData, data)
+	createProjectData: function()
 	{
-		var projectData = {
-			value: "Untitled",
-			data: {
-				plugins: {}
-			}
+		var data = {
+			name: "Untitled",
+			version: editor.config.version,
+			plugins: {},
+			lastResourceId: 0
 		};
 
+		return data;
+	},
+
+	createProject: function(editorData, data)
+	{
 		var projectId = this.db.lastProjectId++;
-		var projectPath = "projects/" + projectId;
-		this.db.projects[projectId] = projectData;
+
+		var projectData = this.createProjectData();
+		var projectInfo = {
+			value: projectData.name,
+			path: "projects/" + projectId
+		};
+
+		this.db.projects[projectId] = projectInfo;
 
 		editor.fs.write("db.json", JSON.stringify(this.db));
 
-		editor.fs.createDir(projectPath, function(dir) {
-			editor.fs.write(projectPath + "/db.json", JSON.stringify(projectData.data), function(path) { console.log("created", path); });
+		editor.fs.createDir(projectInfo.path, function(dir) {
+			editor.fs.write(projectInfo.path + "/db.json", JSON.stringify(projectData));
 		});
 		
-		editorData.performAddKey(projectId, projectData);
+		editorData.performAddKey(projectId, { value: projectData.name });
 	},
 
 	renameProject: function(editorData, data)
@@ -143,6 +159,12 @@ editor.connection.offline =
 
 		project.value = data.value;
 		editor.fs.write("db.json", JSON.stringify(this.db));
+
+		var self = this;
+		this.readProjectDb(project.path, function(db) {
+			db.name = data.value;
+			editor.fs.write(project.path + "/db.json", JSON.stringify(db));
+		});
 
 		editorData.performSetKey("value", data.value);
 	},
@@ -164,41 +186,18 @@ editor.connection.offline =
 		var projectPath = "projects/" + projectId;
 		project.path = projectPath;
 
-		editor.fs.checkDir(projectPath, function(path) 
+		this.readProjectDb(projectPath, function(db) 
 		{
-			if(!path) {
-				console.warn("(editor.connection.offline.openProject) Project directory does not exist: " + projectPath);
-				return;
-			}
-
-			editor.fs.read(projectPath + "/db.json", function(content) 
-			{
-				editor.connection.offline.project = project;
-
-				if(!content) 
-				{
-					var db = {
-						version: editor.version
-					};
-
-					editor.fs.write(projectPath + "/db.json", JSON.parse(project.db), function() {
-						editor.openProject(db);
-					});
-				}
-				else
-				{
-					var db = JSON.parse(content);
-
-					editor.openProject({
-						value: project.value,
-						data: db,
-						id: projectId,
-						path: projectPath + "/",
-						fullPath: "filesystem:" + editor.config.httpUrl + "/persistent/" + projectPath + "/"
-					});
-				}
+			editor.connection.offline.project = project;
+			editor.connection.offline.projectDb = db;
+			editor.openProject({
+				value: project.value,
+				data: db,
+				id: projectId,
+				path: projectPath + "/",
+				fullPath: "filesystem:" + editor.config.httpUrl + "/persistent/" + projectPath + "/"
 			});
-		});		
+		});
 	},
 
 	removeProjects: function()
@@ -217,28 +216,64 @@ editor.connection.offline =
 		});
 	},
 
+	readProjectDb: function(projectPath, callback)
+	{
+		if(!callback) {
+			console.warn("(editor.connection.offline.readProjectDb) Callback not specified for projectPath: " + projectPath);
+			return;
+		}
+
+		editor.fs.checkDir(projectPath, function(path) 
+		{
+			if(!path) {
+				console.warn("(editor.connection.offline.readProjectDb) Project directory does not exist: " + projectPath);
+				return;
+			}
+
+			editor.fs.read(projectPath + "/db.json", function(content) 
+			{
+				if(!content) 
+				{
+					var db = editor.connection.offline.createProjectData();
+
+					editor.fs.write(projectPath + "/db.json", JSON.parse(db), function() {
+						callback(db);
+					});
+				}
+				else
+				{
+					var db = JSON.parse(content);
+					callback(db);
+				}
+			});
+		});
+	},
+
 	saveData: function()
 	{
+		this.needSave = false;
 		editor.fs.write("db.json", JSON.stringify(editor.dataPublic));
 	},
 
 	handleUpdate: function()
 	{
 		if(this.needSave) {
-			this.needSave = false;
-			this.fs.write("../../db.json", JSON.stringify(this.db));
+			this.saveData();
 		}
 	},
 
 	generateHash: function()
 	{
-		var id = this.db.lastResourceId++;
+		var id = editor.dataPublic.get("lastResourceId");
+		editor.dataPublic.performSetKey("lastResourceId", id + 1);
+		
 		this.needSave = true;
 		return btoa(id);
 	},
 
 	//
 	project: null,
+	projectDb: null,
 	db: null,
 	needSave: false
 };

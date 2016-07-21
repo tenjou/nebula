@@ -296,6 +296,8 @@ editor.fileSystem =
 
 	removeDir: function(name, cb)
 	{
+		var self = this;
+
 		this.fs.getDirectory(this.rootDir + name, {},
 			function(dirEntry)
 			{

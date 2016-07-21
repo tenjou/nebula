@@ -282,6 +282,9 @@ wabi.data.prototype =
 		if(index === "*") {
 			return this.raw;
 		}
+		else if(index === "@") {
+			return this.id;
+		}
 
 		var data;
 		if(!isNaN(index)) 

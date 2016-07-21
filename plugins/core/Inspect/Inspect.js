@@ -24,7 +24,7 @@ editor.plugin("inspect",
 			value: [
 				{
 					type: "image",
-					bind: "id",
+					bind: "@",
 				}
 			]
 		});

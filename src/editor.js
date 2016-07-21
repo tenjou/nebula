@@ -281,6 +281,7 @@ var editor =
 		{
 			var hash = this.connection.offline.generateHash();
 			var filePath = hash + "." + ext;
+			console.log(hash)
 
 			if(this.electron)
 			{

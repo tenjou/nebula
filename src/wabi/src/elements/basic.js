@@ -595,7 +595,7 @@ wabi.element("basic",
 		var event = new wabi.event("click", this, domEvent);
 
 		var element = domEvent.target.holder;
-		if(element !== this) 
+		if(element && element !== this) 
 		{
 			event.element = element;
 
