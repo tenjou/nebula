@@ -35,9 +35,9 @@ editor.plugin("login",
 
 	show: function() 
 	{
-		editor.server.on("close", this.onServer_close, this);
-		editor.server.on("register", this.onServer_register, this);
-		editor.server.on("login", this.onServer_login, this);
+		editor.connection.on("close", this.onServer_close, this);
+		editor.connection.on("register", this.onServer_register, this);
+		editor.connection.on("login", this.onServer_login, this);
 
 		this.loginScreen = wabi.createTemplate("loginScreen");
 		this.loginScreen.appendTo(editor.overlayElement);
@@ -46,7 +46,7 @@ editor.plugin("login",
 
 	hide: function() 
 	{	
-		editor.server.off(this);
+		editor.connection.off(this);
 
 		wabi.destroyTemplate(this.loginScreen);
 	},
@@ -164,15 +164,15 @@ editor.plugin("login",
 
 	emit: function(data)
 	{
-		if(!editor.server.open)
+		if(!editor.connection.open)
 		{
-			editor.server.websocket.connect(
+			editor.connection.websocket.connect(
 				function() {
-					editor.server.websocket.emit(data);	
+					editor.connection.websocket.emit(data);	
 				});
 		}
 		else {
-			editor.server.websocket.emit(data);	
+			editor.connection.websocket.emit(data);	
 		}		
 	},
 

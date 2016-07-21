@@ -59,7 +59,7 @@ editor.plugin("projects",
 
 		editor.offline = true;
 
-		this.data = editor.server.get("private.projects", this.handleData, this);
+		this.data = editor.connection.get("private.projects", this.handleData, this);
 		this.template.data = this.data;
 
 		this.template.appendTo(editor.overlayElement);

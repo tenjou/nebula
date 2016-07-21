@@ -167,17 +167,6 @@ editor.plugin("browser",
 		}
 	},
 
-	updateType: function(buffer)
-	{
-		var resources = editor.plugins.resources;
-
-		for(var key in buffer)
-		{
-			var item = buffer[key];
-			item.type = resources.getTypeFromExt(item.tag);
-		}
-	},
-
 	createFolder: function(event) {
 		this.browserResources.get("#resources").createFolder();
 		// event.element.createFolder();
@@ -282,12 +271,16 @@ editor.plugin("browser",
 
 	handleFileOnLoad: function(file, fileResult)
 	{
-		var name = encodeURIComponent(file.name);
-		var wildcardIndex = name.lastIndexOf(".");
-		var idName = name.substr(0, wildcardIndex);
-		var ext = name.substr(wildcardIndex + 1).toLowerCase();
+		editor.writeFile(file, fileResult, function(hash, filename, ext) {
+			editor.dataPublic.get("resources").add(hash, {
+				value: filename,
+				tag: ext
+			});
 
-		console.log(name, idName, ext);
+			console.log(hash, filename, ext);
+		});
+
+		
 
 		// meta.ajax({
 		// 	url: "/upload",

@@ -1,6 +1,6 @@
 "use strict";
 
-editor.server =
+editor.connection =
 {
 	init: function() 
 	{

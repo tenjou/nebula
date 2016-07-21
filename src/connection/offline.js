@@ -1,6 +1,6 @@
 "use strict";
 
-editor.server.offline =
+editor.connection.offline =
 {
 	init: function()
 	{
@@ -8,21 +8,24 @@ editor.server.offline =
 		{
 			if(!result) 
 			{
-				editor.server.offline.db = {
+				editor.connection.offline.db = {
 					projects: [],
-					lastProjectId: 0
+					lastProjectId: 0,
+					lastResourceId: 0
 				};
 
-				editor.fs.write("db.json", JSON.stringify(editor.server.offline.db), function() {
+				editor.fs.write("db.json", JSON.stringify(editor.connection.offline.db), function() {
 					editor.handleServerReady();
 				});
 			}
 			else 
 			{
-				editor.server.offline.db = JSON.parse(result);
+				editor.connection.offline.db = JSON.parse(result);
 				editor.handleServerReady();
 			}
 		});		
+
+		editor.on("update", this.handleUpdate, this);
 	},
 
 	emit: function(data)
@@ -36,7 +39,8 @@ editor.server.offline =
 					this.processProjects(editorData, data);
 				}
 				else {
-					editor.server.handleServerData(data);
+					editor.connection.handleServerData(data);
+					this.saveData();
 				}
 			} break;
 
@@ -104,7 +108,7 @@ editor.server.offline =
 			};
 		}
 
-		editor.server.handleServerData(output);
+		editor.connection.handleServerData(output);
 	},
 
 	createProject: function(editorData, data)
@@ -133,7 +137,7 @@ editor.server.offline =
 	{
 		var project = this.db.projects[editorData.id];
 		if(!project) {
-			console.warn("(editor.server.offline.renameProject) Project does not exist: " + editorData.id);
+			console.warn("(editor.connection.offline.renameProject) Project does not exist: " + editorData.id);
 			return;
 		}
 
@@ -153,7 +157,7 @@ editor.server.offline =
 		var projectId = data.value.id;
 		var project = this.db.projects[projectId];
 		if(!project) {
-			console.warn("(editor.server.offline.openProject) Project does not exist: " + projectId);
+			console.warn("(editor.connection.offline.openProject) Project does not exist: " + projectId);
 			return;
 		}
 
@@ -163,32 +167,34 @@ editor.server.offline =
 		editor.fs.checkDir(projectPath, function(path) 
 		{
 			if(!path) {
-				console.warn("(editor.server.offline.openProject) Project directory does not exist: " + projectPath);
+				console.warn("(editor.connection.offline.openProject) Project directory does not exist: " + projectPath);
 				return;
 			}
 
 			editor.fs.read(projectPath + "/db.json", function(content) 
 			{
-				editor.server.offline.project = project;
+				editor.connection.offline.project = project;
 
 				if(!content) 
 				{
-					project.db = {
-						version: editor.version,
-						plugins: {}
+					var db = {
+						version: editor.version
 					};
 
 					editor.fs.write(projectPath + "/db.json", JSON.parse(project.db), function() {
-						editor.openProject(project.db);
+						editor.openProject(db);
 					});
 				}
 				else
 				{
-					project.db = JSON.parse(content);
+					var db = JSON.parse(content);
+
 					editor.openProject({
 						value: project.value,
-						data: project.db,
-						path: "filesystem:" + editor.config.httpUrl + "/persistent/" + projectPath + "/"
+						data: db,
+						id: projectId,
+						path: projectPath + "/",
+						fullPath: "filesystem:" + editor.config.httpUrl + "/persistent/" + projectPath + "/"
 					});
 				}
 			});
@@ -206,13 +212,33 @@ editor.server.offline =
 
 	installPlugins: function(data)
 	{
-		Object.assign(this.project.data.plugins, data.data);
-		editor.fs.write(this.project.path + "/db.json", JSON.stringify(this.project.data), function() {
+		editor.fs.write("db.json", JSON.stringify(editor.dataPublic), function() {
 			editor.onInstallPlugins(data);
 		});
 	},
 
+	saveData: function()
+	{
+		editor.fs.write("db.json", JSON.stringify(editor.dataPublic));
+	},
+
+	handleUpdate: function()
+	{
+		if(this.needSave) {
+			this.needSave = false;
+			this.fs.write("../../db.json", JSON.stringify(this.db));
+		}
+	},
+
+	generateHash: function()
+	{
+		var id = this.db.lastResourceId++;
+		this.needSave = true;
+		return btoa(id);
+	},
+
 	//
 	project: null,
-	db: null
+	db: null,
+	needSave: false
 };

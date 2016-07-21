@@ -16,8 +16,8 @@ var editor =
 			this.electron = true;
 		}
 
-		this.server.on("openProject", this.openProject, this);
-		this.server.on("installPlugins", this.onInstallPlugins, this);
+		this.connection.on("openProject", this.openProject, this);
+		this.connection.on("installPlugins", this.onInstallPlugins, this);
 
 		if(this.electron) {
 			this.fs = editor.fileSystemLocal;
@@ -30,7 +30,7 @@ var editor =
 
 	handleFsReady: function()
 	{
-		this.server.init();
+		this.connection.init();
 	},
 
 	handleServerReady: function() 
@@ -90,7 +90,7 @@ var editor =
 			return;
 		}
 
-		editor.server.emit({
+		editor.connection.emit({
 			type: "installPlugins",
 			data: pluginData
 		});
@@ -98,10 +98,12 @@ var editor =
 
 	onInstallPlugins: function(serverData)
 	{
-		var data = serverData.data;
-		for(var key in data) 
+		var data = this.dataPublic.get("plugins");
+
+		var pluginData = serverData.data;
+		for(var key in pluginData) 
 		{
-			this.dataPublic.performSetKey(key, data[key]);
+			data.performSetKey(key, pluginData[key]);
 
 			var plugin = this.plugins[key];
 			if(plugin.install) {
@@ -124,6 +126,8 @@ var editor =
 		}
 
 		this.info.enable = false;
+
+		setInterval(this.update.bind(this), 2000);
 	},
 
 	prepareUI: function()
@@ -210,7 +214,7 @@ var editor =
 	{
 		this.info.enable = false;
 		this.plugins.login.hide();
-		this.server.load();
+		this.connection.load();
 
 		this.onSplashStart();
 	},
@@ -227,7 +231,7 @@ var editor =
 		this.loadPlugin("inspect");
 		this.loadPlugin("meta2d");
 
-		this.server.emit({
+		this.connection.emit({
 			type: "openProject",
 			value: data
 		});
@@ -251,36 +255,55 @@ var editor =
 		// 	this.fileSystem.fullPath = "filesystem:http://" + window.location.hostname + "/persistent/" + editor.fileSystem.rootDir;			
 		// }
 
-		// this.fileSystem.read("db.json", this._handleReadDb.bind(this));	
-		
-		
-		// this.onStart();
-
-		// this.info.enable = true;
-		// this.info.value = "Loading Project";
 	},
 
 	openProject: function(serverData)
 	{
-		this.server.applyData(serverData.data);
+		this.connection.applyData(serverData.data);
 
 		this.project = serverData.value;
-		this.projectPath = serverData.path;
+		this.projectPath = serverData.fullPath;
+		this.fs.rootDir = serverData.path;
 
 		document.title = serverData.value + " - " + this.config.titlePrefix;
 
 		this.installPlugins();
 	},
 
-	saveCfg: function() 
+	writeFile: function(file, fileResult, callback)
 	{
-		this.fileSystem.write("db.json", JSON.stringify(this.db), this._handleSavedDb.bind(this));
-		this.needSave = false;
-	},	
+		var name = encodeURIComponent(file.name);
+		var wildcardIndex = name.lastIndexOf(".");
+		var idName = name.substr(0, wildcardIndex);
+		var ext = name.substr(wildcardIndex + 1).toLowerCase();
 
-	_handleSavedDb: function(json)
-	{
-		console.log("db-saved");
+		if(this.offline)
+		{
+			var hash = this.connection.offline.generateHash();
+			var filePath = hash + "." + ext;
+
+			if(this.electron)
+			{
+				editor.fs.writeBase64(filePath, fileResult.target.result, function(path) {
+					if(callback) {
+						callback(hash, idName, ext);
+					}
+				});
+			}
+			else
+			{
+				var blob = dataURItoBlob(fileResult.target.result, file.type);
+				editor.fs.writeBlob(filePath, blob, function(path) {
+					if(callback) {
+						callback(hash, idName, ext);
+					}
+				});
+			}
+		}
+		else 
+		{
+
+		}	
 	},
 
 	getContentInfo: function(name)
@@ -304,32 +327,6 @@ var editor =
 		}
 
 		return obj.info;
-	},
-
-	registerDataset: function(name, buffer, type)
-	{
-		if(this.datasets[name]) {
-			console.warn("(Editor.addDataset) There is already dataset with such name: " + name);
-			return;
-		}
-
-		this.datasets[name] = {
-			buffer: buffer,
-			type: type ? type : "array"
-		};
-	},
-
-	getDataset: function(name) 
-	{
-		if(!name) { return null; }
-
-		var dataset = this.datasets[name];
-		if(!dataset) {
-			console.warn("Editor.getDataset) No such dataset registered: " + name);
-			return null;
-		}
-
-		return dataset;
 	},
 
 	handleClick: function(domEvent) {
@@ -368,6 +365,10 @@ var editor =
 		for(var n = 0; n < buffer.length; n++) {
 			buffer[n](domEvent);
 		}
+	},
+
+	update: function() {
+		this.emit("update", null);
 	},
 
 	plugin: function(name, props) 
@@ -437,8 +438,6 @@ var editor =
 	projectPath: null,
 
 	plugins: null,
-	ctrls: {},
-	datasets: {},
 
 	wrapperElement: null,
 	overlayElement: null,

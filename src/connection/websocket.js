@@ -1,10 +1,10 @@
 "use strict";
 
-editor.server.websocket =
+editor.connection.websocket =
 {
 	init: function()
 	{
-		editor.server.on("data", this.handleServerData, this);
+		editor.connection.on("data", this.handleServerData, this);
 	},
 
 	connect: function(callback)
@@ -32,7 +32,7 @@ editor.server.websocket =
 		this.open = false;
 		wabi.dataProxy = null;
 
-		var buffer = editor.server.callbacks.close;
+		var buffer = editor.connection.callbacks.close;
 		if(!buffer) {
 			return;
 		}
@@ -51,7 +51,7 @@ editor.server.websocket =
 			return;
 		}
 
-		var buffer = editor.server.callbacks[data.type];
+		var buffer = editor.connection.callbacks[data.type];
 		if(!buffer) {
 			return;
 		}
@@ -66,7 +66,7 @@ editor.server.websocket =
 	emit: function(data)
 	{
 		if(!this.open) {
-			console.warn("(editor.server.websocket) Connection is closed");
+			console.warn("(editor.connection.websocket) Connection is closed");
 			return;
 		}
 
@@ -81,4 +81,4 @@ editor.server.websocket =
 	$callback: null
 };
 
-editor.server.websocket.init();
+editor.connection.websocket.init();

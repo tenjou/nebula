@@ -50,6 +50,7 @@ overlay > * {
 }
 
 list {
+	flex: 100%;
 	overflow: auto;
 }
 list.empty {
