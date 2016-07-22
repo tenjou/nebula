@@ -11,6 +11,7 @@ editor.plugin("browser",
 				{
 					id: "hierarchy",
 					type: "list",
+					itemCls: "browserListItem",
 					bind: "*"
 				}
 			]
@@ -23,6 +24,7 @@ editor.plugin("browser",
 				{
 					id: "resources",
 					type: "list",
+					itemCls: "browserListItem",
 					bind: "*"
 				}
 			]
@@ -35,6 +37,7 @@ editor.plugin("browser",
 				{
 					id: "defs",
 					type: "list",
+					itemCls: "browserListItem",
 					bind: "*"
 				}
 			]

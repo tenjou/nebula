@@ -32,6 +32,19 @@ wabi.elements.basic = function(parent, params)
 
 			this.$state[parentLink] = element;
 			this.$elements[key] = element;
+
+			var bind = this.$metadata.elementsBinded[key];
+			if(bind) {
+				element.$parentLink = bind;
+				element.bind = bind;
+			}
+			else
+			{
+				var parentLink = this.$metadata.elementsLinked[key];
+				if(parentLink) {
+					element.$parentLink = parentLink;
+				}	
+			}
 		}
 	}
 
@@ -244,6 +257,11 @@ wabi.element("basic",
 
 	on: function(event, id, cb, owner)
 	{
+		if(id === undefined) {
+			console.warn("(wabi.elements.basic.on) Invalid callback passed to event: " + event);
+			return;
+		}
+
 		if(typeof(id) === "function") {
 			owner = cb;
 			cb = id;

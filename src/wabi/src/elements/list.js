@@ -50,7 +50,7 @@ wabi.element("list",
 	{
 		this.set_placeholder(null);
 
-		var element = wabi.createElement("listItem", this);
+		var element = wabi.createElement(this.itemCls, this);
 		element.data = data;
 	},
 
@@ -75,6 +75,19 @@ wabi.element("list",
 			if(!this.$children || this.$children.length === 0) {
 				this.$domElement.innerHTML = "";
 			}
+		}
+	},
+
+	set_itemCls: function(itemCls)
+	{
+		if(!itemCls) {
+			return "listItem";
+		}
+
+		var cls = wabi.elements[itemCls];
+		if(!cls) {
+			console.warn("(wabi.elements.list.set_itemCls) No such element found: " + itemCls);
+			return "listItem";
 		}
 	},
 
@@ -116,28 +129,18 @@ wabi.element("list",
 	},
 
 	//
-	$cache: null
+	$cache: null,
+
+	itemCls: "listItem"
 });
 
 wabi.element("listItem",
 {
 	elements: 
 	{
-		caret: {
-			type: "caret",
-			link: "folder"
-		},
-		icon: {
-			type: "icon",
-			link: "icon"
-		},
-		name: {
+		word: {
 			type: "word",
-			link: "value"
-		},
-		tag: {
-			type: "tag",
-			link: "tag"
+			bind: "value"
 		}
 	},
 
@@ -145,15 +148,6 @@ wabi.element("listItem",
 	{
 		this.attrib("tabindex", "0");
 		this.$flags |= this.Flag.REGION;
-	},
-
-	setup: function()
-	{
-		this.$elements.caret.bind = "folder";
-		this.$elements.icon.bind = "icon";
-		this.$elements.name.bind = "value",
-		this.$elements.tag.bind = "tag";	
-		this.$elements.caret.hidden = true;	
 	},
 
 	set_select: function(value)
@@ -198,8 +192,6 @@ wabi.element("listItem",
 	//
 	$tag: "item",
 
-	open: false,
 	select: false,
-	folder: false,
 	draggable: false
 });

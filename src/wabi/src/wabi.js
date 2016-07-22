@@ -246,6 +246,7 @@ var wabi =
 		var statesHandled = {};
 		var statesLinked = {};
 		var elementsLinked = {};
+		var elementsBinded = {};
 		var elements = {};
 		var events = [];
 		var proto = {};
@@ -263,6 +264,13 @@ var wabi =
 					states[item.link] = null;
 					statesLinked[item.link] = key;
 					elementsLinked[key] = item.link;
+				}
+				else if(item.bind)
+				{
+					states[item.bind] = null;
+					statesLinked[item.bind] = key;
+					elementsLinked[key] = item.bind;
+					elementsBinded[key] = item.bind;
 				}
 			}
 
@@ -351,6 +359,7 @@ var wabi =
 		metadata.states = statesProto;
 		metadata.statesLinked = statesLinked;
 		metadata.elementsLinked = elementsLinked;
+		metadata.elementsBinded = elementsBinded;
 
 		if(elements) {
 			metadata.elements = elements;
@@ -477,6 +486,7 @@ var wabi =
 		this.statesLinked = null;
 		this.elements = null;
 		this.elementsLinked = null;
+		this.elementsBinded = null;
 		this.events = null;
 	},
 
