@@ -146,7 +146,8 @@ editor.plugin("browser",
 		list.on("click", "browserListItem", this.inspectItem, this);
 		list.on("contextmenu", "browserListItem", function(event) {
 			editor.plugins.contextmenu.show("resourcesItem", event.x, event.y);
-		});
+			this.inspectItem(event);
+		}, this);
 		
 		this.browserResources.appendTo(content);		
 	},
@@ -294,6 +295,7 @@ editor.plugin("browser",
 	},
 
 	inspectItem: function(event) {
+		event.element.select = true;
 		editor.plugins.inspect.show(event.element.data);
 	},
 

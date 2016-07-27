@@ -10,6 +10,10 @@ wabi.element("iframe",
 		this.$wnd = this.$domElement.contentWindow;
 	},
 
+	get wnd() {
+		return this.$wnd;
+	},
+
 	//
 	$wnd: null
 });

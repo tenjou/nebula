@@ -12,9 +12,8 @@ editor.plugin("meta2d",
 		this.iframe.appendTo(parent);
 	},
 
-	handleIframeLoad: function()
-	{
-		console.log("loaded")
+	handleIframeLoad: function() {
+		this.iframe.$wnd.meta.loader.register(editor.dataPublic);
 	},
 
 	//
