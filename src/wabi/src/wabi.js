@@ -230,18 +230,46 @@ var wabi =
 
 	},
 
-	element: function(name, props) 
+	// TODO: Better method for extending classes, so that instanceof works on parent extends.
+	// TODO: Multi-level inheritance support.
+	element: function(name, extend, props) 
 	{
+		if(props === undefined) {
+			props = extend;
+			extend = null;
+		}
+
+		if(this.elementDefs[name]) {
+			console.warn("(wabi.element) There is already defined element with such name: " + name);
+			return;
+		}
+
+		var elementDef = new this.ElementDef(props, extend);
+		this.elementDefs[name] = elementDef;
+
 		if(name === "basic") {
-			this.compileBasicElement(props);
+			this.compileBasicElement(props, extend);
 		}
 		else {
-			this.compileElement(name, props);
+			this.compileElement(name, props, extend);
 		}
 	},	
 
-	genPrototype: function(name, props)
+	genPrototype: function(name, extend, props)
 	{
+		if(extend) 
+		{
+			var extendedDef = this.elementDefs[extend]
+			if(!extendedDef) {
+				console.warn("(wabi.genPrototype) Extended class not found: " + extend);
+				return;
+			}
+
+			var newProps = Object.assign({}, extendedDef.props);
+			Object.assign(newProps, props);
+			props = newProps;
+		}		
+
 		var states = {};
 		var statesHandled = {};
 		var statesLinked = {};
@@ -269,7 +297,6 @@ var wabi =
 				{
 					states[item.bind] = null;
 					statesLinked[item.bind] = key;
-					elementsLinked[key] = item.bind;
 					elementsBinded[key] = item.bind;
 				}
 			}
@@ -372,20 +399,20 @@ var wabi =
 		return proto;
 	},
 
-	compileBasicElement: function(props)
+	compileBasicElement: function(props, extend)
 	{
-		var proto = this.genPrototype("basic", props);
+		var proto = this.genPrototype("basic", extend, props);
 
 		wabi.elements.basic.prototype = proto;
 	},	
 
-	compileElement: function(name, props)
+	compileElement: function(name, props, extend)
 	{
 		function element(parent, params) {
 			wabi.elements.basic.call(this, parent, params);
 		};
 
-		var elementProto = this.genPrototype(name, props);
+		var elementProto = this.genPrototype(name, extend, props);
 
 		element.prototype = Object.create(this.elements.basic.prototype);
 		element.prototype.constructor = element;
@@ -515,11 +542,18 @@ var wabi =
 		}
 	},
 
+	ElementDef: function(props, extend)
+	{
+		this.props = props;
+		this.extend = extend;
+	},
+
 	//
 	globalData: {},
 
 	elements: {},
 	elementsCached: {},
+	elementDefs: {},
 	datasets: {},
 
 	fragments: {},

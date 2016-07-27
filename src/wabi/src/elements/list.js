@@ -4,7 +4,7 @@ wabi.element("list",
 {
 	prepare: function() 
 	{
-		this.on("click", "listItem", this.handleItemClick, this);
+		this.on("click", "*", this.handleItemClick, this);
 	},
 
 	setup: function()
@@ -104,7 +104,6 @@ wabi.element("list",
 
 	set select(element)
 	{
-		if(!(element instanceof wabi.elements.listItem)) { return; }
 		if(!this.$cache.selectable) { return; }
 
 		element.select = true;
@@ -148,6 +147,10 @@ wabi.element("listItem",
 	{
 		this.attrib("tabindex", "0");
 		this.$flags |= this.Flag.REGION;
+
+		this.on("click", "*", function() {
+			this.select = true;
+		}, this);
 	},
 
 	set_select: function(value)

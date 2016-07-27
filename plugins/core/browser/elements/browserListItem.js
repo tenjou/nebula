@@ -6,24 +6,15 @@ wabi.element("browserListItem", "listItem",
 	{
 		icon: {
 			type: "type",
-			link: "type"
+			bind: "type"
 		},
 		name: {
 			type: "word",
-			link: "value"
+			bind: "value"
 		},
 		tag: {
 			type: "tag",
-			link: "ext"
+			bind: "ext"
 		}
-	},
-
-	setup: function()
-	{
-		this.$elements.caret.bind = "folder";
-		this.$elements.icon.bind = "type";
-		this.$elements.name.bind = "value",
-		this.$elements.tag.bind = "tag";	
-		this.$elements.caret.hidden = true;	
 	}
 });

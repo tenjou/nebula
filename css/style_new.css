@@ -93,6 +93,14 @@ list item tag {
 	line-height: 11px;
 }
 
+content.browser list item type {
+	width: 18px;
+	text-align: center;
+}
+content.browser list item {
+	padding-left: 0;
+}
+
 button {
     margin: 2px;
     height: 28px;

@@ -80,7 +80,7 @@ editor.plugin("browser",
 					}
 				]
 			}
-		]);
+		]);	
 	},
 
 	install: function()
@@ -96,8 +96,8 @@ editor.plugin("browser",
 	{
 		this.loadData();
 
-		var browserContent = editor.plugins.layout.toolbarBrowser.$elements.content;
-		browserContent.setCls("browser", true);
+		var content = editor.plugins.layout.toolbarBrowser.$elements.content;
+		content.setCls("browser", true);
 
 		// HIERARCHY
 		this.browserHierarchy = wabi.createTemplate("browserHierarchy");
@@ -109,25 +109,12 @@ editor.plugin("browser",
 			editor.plugins.contextmenu.show("hierarchyItem", event.x, event.y);
 		});
 		this.browserHierarchy.on("click", "listItem", this.inspectItem, this);
-		this.browserHierarchy.appendTo(browserContent);
+		this.browserHierarchy.appendTo(content);
 
 		var cache = this.browserHierarchy.get("#hierarchy").$cache;
 
 		// RESOURCES
-		this.browserResources = wabi.createTemplate("browserResources");
-		this.browserResources.get("#resources").$cache = cache;
-		this.browserResources.data = this.resources;
-		this.browserResources.on("contextmenu", "list", function(event) {
-			editor.plugins.contextmenu.show("resources", event.x, event.y);
-		});
-		this.browserResources.on("contextmenu", "listItem", function(event) {
-			editor.plugins.contextmenu.show("resourcesItem", event.x, event.y);
-		});
-		this.browserResources.on("drop", "list", this.handleResourceDrop, this);
-		this.browserResources.on("dragenter", [ "list", "listItem" ], this.handleDragEnter, this);
-		this.browserResources.on("dragleave", [ "list", "listItem" ], this.handleDragLeave, this);
-		this.browserResources.on("click", "listItem", this.inspectItem, this);
-		this.browserResources.appendTo(browserContent);
+		this.createResourcePanel(content, cache);
 
 		// DEFS
 		this.browserDefs = wabi.createTemplate("browserDefs");
@@ -140,7 +127,28 @@ editor.plugin("browser",
 			editor.plugins.contextmenu.show("defsItem", event.x, event.y);
 		});
 		this.browserDefs.on("click", "listItem", this.inspectItem, this);
-		this.browserDefs.appendTo(browserContent);
+		this.browserDefs.appendTo(content);
+	},
+
+	createResourcePanel: function(content, cache)
+	{
+		this.browserResources = wabi.createTemplate("browserResources");
+		this.browserResources.get("#resources").$cache = cache;
+		this.browserResources.data = this.resources;
+		this.browserResources.on("drop", [ "list", "listItem" ], this.handleResourceDrop, this);
+		this.browserResources.on("dragenter", [ "list", "listItem" ], this.handleDragEnter, this);
+		this.browserResources.on("dragleave", [ "list", "listItem" ], this.handleDragLeave, this);
+
+		var list = this.browserResources.get("list")[0];
+		list.on("contextmenu", function(event) {
+			editor.plugins.contextmenu.show("resources", event.x, event.y);
+		});
+		list.on("click", "browserListItem", this.inspectItem, this);
+		list.on("contextmenu", "browserListItem", function(event) {
+			editor.plugins.contextmenu.show("resourcesItem", event.x, event.y);
+		});
+		
+		this.browserResources.appendTo(content);		
 	},
 
 	loadData: function()
