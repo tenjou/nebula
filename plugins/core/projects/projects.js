@@ -32,6 +32,18 @@ editor.plugin("projects",
 			]
 		});
 
+		// Actions: {
+		// 	Delete: {
+		// 		icon: "fa-trash",
+		// 		func: this.deleteProject.bind(this)
+		// 	},
+
+		// }
+
+		editor.plugins.contextmenu.add("projectItem", [
+				"test1", "test2"
+			])
+
 		// editor.plugins.contextmenu.add("projectItem", [
 		// 	{
 		// 		value: "Actions",

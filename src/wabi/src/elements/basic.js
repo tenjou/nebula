@@ -317,7 +317,7 @@ wabi.element("basic",
 		buffer.push(cb.bind(owner));			
 	},
 
-	emit: function(eventName)
+	emit: function(eventName, domEvent)
 	{
 		if(!this.$listeners) { 
 			return; 
@@ -327,6 +327,9 @@ wabi.element("basic",
 		if(!buffer) { return; }
 
 		var event = new wabi.event(eventName, this, domEvent);
+		if(this.$preventableEvents[eventName]) {
+			domEvent.preventDefault();
+		}
 
 		for(var n = 0; n < buffer.length; n++) {
 			buffer[n](event);
@@ -671,6 +674,10 @@ wabi.element("basic",
 	$processEvent: function(eventName, func, domEvent)
 	{
 		var event = new wabi.event(eventName, this, domEvent);
+		if(this.$preventableEvents[eventName]) {
+			domEvent.preventDefault();
+			domEvent.stopPropagation();
+		}		
 
 		var element = domEvent.target.holder;
 		if(element !== this) 
@@ -869,6 +876,9 @@ wabi.element("basic",
 
 	$children: null,
 	$childrenListeners: null,
+	$preventableEvents: {
+		"contextmenu": true
+	},
 
 	id: "",
 	hidden: false,

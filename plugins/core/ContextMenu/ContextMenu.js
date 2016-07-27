@@ -55,6 +55,7 @@ editor.plugin("contextmenu",
 
 	handleContextmenu: function(event) {
 		event.domEvent.preventDefault();
+		this.hide();
 	},
 
 	Menu: function(id, extend, props)
