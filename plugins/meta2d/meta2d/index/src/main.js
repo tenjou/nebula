@@ -25,8 +25,8 @@ meta.loader =
 		var raw = data.raw;
 		for(var key in raw)
 		{
-			var item = data.get(key);
-			var type = item.get("type");
+			var itemData = data.get(key);
+			var type = itemData.get("type");
 			var cls = this.typeClasses[type];
 			if(!cls) {
 				console.warn("(meta.loader.registerResources) Type is unsupported: " + type);
@@ -34,7 +34,7 @@ meta.loader =
 			}
 
 			var item = meta.new(cls);
-			item.data = data;
+			item.data = itemData;
 			resources.add(type, item);
 		}
 	},
