@@ -84,7 +84,7 @@ wabi.element("list",
 			return "listItem";
 		}
 
-		var cls = wabi.elements[itemCls];
+		var cls = wabi.element[itemCls];
 		if(!cls) {
 			console.warn("(wabi.elements.list.set_itemCls) No such element found: " + itemCls);
 			return "listItem";

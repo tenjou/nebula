@@ -1,6 +1,6 @@
 "use strict";
 
-wabi.elements.basic = function(parent, params)
+wabi.element.basic = function(parent, params)
 {
 	if(this.create) {
 		this.create(params);
@@ -258,7 +258,7 @@ wabi.element("basic",
 	on: function(event, id, cb, owner)
 	{
 		if(id === undefined) {
-			console.warn("(wabi.elements.basic.on) Invalid callback passed to event: " + event);
+			console.warn("(wabi.on) Invalid callback passed to event: " + event);
 			return;
 		}
 
@@ -810,7 +810,7 @@ wabi.element("basic",
 			}
 		}
 
-		if(stateValue instanceof wabi.elements.basic) 
+		if(stateValue instanceof wabi.element.basic) 
 		{
 			if(value instanceof Object && !(value instanceof Array)) {
 				stateValue.state = value;

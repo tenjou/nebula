@@ -51,7 +51,7 @@ var wabi =
 			}
 		}
 
-		var element = this.elements[props.type];
+		var element = this.element[props.type];
 		if(!element) {
 			console.warn("(wabi.createTemplate) Element type not found: " + props.type);
 			return null;
@@ -171,13 +171,13 @@ var wabi =
 			}
 		}
 
-		var cls = wabi.elements[name];
+		var cls = this.element[name];
 		if(!cls) {			
 			console.warn("(editor.createElement) No such element found: " + name);
 			return null;
 		}
 
-		return new wabi.elements[name](parent, params);
+		return new this.element[name](parent, params);
 	},
 
 	removeElement: function(element)
@@ -186,10 +186,10 @@ var wabi =
 		element.$flag &= ~element.Flag.ACTIVE;
 		element.remove();
 
-		var buffer = this.elements[element.$metadata.name];
+		var buffer = this.element[element.$metadata.name];
 		if(!buffer) {
 			buffer = [ element ];
-			this.elements[element.$metadata.name] = buffer;
+			this.element[element.$metadata.name] = buffer;
 		}
 		else {
 			buffer.push(element);
@@ -352,7 +352,7 @@ var wabi =
 
 		if(name !== "basic")
 		{
-			var basicMetadata = wabi.elements.basic.prototype.$metadata;
+			var basicMetadata = this.element.basic.prototype.$metadata;
 			var basicStates = basicMetadata.states;
 
 			statesProto = Object.assign({}, basicStates);
@@ -403,18 +403,18 @@ var wabi =
 	{
 		var proto = this.genPrototype("basic", extend, props);
 
-		wabi.elements.basic.prototype = proto;
+		this.element.basic.prototype = proto;
 	},	
 
 	compileElement: function(name, props, extend)
 	{
 		function element(parent, params) {
-			wabi.elements.basic.call(this, parent, params);
+			wabi.element.basic.call(this, parent, params);
 		};
 
 		var elementProto = this.genPrototype(name, extend, props);
 
-		element.prototype = Object.create(this.elements.basic.prototype);
+		element.prototype = Object.create(this.element.basic.prototype);
 		element.prototype.constructor = element;
 		var proto = element.prototype;
 
@@ -460,7 +460,7 @@ var wabi =
 		state.prototype = statesProto;
 		metadata.stateCls = state;
 
-		this.elements[name] = element;
+		this.element[name] = element;
 	},
 
 	defState: function(proto, key)
@@ -551,7 +551,6 @@ var wabi =
 	//
 	globalData: {},
 
-	elements: {},
 	elementsCached: {},
 	elementDefs: {},
 	datasets: {},
