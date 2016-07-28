@@ -40,6 +40,12 @@ editor.plugin("inspect",
 
 	show: function(data)
 	{
+		if(!data) {
+			this.content.value = "";
+			this.content.data = null;
+			return;
+		}
+		
 		var props = wabi.getFragment("inspect-" + data.get("type"));
 		if(!props) {
 			props = wabi.getFragment("inspect-general");
