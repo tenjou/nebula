@@ -42,6 +42,10 @@ wabi.element("contextmenuItem",
 		}
 	},
 
+	prepare: function() {
+		this.on("click", "*", this.handle_click, this);
+	},
+
 	handle_click: function(event)
 	{
 		if(this.func) {
@@ -50,7 +54,8 @@ wabi.element("contextmenuItem",
 	},
 
 	//
-	$tag: "item"
+	$tag: "item",
+	func: null
 });
 
 wabi.element("contextmenuCategory",
@@ -106,7 +111,7 @@ wabi.element("contextmenuInner",
 		}
 		else
 		{
-			console.warn("(element.contextmenu.createItem) Invalid data");
+			console.warn("(wabi.element.contextmenu.createItem) Invalid data");
 			return;
 		}
 
