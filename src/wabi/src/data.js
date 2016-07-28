@@ -76,7 +76,7 @@ wabi.data.prototype =
 		if(typeof value === "string") 
 		{
 			if(value[0] === "#") {
-				var ref = new wabi.ref(value);
+				var ref = new wabi.ref(value, key, this);
 				this.raw[key] = ref;
 				return ref;
 			}
@@ -221,6 +221,11 @@ wabi.data.prototype =
 			if(value instanceof Object && !(value instanceof wabi.data)) {
 				value = new wabi.data(value, key, this);
 			}
+			else if(typeof value === "string" && value[0] === "#") {
+				var ref = new wabi.ref(value, key, this);
+				this.raw[key] = value;
+				value = ref;
+			}	
 
 			this.raw[key] = value;
 		}
@@ -231,9 +236,9 @@ wabi.data.prototype =
 		}	
 
 		if(typeof value === "string" && value[0] === "#") {
-			var ref = new wabi.ref(value);
+			var ref = new wabi.ref(value, key, this);
 			this.raw[key] = value;
-			value = ref.instance;
+			value = ref;
 		}	
 
 		if(this.watchers) 
@@ -246,26 +251,58 @@ wabi.data.prototype =
 		}
 	},
 
-	remove: function(key, id)
+	remove: function(key)
 	{
 		// Remove self?
-		if(key === void(0)) 
-		{
-			// this.parent.removeItem();
+		if(key === undefined) {
+			this.parent.remove(this.id);
 		}
 		else
 		{
-			delete this.raw[key];
-
-			if(this.watchers) 
+			if(wabi.dataProxy) 
 			{
-				var info;
-				for(var n = 0; n < this.watchers.length; n++) {
-					info = this.watchers[n];
-					info.func.call(info.owner, "remove", key, id, 0, this);
-				}
-			}	
+				wabi.dataProxy({ 
+					id: this.genId(),
+					type: "data",
+					action: "remove",
+					key: key
+				});
+			}
+			else {
+				this.performRemove(key);
+			}
 		}
+	},
+
+	performRemove: function(key)
+	{
+		var value = this.raw[key];
+		delete this.raw[key];
+
+		if(value instanceof wabi.data)
+		{
+			var refs = value.refs;
+			if(refs)
+			{
+				for(var n = 0; n < refs.length; n++) {
+					refs[n].$remove();
+				}
+
+				value.refs = null;
+			}
+		}
+		else if(value instanceof wabi.ref) {
+			value = value.instance;
+		}
+
+		if(this.watchers) 
+		{
+			var info;
+			for(var n = 0; n < this.watchers.length; n++) {
+				info = this.watchers[n];
+				info.func.call(info.owner, "remove", key, value, -1, this);
+			}
+		}	
 	},
 
 	removeItem: function(key, id)
@@ -323,9 +360,9 @@ wabi.data.prototype =
 					this.raw[index] = data;
 				}
 				else if(typeof data === "string" && data[0] === "#") {
-					data = new wabi.ref(data);
+					data = new wabi.ref(data, index, this);
 					this.raw[index] = data;
-					return data.instance;
+					return data;
 				}
 			}
 			else
@@ -487,6 +524,18 @@ wabi.data.prototype =
 		}
 	},
 
+	removeRef: function(ref)
+	{
+		if(!this.refs) { 
+			console.warn("(wabi.data.removeRef) No references created from this item");
+			return;
+		}
+
+		var index = this.refs.indexOf(ref);
+		this.refs[index] = this.refs[this.refs.length - 1];
+		this.refs.pop();
+	},
+
 	toJSON: function() {
 		return this.raw;
 	},
@@ -503,22 +552,43 @@ wabi.data.prototype =
 	refs: null
 };
 
-wabi.ref = function(id) 
+wabi.ref = function(path, id, parent) 
 {
 	this.id = id;
-	this.instance = wabi.globalData.raw.assets.get(id.slice(1));
+	this.path = path;
+	this.parent = parent;
 
-	if(this.instance.refs) {
-		this.instance.refs.push(this);
+	var refPath = path.slice(1);
+	this.instance = wabi.globalData.raw.assets.get(refPath);
+
+	if(this.instance)
+	{
+		if(this.instance.refs) {
+			this.instance.refs.push(this);
+		}
+		else {
+			this.instance.refs = [ this ];
+		}
 	}
 	else {
-		this.instance.refs = [ this ];
+		console.warn("(wabi.ref) Invalid ref: " + refPath);
 	}
 };
 
 wabi.ref.prototype = 
 {
+	remove: function()
+	{
+		this.instance.removeRef(this);
+		this.instance = null;
+		this.parent.remove(this.id);
+	},
+
+	$remove: function() {
+		this.parent.remove(this.id);
+	},
+
 	toJSON: function() {
-		return this.id;
+		return this.path;
 	}
 };

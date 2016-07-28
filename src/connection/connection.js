@@ -114,7 +114,7 @@ editor.connection =
 
 			case "remove":
 			{
-				console.log("todo")
+				data.performRemove(serverData.key);
 			} break;
 		}
 	},

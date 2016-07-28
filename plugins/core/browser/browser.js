@@ -111,14 +111,14 @@ editor.plugin("browser",
 		this.browserHierarchy.on("click", "listItem", this.inspectItem, this);
 		this.browserHierarchy.appendTo(content);
 
-		var cache = this.browserHierarchy.get("#hierarchy").$cache;
+		this.cache = this.browserHierarchy.get("#hierarchy").$cache;
 
 		// RESOURCES
-		this.createResourcePanel(content, cache);
+		this.createResourcePanel(content, this.cache);
 
 		// DEFS
 		this.browserDefs = wabi.createTemplate("browserDefs");
-		this.browserDefs.get("#defs").cache = cache;
+		this.browserDefs.get("#defs").cache = this.cache;
 		this.browserDefs.data = this.defs;
 		this.browserDefs.on("contextmenu", "list", function(event) {
 			editor.plugins.contextmenu.show("defs", event.x, event.y);
@@ -133,7 +133,7 @@ editor.plugin("browser",
 	createResourcePanel: function(content, cache)
 	{
 		this.browserResources = wabi.createTemplate("browserResources");
-		this.browserResources.get("#resources").$cache = cache;
+		this.browserResources.get("#resources").$cache = this.cache;
 		this.browserResources.data = this.resources;
 		this.browserResources.on("drop", [ "list", "listItem" ], this.handleResourceDrop, this);
 		this.browserResources.on("dragenter", [ "list", "listItem" ], this.handleDragEnter, this);
@@ -176,11 +176,6 @@ editor.plugin("browser",
 	},
 
 	upload: function()
-	{
-
-	},
-
-	deleteItem: function()
 	{
 
 	},
@@ -288,6 +283,14 @@ editor.plugin("browser",
 		editor.plugins.inspect.show(event.element.data);
 	},
 
+	deleteItem: function(event)
+	{
+		var selected = this.cache.selected;
+		if(!selected) { return; }
+
+		editor.deleteFile(selected.data);	
+	},
+
 	//
 	hierarchy: null,
 	resources: null,
@@ -295,5 +298,7 @@ editor.plugin("browser",
 
 	browserHierarchy: null,
 	browserResources: null,
-	browserDefs: null
+	browserDefs: null,
+
+	cache: null
 });

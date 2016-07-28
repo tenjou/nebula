@@ -150,6 +150,10 @@ wabi.element("basic",
 			return;
 		}
 
+		if(element.cleanup) {
+			element.cleanup();
+		}
+
 		if(element.$data) {
 			element.data = null;
 		}
@@ -506,15 +510,30 @@ wabi.element("basic",
 
 	set data(data)
 	{
-		if(this.$data && 
-		   this.$data !== data && 
-		   this.$flags & this.Flag.WATCHING) 
+		if(data instanceof wabi.ref)
 		{
-			this.$flags &= ~this.Flag.WATCHING;
-			this.$data.unwatch(this);
+			if(this.$data === data.instance) { return; }
+
+			if(this.$data && this.$flags & this.Flag.WATCHING) {
+				this.$flags &= ~this.Flag.WATCHING;
+				this.$data.unwatch(this);
+			}
+
+			this.$data = data.instance;
+			this.ref = data;
+		}
+		else 
+		{
+			if(this.$data === data) { return; }
+
+			if(this.$data && this.$flags & this.Flag.WATCHING) {
+				this.$flags &= ~this.Flag.WATCHING;
+				this.$data.unwatch(this);
+			}
+
+			this.$data = data;
 		}
 
-		this.$data = data;
 		this.$updateBindings(this.$state.bind);
 		
 		if(this.$children)
@@ -869,6 +888,7 @@ wabi.element("basic",
 	$state: null,
 	$parent: null,
 	$data: null,
+	ref: null,
 	$parentLink: null,
 
 	$flags: 0,

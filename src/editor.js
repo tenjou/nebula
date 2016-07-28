@@ -278,16 +278,16 @@ var editor =
 		var idName = name.substr(0, wildcardIndex);
 		var ext = name.substr(wildcardIndex + 1).toLowerCase();
 
-		var type = editor.plugins.resources.getTypeFromExt(ext);
+		var type = this.plugins.resources.getTypeFromExt(ext);
 
 		if(this.offline)
 		{
 			var hash = this.connection.offline.generateHash();
 			var filePath = hash + "." + ext;
 
-			var map = editor.dataAssets.get(type);
+			var map = this.dataAssets.get(type);
 			if(!map) {
-				map = editor.dataAssets.performSetKey(type, {});
+				map = this.dataAssets.performSetKey(type, {});
 			}
 
 			var info = {
@@ -298,7 +298,7 @@ var editor =
 
 			if(this.electron)
 			{
-				editor.fs.writeBase64(filePath, fileResult.target.result, function(path) {
+				this.fs.writeBase64(filePath, fileResult.target.result, function(path) {
 					map.set(hash, info);
 					if(callback) {
 						callback(hash, type);
@@ -308,7 +308,7 @@ var editor =
 			else
 			{
 				var blob = dataURItoBlob(fileResult.target.result, file.type);
-				editor.fs.writeBlob(filePath, blob, function(path) {
+				this.fs.writeBlob(filePath, blob, function(path) {
 					map.set(hash, info);
 					if(callback) {
 						callback(hash, type);
@@ -320,6 +320,17 @@ var editor =
 		{
 
 		}	
+	},
+
+	deleteFile: function(data)
+	{
+		data.remove();
+
+		if(this.offline) 
+		{
+			var filePath = data.id + "." + data.raw.ext;
+			this.fs.remove(filePath);
+		}
 	},
 
 	getContentInfo: function(name)

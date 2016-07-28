@@ -54,9 +54,18 @@ wabi.element("list",
 		element.data = data;
 	},
 
-	remove_value: function(value, id)
+	remove_value: function(value)
 	{
+		if(!this.$children) { return; }
 
+		for(var n = 0; n < this.$children.length; n++) 
+		{
+			var child = this.$children[n];
+			if(child.data === value) {
+				this.remove(child);
+				return;
+			}
+		}
 	},
 
 	set_placeholder: function(value)
@@ -151,6 +160,13 @@ wabi.element("listItem",
 		this.on("click", "*", function() {
 			this.select = true;
 		}, this);
+	},
+
+	cleanup: function() 
+	{
+		if(this.$parent.$cache.selected === this) {
+			this.$parent.$cache.selected = null;
+		}
 	},
 
 	set_select: function(value)
