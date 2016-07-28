@@ -6,9 +6,11 @@ meta.loader =
 	{
 		this.registerFuncs();
 
-		this.registerResources(data.get("resources"));
-		this.registerDefs(data.get("defs"));
-		this.registerHierarchy(data.get("hierarchy"));
+		var assets = data.get("assets");
+		var assetsRaw = assets.raw;
+		for(var key in assetsRaw) {
+			this.registerItems(key, assets.get(key));
+		}
 	},
 
 	registerFuncs: function()
@@ -18,20 +20,20 @@ meta.loader =
 		};
 	},
 
-	registerResources: function(data)
+	registerItems: function(type, data)
 	{
+		var cls = this.typeClasses[type];
+		if(!cls) {
+			console.warn("(meta.loader.registerItems) Type is unsupported: " + type);
+			return;
+		}
+
 		var resources = meta.resources;
 
 		var raw = data.raw;
 		for(var key in raw)
 		{
 			var itemData = data.get(key);
-			var type = itemData.get("type");
-			var cls = this.typeClasses[type];
-			if(!cls) {
-				console.warn("(meta.loader.registerResources) Type is unsupported: " + type);
-				continue;
-			}
 
 			var item = meta.new(cls);
 			item.data = itemData;
@@ -39,17 +41,6 @@ meta.loader =
 		}
 	},
 
-	registerDefs: function(data)
-	{
-
-	},
-
-	registerHierarchy: function(data)
-	{
-
-	},	
-
 	//
-	data: null,
 	typeClasses: null
 };

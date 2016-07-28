@@ -73,6 +73,15 @@ wabi.data.prototype =
 
 	performSetKey: function(key, value) 
 	{
+		if(typeof value === "string") 
+		{
+			if(value[0] === "#") {
+				var ref = new wabi.ref(value);
+				this.raw[key] = ref;
+				return ref;
+			}
+		}
+
 		var index = key.indexOf(".");
 		if(index === -1) 
 		{
@@ -219,7 +228,13 @@ wabi.data.prototype =
 		{
 			console.warn("(wabi.data.performAddKey) Can peform add only to Object");
 			return;
-		}		
+		}	
+
+		if(typeof value === "string" && value[0] === "#") {
+			var ref = new wabi.ref(value);
+			this.raw[key] = value;
+			value = ref.instance;
+		}	
 
 		if(this.watchers) 
 		{
@@ -298,11 +313,29 @@ wabi.data.prototype =
 		}
 		else 
 		{
-			var buffer = index.split(".");
-			data = this;
-			for(var n = 0; n < buffer.length; n++)
+			var cursor = index.indexOf(".");
+			if(cursor === -1) 
 			{
-				data = data.getItem(buffer[n]);
+				data = this.raw[index];
+
+				if(typeof data === "object" && !(data instanceof wabi.data)) {
+					data = new wabi.data(data, index + "", this);
+					this.raw[index] = data;
+				}
+				else if(typeof data === "string" && data[0] === "#") {
+					data = new wabi.ref(data);
+					this.raw[index] = data;
+					return data.instance;
+				}
+			}
+			else
+			{
+				var buffer = index.split(".");
+				data = this;
+				for(var n = 0; n < buffer.length; n++)
+				{
+					data = data.getItem(buffer[n]);
+				}
 			}
 		}
 
@@ -466,5 +499,26 @@ wabi.data.prototype =
 
 	//
 	watchers: null,
-	parent: null
+	parent: null,
+	refs: null
+};
+
+wabi.ref = function(id) 
+{
+	this.id = id;
+	this.instance = wabi.globalData.raw.assets.get(id.slice(1));
+
+	if(this.instance.refs) {
+		this.instance.refs.push(this);
+	}
+	else {
+		this.instance.refs = [ this ];
+	}
+};
+
+wabi.ref.prototype = 
+{
+	toJSON: function() {
+		return this.id;
+	}
 };

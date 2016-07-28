@@ -4,6 +4,8 @@ editor.plugin("meta2d",
 {
 	onStart: function()
 	{
+		this.loadContextMenu();
+
 		var parent = editor.plugins.layout.toolbarIFrame.$elements.content;
 
 		this.iframe = wabi.createElement("iframe");
@@ -14,6 +16,26 @@ editor.plugin("meta2d",
 
 	handleIframeLoad: function() {
 		this.iframe.$wnd.meta.loader.register(editor.dataPublic);
+	},
+
+	loadContextMenu: function()
+	{
+		var contextmenu = editor.plugins.contextmenu;
+		contextmenu.add("defs", {
+			value: "Create",
+			content: [
+				{
+					value: "Prefab",
+					func: this.createPrefab.bind(this)
+				}, 
+				"test2"
+			]
+		});
+	},
+
+	createPrefab: function(event)
+	{
+
 	},
 
 	//

@@ -261,6 +261,7 @@ var editor =
 	{
 		this.connection.applyData(serverData.data);
 
+		this.dataAssets = this.dataPublic.get("assets");
 		this.project = serverData.value;
 		this.projectPath = serverData.fullPath;
 		this.fs.rootDir = serverData.path;
@@ -277,17 +278,30 @@ var editor =
 		var idName = name.substr(0, wildcardIndex);
 		var ext = name.substr(wildcardIndex + 1).toLowerCase();
 
+		var type = editor.plugins.resources.getTypeFromExt(ext);
+
 		if(this.offline)
 		{
 			var hash = this.connection.offline.generateHash();
 			var filePath = hash + "." + ext;
-			console.log(hash)
+
+			var map = editor.dataAssets.get(type);
+			if(!map) {
+				map = editor.dataAssets.performSetKey(type, {});
+			}
+
+			var info = {
+				value: idName,
+				ext: ext,
+				type: type
+			};
 
 			if(this.electron)
 			{
 				editor.fs.writeBase64(filePath, fileResult.target.result, function(path) {
+					map.set(hash, info);
 					if(callback) {
-						callback(hash, idName, ext);
+						callback(hash, type);
 					}
 				});
 			}
@@ -295,8 +309,9 @@ var editor =
 			{
 				var blob = dataURItoBlob(fileResult.target.result, file.type);
 				editor.fs.writeBlob(filePath, blob, function(path) {
+					map.set(hash, info);
 					if(callback) {
-						callback(hash, idName, ext);
+						callback(hash, type);
 					}
 				});
 			}
@@ -427,6 +442,7 @@ var editor =
 	data: null,
 	dataPublic: null,
 	dataPrivate: null,
+	dataAssets: null,
 
 	eventBuffer: {},
 

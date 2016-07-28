@@ -35,9 +35,8 @@ editor.connection.offline =
 		{
 			case "data":
 			{
-				var editorData = editor.data.get(data.id);
 				if(data.id.indexOf("private.projects") > -1) {
-					this.processProjects(editorData, data);
+					this.processProjects(editor.data.get(data.id), data);
 				}
 				else {
 					editor.connection.handleServerData(data);
@@ -122,6 +121,7 @@ editor.connection.offline =
 			name: "Untitled",
 			version: editor.config.version,
 			plugins: {},
+			assets: {},
 			lastResourceId: 0
 		};
 

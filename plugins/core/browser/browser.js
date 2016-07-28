@@ -263,26 +263,15 @@ editor.plugin("browser",
 		this.numItemsLoading++;
 
 		var self = this;
-
 		var reader = new FileReader();
-		reader.onload = function(fileResult) {
-			self.handleFileOnLoad(file, fileResult);
+		reader.onload = function(fileResult) 
+		{
+			editor.writeFile(file, fileResult, function(hash, type) {
+				self.resources.add(hash, "#" + type + "." + hash);
+			});
 		};
 
 		reader.readAsDataURL(file);
-	},
-
-	handleFileOnLoad: function(file, fileResult)
-	{
-		var self = this;
-
-		editor.writeFile(file, fileResult, function(hash, filename, ext) {
-			self.resources.add(hash, {
-				value: filename,
-				ext: ext,
-				type: editor.plugins.resources.getTypeFromExt(ext)
-			});
-		});
 	},
 
 	_handleOnFileLoad: function(path, currList, info)

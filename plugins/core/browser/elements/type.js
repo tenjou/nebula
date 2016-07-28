@@ -9,8 +9,6 @@ wabi.element("type",
 
 	set_value: function(value, prevValue) 
 	{
-		console.log("type", value);
-
 		var icon = editor.plugins.resources.getIconFromType(value);
 		this.setCls(icon, true);
 		// if(prevValue) {
