@@ -293,7 +293,6 @@ editor.connection.offline =
 
 	handleUpdate: function()
 	{
-		console.log("here")
 		if(this.needSaveDb) {
 			this.saveDb();
 		}

@@ -91,7 +91,6 @@ editor.fileSystem =
 
 		this.fs.getFile(this.rootDir + filename, { create: true },
 			function(fileEntry) {
-				console.log(content)
 				self.writeContent(fileEntry, content, cb);
 			},
 			function(fileError) {
