@@ -37,26 +37,25 @@ editor.plugin("projects",
 		// 		icon: "fa-trash",
 		// 		func: this.deleteProject.bind(this)
 		// 	},
-
 		// }
 
-		editor.plugins.contextmenu.add("projectItem", [
-				"test1", "test2"
-			])
-
 		// editor.plugins.contextmenu.add("projectItem", [
-		// 	{
-		// 		value: "Actions",
-		// 		type: "category",
-		// 		content: [
-		// 			{
-		// 				value: "Delete",
-		// 				icon: "fa-trash",
-		// 				func: this.deleteProject.bind(this)
-		// 			}
-		// 		]
-		// 	}
-		// ]);
+		// 		"test1", "test2"
+		// 	])
+
+		editor.plugins.contextmenu.add("projectItem", [
+			{
+				value: "Actions",
+				type: "category",
+				content: [
+					{
+						value: "Delete",
+						icon: "fa-trash",
+						func: this.deleteProject.bind(this)
+					}
+				]
+			}
+		]);
 	},
 
 	onSplashStart: function()
@@ -93,10 +92,10 @@ editor.plugin("projects",
 
 	deleteProject: function(event) 
 	{
-		var selectedItem = this.template.get("#projects-list").select;
+		var selectedItem = this.template.get("#projects-list").$cache.selected;
 		if(!selectedItem) { return; }
 		
-		selectedItem.remove();
+		this.data.remove(selectedItem.data);
 	},
 
 	handleData: function(action, key, value, data)

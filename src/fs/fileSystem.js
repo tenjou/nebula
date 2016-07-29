@@ -1,5 +1,7 @@
 "use strict";
 
+// TODO: queue system for files.
+
 editor.fileSystem =
 {
 	init: function()
@@ -32,8 +34,9 @@ editor.fileSystem =
 	create: function(filename, cb)
 	{
 		var self = this;
+		var path = this.rootDir + filename;
 
-		this.fs.getFile(this.rootDir + filename, {
+		this.fs.getFile(path, {
 				create: true
 			},
 			function(fileEntry)
@@ -88,6 +91,7 @@ editor.fileSystem =
 
 		this.fs.getFile(this.rootDir + filename, { create: true },
 			function(fileEntry) {
+				console.log(content)
 				self.writeContent(fileEntry, content, cb);
 			},
 			function(fileError) {

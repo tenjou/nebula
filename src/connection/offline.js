@@ -9,7 +9,7 @@ editor.connection.offline =
 			if(!result) 
 			{
 				editor.connection.offline.db = {
-					projects: [],
+					projects: {},
 					lastProjectId: 0
 				};
 
@@ -66,6 +66,10 @@ editor.connection.offline =
 				this.createProject(editorData, data);
 				break;
 
+			case "remove":
+				this.deleteProject(editorData, data);
+				break;
+
 			case "set":
 				this.renameProject(editorData, data);
 				break;
@@ -83,10 +87,10 @@ editor.connection.offline =
 		};
 
 		var projects = this.db.projects;
-		for(var n = 0; n < projects.length; n++)
+		for(var key in projects)
 		{
-			var project = projects[n];
-			data[n] = {
+			var project = projects[key];
+			data[key] = {
 				value: project.value
 			};
 		}
@@ -147,6 +151,32 @@ editor.connection.offline =
 		});
 		
 		editorData.performAddKey(projectId, { value: projectData.name });
+	},
+
+	deleteProject: function(editorData, data)
+	{
+		var projectId = parseInt(data.key.id);
+		if(isNaN(projectId)) {
+			console.warn("(editor.connection.offline.deleteProject) Invalid project id: " + data.key.id);
+			return;
+		}
+
+		var project = this.db.projects[projectId];
+		if(!project) {
+			console.warn("(editor.connection.offline.deleteProject) Project not found with id: " + projectId);
+			return;
+		}
+
+		var self = this;
+		editor.fs.removeDir(project.path, function(dir) {
+			if(dir) 
+			{
+				delete self.db.projects[projectId];
+				self.saveDb();
+
+				editorData.performRemove(projectId);
+			}
+		});
 	},
 
 	renameProject: function(editorData, data)
@@ -255,8 +285,18 @@ editor.connection.offline =
 		editor.fs.write("db.json", JSON.stringify(editor.dataPublic));
 	},
 
+	saveDb: function()
+	{
+		this.needSaveDb = false;
+		editor.fs.write("db.json", JSON.stringify(this.db));		
+	},
+
 	handleUpdate: function()
 	{
+		console.log("here")
+		if(this.needSaveDb) {
+			this.saveDb();
+		}
 		if(this.needSave) {
 			this.saveData();
 		}
@@ -275,5 +315,6 @@ editor.connection.offline =
 	project: null,
 	projectDb: null,
 	db: null,
-	needSave: false
+	needSave: false,
+	needSaveDb: false
 };

@@ -173,12 +173,21 @@ wabi.element("basic",
 
 	remove: function(element)
 	{
-		this.$removeElement(element);
+		if(!element)
+		{
+			if(this.$parent) {
+				this.$parent.remove(this);
+			}
+		}
+		else
+		{
+			this.$removeElement(element);
 
-		var index = this.$children.indexOf(element);
-		if(index > -1) {
-			this.$children[index] = this.$children[this.$children.length - 1];
-			this.$children.pop();
+			var index = this.$children.indexOf(element);
+			if(index > -1) {
+				this.$children[index] = this.$children[this.$children.length - 1];
+				this.$children.pop();
+			}
 		}
 	},
 
