@@ -252,16 +252,38 @@ wabi.element("basic",
 		}
 		else
 		{
-			var buffer = this.$domElement.querySelectorAll(id);
-			var num = buffer.length;
-			if(num > 0) 
+			if(typeof id === "function")
 			{
-				var holderBuffer = new Array(num);
-				for(var n = 0; n < num; n++) {
-					holderBuffer[n] = buffer[n].holder;
-				}
+				var tag = id.prototype.$tag || id.prototype.$metadata.name;
 
-				return holderBuffer;
+				var buffer = this.$domElement.querySelectorAll(tag);
+				var num = buffer.length;
+				if(num > 0) 
+				{
+					var holderBuffer = new Array(num);
+					for(var n = 0; n < num; n++) 
+					{
+						if(buffer[n].holder instanceof id) {
+							holderBuffer[n] = buffer[n].holder;
+						}
+					}
+
+					return holderBuffer;
+				}
+			}
+			else
+			{
+				var buffer = this.$domElement.querySelectorAll(id);
+				var num = buffer.length;
+				if(num > 0) 
+				{
+					var holderBuffer = new Array(num);
+					for(var n = 0; n < num; n++) {
+						holderBuffer[n] = buffer[n].holder;
+					}
+
+					return holderBuffer;
+				}
 			}
 		}
 
