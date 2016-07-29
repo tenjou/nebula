@@ -278,7 +278,7 @@ var editor =
 		var idName = name.substr(0, wildcardIndex);
 		var ext = name.substr(wildcardIndex + 1).toLowerCase();
 
-		var type = this.plugins.resources.getTypeFromExt(ext);
+		var type = this.plugins.resources.getTypeFromExt(ext) || "etc";
 
 		if(this.offline)
 		{

@@ -46,7 +46,6 @@ editor.plugin("projects",
 		editor.plugins.contextmenu.add("projectItem", [
 			{
 				value: "Actions",
-				type: "category",
 				content: [
 					{
 						value: "Delete",

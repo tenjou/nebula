@@ -99,7 +99,7 @@ wabi.element("contextmenuInner",
 		var strType = typeof(item);
 		if(strType === "object")
 		{
-			if(item.type === "category") {
+			if(item.content !== undefined) {
 				element = wabi.createElement("contextmenuCategory", this);
 			}
 			else {
