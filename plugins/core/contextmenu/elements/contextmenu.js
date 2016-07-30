@@ -88,34 +88,23 @@ wabi.element("contextmenuInner",
 
 		if(!value) { return; }
 
-		for(var n = 0; n < value.length; n++) {
-			this.createItem(value[n]);
+		for(var key in value) {
+			this.createItem(key, value[key]);
 		}
 	},
 
-	createItem: function(item)
+	createItem: function(name, state)
 	{
 		var element;
-		var strType = typeof(item);
-		if(strType === "object")
-		{
-			if(item.content !== undefined) {
-				element = wabi.createElement("contextmenuCategory", this);
-			}
-			else {
-				element = wabi.createElement("contextmenuItem", this);
-			}
+
+		if(state.type === "category") {
+			element = wabi.createElement("contextmenuCategory", this);
 		}
-		else if(strType === "string") {
+		else {
 			element = wabi.createElement("contextmenuItem", this);
 		}
-		else
-		{
-			console.warn("(wabi.element.contextmenu.createItem) Invalid data");
-			return;
-		}
 
-		element.state = item;
+		element.state = state;
 	},
 
 	//

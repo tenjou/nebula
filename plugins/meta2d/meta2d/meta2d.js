@@ -21,16 +21,7 @@ editor.plugin("meta2d",
 	loadContextMenu: function()
 	{
 		var contextmenu = editor.plugins.contextmenu;
-		contextmenu.add("defs", {
-			value: "Create",
-			content: [
-				{
-					value: "Prefab",
-					func: this.createPrefab.bind(this)
-				}, 
-				"test2"
-			]
-		});
+
 	},
 
 	createPrefab: function(event)

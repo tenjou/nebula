@@ -46,62 +46,72 @@ editor.plugin("browser",
 			]
 		});
 
-		editor.plugins.contextmenu.add("resources", [
-			{
-				value: "Create",
+		editor.plugins.contextmenu.add("resources", {
+			Create: {
 				type: "category",
-				content: [
-					{
-						value: "Folder",
+				content: {
+					Folder: {
 						icon: "fa-folder",
 						func: this.createFolder.bind(this)
 					}
-				]
+				}
 			},
-			{
-				value: "Actions",
+			Actions: {
 				type: "category",
-				content: [
-					{
-						value: "Upload",
+				content: {
+					Upload: {
 						icon: "fa-upload",
 						func: this.upload.bind(this)
 					}
-				]
+				}
 			}
-		]);
+		});
 
-		editor.plugins.contextmenu.add("defs", [
-			"test", {
-				value: "Action",
-				content: [ "test2" ]
-			}
-		]);
-		editor.plugins.contextmenu.add("defsItem", "defs", [
-			{
-				value: "Actions",
-				content: [
-					{
-						value: "Delete",
-						icon: "fa-trash",
-						func: this.deleteItem.bind(this)
-					}
-				]
-			}
-		]);
-
-		editor.plugins.contextmenu.add("resourcesItem", [
-			{
-				value: "Actions",
-				content: [
-					{
-						value: "Delete",
+		editor.plugins.contextmenu.add("resourcesItem", "resources", {
+			Actions: {
+				type: "category",
+				content: {
+					Delete: {
 						icon: "fa-trash",
 						func: this.deleteResourceItem.bind(this)
 					}
-				]
+				}
 			}
-		]);	
+		});	
+
+		editor.plugins.contextmenu.add("defs", {});
+
+		// editor.plugins.contextmenu.add("defs", "resources", {
+		// 	Actions: {
+		// 		type: "category",
+		// 		content: {
+		// 			Delete: {
+		// 				icon: "fa-trash",
+		// 				func: this.deleteResourceItem.bind(this)
+		// 			}
+		// 		}
+		// 	}
+		// });	
+		// editor.plugins.contextmenu.add("defsItem", "resources", {
+		// 	Actions: {
+		// 		type: "category",
+		// 		content: {
+		// 			Delete: {
+		// 				icon: "fa-trash",
+		// 				func: this.deleteResourceItem.bind(this)
+		// 			}
+		// 		}
+		// 	}
+		// 	// Actions: {
+		// 	// 	type: "category",
+		// 	// 	content: {
+		// 	// 		Delete: {
+		// 	// 			icon: "fa-trash",
+		// 	// 			func: this.deleteItem.bind(this)
+		// 	// 		}
+		// 	// 	}
+		// 	// }
+		// });
 	},
 
 	install: function()
@@ -182,7 +192,6 @@ editor.plugin("browser",
 		this.browserDefs.on("click", "listItem", this.inspectItem, this);
 
 		var list = this.browserDefs.get("list")[0];
-
 
 		this.browserDefs.appendTo(parent);		
 	},

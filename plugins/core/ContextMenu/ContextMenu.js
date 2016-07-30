@@ -20,29 +20,174 @@ editor.plugin("contextmenu",
 			extend = null;
 		}
 
-		if(this.menus[id]) {
-			console.warn("(plugin.contextmenu.add) There is already contextmenu with id: " + id);
+		if(!props) {
+			console.warn("(plugin.contextmenu.add) Invalid properties passed for id: " + id);
 			return;
 		}
 
-		this.menus[id] = new this.Menu(id, extend, props);
+		var menu = this.menus[id];
+		if(!menu) 
+		{
+			var processedProps = {};
+			this.processProps(processedProps, props);
+
+			menu = new this.Menu(id, extend, processedProps);
+			this.menus[id] = menu;
+		}
+		else 
+		{
+			this.processProps(menu.props, props);
+
+			if(extend) 
+			{
+				if(menu.extend) {
+					menu.extend.push(extend);
+				}
+				else {
+					menu.extend = [ extend ];
+				}
+			}
+		}
+	},
+
+	processProps: function(src, props)
+	{
+		for(var key in props)
+		{
+			var state = props[key];
+			var prevState = src[key];
+
+			if(!state) 
+			{
+				if(!prevState) {
+					src[key] = { value: key };
+				}
+			}
+			else if(state instanceof Function) 
+			{
+				if(prevState) {
+					prevState.func = state;
+				}
+				else {
+					src[key] = { value: key, func: state };
+				}
+			}
+			else if(state instanceof Object) 
+			{
+				if(prevState)
+				{
+					if(state.value && state.value !== prevState.value) {
+						prevState.value = state.value;
+					}
+
+					if(state.content) {
+						this.processProps(prevState.content, state.content);
+					}
+				}
+				else
+				{
+					if(!state.value) {
+						state.value = key;
+					}
+
+					if(state.content) 
+					{
+						if(!state.type) {
+							state.type = "category";
+						}
+
+						var content = {};
+						this.processProps(content, state.content);
+						state.content = content;
+					}
+
+					src[key] = state;
+				}
+
+			}
+		}
 	},
 
 	show: function(id, x, y)
 	{
 		var menu = this.menus[id];
 		if(!menu) {
-			console.warn("(plugin.contextmenu.show) No such contextmenus found: " + id);
+			console.warn("(plugin.contextmenu.show) No such context menu found: " + id);
 			return;
 		}
 
-		if(menu.extend) {
-			console.log("extend");
+		if(menu.extend) 
+		{
+			var props = {};
+			this.extendMenu(props, menu);
+			this.contextmenu.value = props;
+		}
+		else 
+		{
+			this.contextmenu.value = menu.props;
 		}
 
 		this.contextmenu.position(event.x, event.y);
-		this.contextmenu.value = menu.props;
 		this.contextmenu.hidden = false;
+	},
+
+	extendMenu: function(src, menu)
+	{
+		if(menu.extend) 
+		{
+			var extend = menu.extend;
+			for(var n = 0; n < extend.length; n++) 
+			{
+				var extendId = extend[n];
+				var extendMenu = this.menus[extendId];
+				if(!extendMenu) {
+					console.warn("(plugin.contextmenu.extendMenu) No such context menu found: " + extendId);
+					continue;
+				}
+
+				this.extendMenu(src, extendMenu)
+			}
+		}
+
+		this.mergeProps(src, menu.props);
+	},
+
+	mergeProps: function(src, props)
+	{
+		for(var key in props)
+		{
+			var state = props[key]
+			var prevState = src[key];
+
+			if(!prevState) 
+			{
+				var newState = {};
+				Object.assign(newState, state);
+				if(newState.content) {
+					newState.content = {};
+					Object.assign(newState.content, state.content);
+				}
+
+				src[key] = newState;
+			}
+			else
+			{
+				if(prevState.value !== state.value) {
+					prevState.value = state.value;
+				}
+
+				if(state.content) 
+				{
+					if(prevState.content) {
+						this.mergeProps(prevState.content, state.content);
+					}
+					else {
+						prevState.content = {};
+						Object.assign(prevState.content, state.content);
+					}
+				}
+			}
+		}
 	},
 
 	hide: function() {
@@ -62,19 +207,7 @@ editor.plugin("contextmenu",
 	{
 		this.id = id;
 		this.props = props;
-
-		if(this.extend)
-		{
-			if(typeof(extend) === "string") {
-				this.extend = [ extend ];
-			}
-			else {
-				this.extend = extend;
-			}
-		}
-		else {
-			this.extend = null;
-		}
+		this.extend = extend ? [ extend ] : null;
 	},
 
 	//

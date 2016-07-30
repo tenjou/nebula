@@ -867,14 +867,8 @@ wabi.element("basic",
 			}
 		}
 
-		if(stateValue instanceof wabi.element.basic) 
-		{
-			if(value instanceof Object && !(value instanceof Array)) {
-				stateValue.state = value;
-			}
-			else {
-				stateValue.$setState("value", value);
-			}
+		if(stateValue instanceof wabi.element.basic) {
+			stateValue.$setState("value", value);
 		}
 		else {
 			this.$state[key] = value;
