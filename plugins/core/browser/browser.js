@@ -77,41 +77,7 @@ editor.plugin("browser",
 					}
 				}
 			}
-		});	
-
-		editor.plugins.contextmenu.add("defs", {});
-
-		// editor.plugins.contextmenu.add("defs", "resources", {
-		// 	Actions: {
-		// 		type: "category",
-		// 		content: {
-		// 			Delete: {
-		// 				icon: "fa-trash",
-		// 				func: this.deleteResourceItem.bind(this)
-		// 			}
-		// 		}
-		// 	}
-		// });	
-		// editor.plugins.contextmenu.add("defsItem", "resources", {
-		// 	Actions: {
-		// 		type: "category",
-		// 		content: {
-		// 			Delete: {
-		// 				icon: "fa-trash",
-		// 				func: this.deleteResourceItem.bind(this)
-		// 			}
-		// 		}
-		// 	}
-		// 	// Actions: {
-		// 	// 	type: "category",
-		// 	// 	content: {
-		// 	// 		Delete: {
-		// 	// 			icon: "fa-trash",
-		// 	// 			func: this.deleteItem.bind(this)
-		// 	// 		}
-		// 	// 	}
-		// 	// }
-		// });
+		});
 	},
 
 	install: function()
@@ -130,7 +96,6 @@ editor.plugin("browser",
 		var content = editor.plugins.layout.toolbarBrowser.$elements.content;
 		content.setCls("browser", true);
 
-		// HIERARCHY
 		this.createHierarchyPanel(content, this.cache);
 
 		this.cache = this.browserHierarchy.get("#hierarchy").$cache;
@@ -146,10 +111,10 @@ editor.plugin("browser",
 		this.browserHierarchy.on("contextmenu", "list", function(event) {
 			editor.plugins.contextmenu.show("hierarchy", event.x, event.y);
 		});
-		this.browserHierarchy.on("contextmenu", "listItem", function(event) {
-			editor.plugins.contextmenu.show("hierarchyItem", event.x, event.y);
-		});
-		this.browserHierarchy.on("click", "listItem", this.inspectItem, this);
+		this.browserHierarchy.on("contextmenu", "browserListItem", function(event) {
+			this.openContextMenu("hierarchyItem", event);
+		}, this);
+		this.browserHierarchy.on("click", "browserListItem", this.inspectItem, this);
 		this.browserHierarchy.appendTo(parent);		
 	},
 
@@ -158,9 +123,9 @@ editor.plugin("browser",
 		this.browserResources = wabi.createTemplate("browserResources");
 		this.browserResources.get("#resources").$cache = this.cache;
 		this.browserResources.data = this.resources;
-		this.browserResources.on("drop", [ "list", "listItem" ], this.handleResourceDrop, this);
-		this.browserResources.on("dragenter", [ "list", "listItem" ], this.handleDragEnter, this);
-		this.browserResources.on("dragleave", [ "list", "listItem" ], this.handleDragLeave, this);
+		this.browserResources.on("drop", [ "list", "browserListItem" ], this.handleResourceDrop, this);
+		this.browserResources.on("dragenter", [ "list", "browserListItem" ], this.handleDragEnter, this);
+		this.browserResources.on("dragleave", [ "list", "browserListItem" ], this.handleDragLeave, this);
 
 		var list = this.browserResources.get("list")[0];
 		list.on("contextmenu", function(event) {
@@ -168,8 +133,7 @@ editor.plugin("browser",
 		});
 		list.on("click", "browserListItem", this.inspectItem, this);
 		list.on("contextmenu", "browserListItem", function(event) {
-			editor.plugins.contextmenu.show("resourcesItem", event.x, event.y);
-			this.inspectItem(event);
+			this.openContextMenu("resourcesItem", event);
 		}, this);
 
 		this.resourceUpload = this.browserResources.get(wabi.element.upload)[0];
@@ -186,10 +150,10 @@ editor.plugin("browser",
 		this.browserDefs.on("contextmenu", "list", function(event) {
 			editor.plugins.contextmenu.show("defs", event.x, event.y);
 		});
-		this.browserDefs.on("contextmenu", "listItem", function(event) {
-			editor.plugins.contextmenu.show("defsItem", event.x, event.y);
+		this.browserDefs.on("contextmenu", "browserListItem", function(event) {
+			this.openContextMenu("defsItem", event);
 		});
-		this.browserDefs.on("click", "listItem", this.inspectItem, this);
+		this.browserDefs.on("click", "browserListItem", this.inspectItem, this);
 
 		var list = this.browserDefs.get("list")[0];
 
@@ -327,6 +291,12 @@ editor.plugin("browser",
 		this.numItemsLoading--;
 		if(this.numItemsLoading === 0) {
 		}
+	},
+
+	openContextMenu: function(menuId, event)
+	{
+		editor.plugins.contextmenu.show(menuId, event.x, event.y);
+		this.inspectItem(event);
 	},
 
 	inspectItem: function(event) {

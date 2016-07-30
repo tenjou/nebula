@@ -100,12 +100,13 @@ var editor =
 	{
 		var data = this.dataPublic.get("plugins");
 
+		var plugin;
 		var pluginData = serverData.data;
 		for(var key in pluginData) 
 		{
 			data.performSetKey(key, pluginData[key]);
 
-			var plugin = this.plugins[key];
+			plugin = this.plugins[key];
 			if(plugin.install) {
 				plugin.install();
 			}
@@ -117,6 +118,15 @@ var editor =
 	onStart: function()
 	{
 		var plugin;
+		
+		for(var key in this.plugins) 
+		{
+			plugin = this.plugins[key];
+			if(plugin.onPrepare) {
+				plugin.onPrepare();
+			}
+		}
+
 		for(var key in this.plugins) 
 		{
 			plugin = this.plugins[key];

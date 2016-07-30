@@ -38,7 +38,12 @@ editor.connection.offline =
 				if(data.id.indexOf("private.projects") > -1) {
 					this.processProjects(editor.data.get(data.id), data);
 				}
-				else {
+				else 
+				{
+					if(data.key === "@") {
+						data.key = this.generateHash();
+					}
+					
 					editor.connection.handleServerData(data);
 					this.saveData();
 				}
