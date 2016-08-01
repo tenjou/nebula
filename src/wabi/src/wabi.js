@@ -51,13 +51,7 @@ var wabi =
 			}
 		}
 
-		var element = this.element[props.type];
-		if(!element) {
-			console.warn("(wabi.createTemplate) Element type not found: " + props.type);
-			return null;
-		}
-
-		template = new element(null);
+		var template = wabi.createElement(props.type);
 		template.state = props;
 		template.$flags |= template.Flag.REGION;
 
@@ -152,44 +146,51 @@ var wabi =
 		return props;
 	},
 
-	createElement: function(name, parent, params)
+	createElement: function(name, parent, params, autoSetup)
 	{
+		var element;
 		var buffer = this.elementsCached[name];
-		if(buffer) 
+		if(buffer && buffer.length > 0) 
 		{
-			var element = buffer.pop();
+			element = buffer.pop();
 			if(element) 
 			{
-				element.$flag |= element.Flag.ACTIVE;
+				element.$flags |= element.Flag.ACTIVE;
 				element.parent = parent;
+			}
+		}
+		else 
+		{
+			var cls = this.element[name];
+			if(!cls) {			
+				console.warn("(editor.createElement) No such element found: " + name);
+				return null;
+			}
 
-				if(element.setup) {
-					element.setup();
-				}
+			element = new this.element[name](parent, params);
+			element.$flags |= element.Flag.ACTIVE;
+		}
 
-				return element;
+		if(autoSetup !== false) 
+		{
+			if(element.$setup) {
+				element.$setup();
 			}
 		}
 
-		var cls = this.element[name];
-		if(!cls) {			
-			console.warn("(editor.createElement) No such element found: " + name);
-			return null;
-		}
-
-		return new this.element[name](parent, params);
+		return element;
 	},
 
-	removeElement: function(element)
+	removeElement: function(element, skipChildRemove)
 	{
-		if((element.$flag & element.Flag.ACTIVE) === 0) { return; }
-		element.$flag &= ~element.Flag.ACTIVE;
-		element.remove();
+		if((element.$flags & element.Flag.ACTIVE) === 0) { return; }
+		element.$flags &= ~element.Flag.ACTIVE;
+		element.$remove(skipChildRemove);
 
-		var buffer = this.element[element.$metadata.name];
+		var buffer = this.elementsCached[element.$metadata.name];
 		if(!buffer) {
 			buffer = [ element ];
-			this.element[element.$metadata.name] = buffer;
+			this.elementsCached[element.$metadata.name] = buffer;
 		}
 		else {
 			buffer.push(element);
@@ -278,6 +279,7 @@ var wabi =
 		var elements = {};
 		var events = [];
 		var proto = {};
+		var numElements = 0;
 
 		if(props.elements) 
 		{
@@ -286,16 +288,15 @@ var wabi =
 			{
 				var item = elementsProps[key];
 				elements[key] = item.type;
+				numElements++;
 
 				if(item.link)
 				{
-					states[item.link] = null;
 					statesLinked[item.link] = key;
 					elementsLinked[key] = item.link;
 				}
 				else if(item.bind)
 				{
-					states[item.bind] = null;
 					statesLinked[item.bind] = key;
 					elementsBinded[key] = item.bind;
 				}
@@ -388,10 +389,10 @@ var wabi =
 		metadata.elementsLinked = elementsLinked;
 		metadata.elementsBinded = elementsBinded;
 
-		if(elements) {
+		if(numElements > 0) {
 			metadata.elements = elements;
 		}
-		if(events) {
+		if(events.length > 0) {
 			metadata.events = events;
 		}
 
@@ -443,6 +444,10 @@ var wabi =
 				{
 					if(elementProto.set_value === undefined) {
 						proto.set_value = null;
+					}
+					if(elementProto.value === undefined) {
+						elementProto.value = undefined;
+						delete states.value;
 					}
 				}
 
@@ -508,7 +513,6 @@ var wabi =
 	{
 		this.name = name;
 		this.states = null;
-		this.statesInitial = null;
 		this.stateCls = null;
 		this.statesLinked = null;
 		this.elements = null;

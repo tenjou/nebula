@@ -84,7 +84,7 @@ wabi.element("contextmenuInner",
 {
 	set_value: function(value)
 	{
-		this.removeAll();
+		this.removeChildren();
 
 		if(!value) { return; }
 

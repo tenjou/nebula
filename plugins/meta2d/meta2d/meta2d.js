@@ -6,6 +6,7 @@ editor.plugin("meta2d",
 	{
 		this.loadTypes();
 		this.loadContextMenu();
+		this.loadInspect();
 	},
 
 	onStart: function()
@@ -58,11 +59,49 @@ editor.plugin("meta2d",
 		});
 	},
 
+	loadInspect: function()
+	{
+		var inspect = editor.plugins.inspect;
+
+		wabi.addFragment("inspect-sprite", "inspect-general",
+		{
+			type: "section",
+			name: "Transform",
+			value: [		
+				{
+					type: "label",
+					name: "Position",
+					value: [
+						{
+							type: "taggedNumber",
+							bind: "posX",
+							name: "x",
+							color: "#D04031"
+						},
+						{
+							type: "taggedNumber",
+							bind: "posY",
+							name: "y",
+							color: "#72B529"
+						},
+						{
+							type: "taggedNumber",
+							bind: "posZ",
+							name: "z",
+							color: "#2F80AD"
+						}
+					]
+				},
+			]
+		});
+	},
+
 	createSprite: function(event)
 	{
 		editor.dataPublic.get("hierarchy").add("@", {
 			value: "Sprite",
-			type: "sprite"
+			type: "sprite",
+			posX: 300
 		});
 	},
 

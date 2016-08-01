@@ -277,7 +277,7 @@ editor.plugin("browser",
 		reader.onload = function(fileResult) 
 		{
 			editor.writeFile(file, fileResult, function(hash, type) {
-				self.resources.add(hash, "#" + type + "." + hash);
+				self.resources.add(hash, "*" + type + "." + hash);
 			});
 		};
 

@@ -46,7 +46,7 @@ wabi.element("dropdown",
 	openMenu: function(event)
 	{
 		var list = this.$elements.list;
-		list.removeAll();
+		list.removeChildren();
 
 		if(!this.$dataset) { return; }
 

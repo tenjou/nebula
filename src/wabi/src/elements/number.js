@@ -8,11 +8,19 @@ wabi.element("number",
 
 	set_value: function(value)
 	{
-		if(value < this.min) {
-			value = this.min;
+		if(isNaN(value)) {
+			// value = "0";
+			//value = 0;
+			console.log("num", value)
 		}
-		if(value > this.max) {
-			value = this.max;
+		else
+		{
+			if(value < this.min) {
+				value = this.min;
+			}
+			if(value > this.max) {
+				value = this.max;
+			}
 		}
 
 		this.$domElement.value = value + "";
@@ -21,11 +29,11 @@ wabi.element("number",
 	},
 
 	set_min: function(value) {
-		this.value = value;
+		this.value = this.value;
 	},
 
 	set_max: function(value) {
-		this.value = value;
+		this.value = this.value;
 	},
 
 	handle_keydown: function(event)

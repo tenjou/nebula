@@ -75,7 +75,7 @@ wabi.data.prototype =
 	{
 		if(typeof value === "string") 
 		{
-			if(value[0] === "#") {
+			if(value[0] === "*") {
 				var ref = new wabi.ref(value, key, this);
 				this.raw[key] = ref;
 				return ref;
@@ -221,7 +221,7 @@ wabi.data.prototype =
 			if(value instanceof Object && !(value instanceof wabi.data)) {
 				value = new wabi.data(value, key, this);
 			}
-			else if(typeof value === "string" && value[0] === "#") {
+			else if(typeof value === "string" && value[0] === "*") {
 				var ref = new wabi.ref(value, key, this);
 				this.raw[key] = value;
 				value = ref;
@@ -235,7 +235,7 @@ wabi.data.prototype =
 			return;
 		}	
 
-		if(typeof value === "string" && value[0] === "#") {
+		if(typeof value === "string" && value[0] === "*") {
 			var ref = new wabi.ref(value, key, this);
 			this.raw[key] = value;
 			value = ref;
@@ -359,7 +359,7 @@ wabi.data.prototype =
 					data = new wabi.data(data, index + "", this);
 					this.raw[index] = data;
 				}
-				else if(typeof data === "string" && data[0] === "#") {
+				else if(typeof data === "string" && data[0] === "*") {
 					data = new wabi.ref(data, index, this);
 					this.raw[index] = data;
 					return data;

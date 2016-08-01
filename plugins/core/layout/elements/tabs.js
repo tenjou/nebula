@@ -4,7 +4,7 @@ wabi.element("tabs",
 {
 	set_value: function(value)
 	{
-		this.removeAll();
+		this.removeChildren();
 
 		var tab;
 

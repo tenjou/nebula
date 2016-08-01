@@ -38,6 +38,11 @@ editor.plugin("inspect",
 		this.content.appendTo(toolbarContent);
 	},
 
+	add: function(id, props)
+	{
+
+	},
+
 	show: function(data)
 	{
 		if(!data) {
@@ -51,6 +56,7 @@ editor.plugin("inspect",
 			props = wabi.getFragment("inspect-general");
 		}
 
+		this.content.data = null;
 		this.content.value = props;
 		this.content.data = data;
 	},

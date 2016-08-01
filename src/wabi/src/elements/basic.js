@@ -22,27 +22,24 @@ wabi.element.basic = function(parent, params)
 
 		for(var key in elements)
 		{
-			var element = wabi.createElement(elements[key], this);
+			var element = wabi.createElement(elements[key], this, null, false);
 			if(!element) { continue; }
 
-			var parentLink = this.$metadata.elementsLinked[key];
-			if(parentLink) {
-				element.$parentLink = parentLink;
-			}
-
-			this.$state[parentLink] = element;
+			element.$flags |= this.Flag.ELEMENT;
 			this.$elements[key] = element;
 
 			var bind = this.$metadata.elementsBinded[key];
 			if(bind) {
 				element.$parentLink = bind;
 				element.bind = bind;
+				this.$state[bind] = element;
 			}
 			else
 			{
 				var parentLink = this.$metadata.elementsLinked[key];
 				if(parentLink) {
 					element.$parentLink = parentLink;
+					this.$state[parentLink] = element;
 				}	
 			}
 		}
@@ -64,8 +61,6 @@ wabi.element.basic = function(parent, params)
 	if(this.prepare) {
 		this.prepare();
 	}
-
-	this.$setup();
 };
 
 wabi.element("basic", 
@@ -76,15 +71,23 @@ wabi.element("basic",
 
 	$setup: function()
 	{
+		var elementsBinded = this.$metadata.elementsBinded;
+
+		for(var key in this.$elements) 
+		{
+			var element = this.$elements[key];
+			element.$setup();
+			if(elementsBinded[key]) {
+				element.$state.bind = elementsBinded[key];
+			}
+		}
+
 		// Process initial state:
 		var states = this.$metadata.states;
 		for(var key in states) 
 		{
 			var value = states[key];
-			var newValue = this.$processState(key, value);
-			if(value !== newValue) {
-				this.$state[key] = newValue;
-			}
+			this.$processState(key, value);
 		}
 
 		if(this.setup) {
@@ -143,63 +146,82 @@ wabi.element("basic",
 		}
 	},
 
-	$removeElement: function(element)
+	$remove: function(skipChildRemove)
 	{
-		if(element.$parent !== this) {
-			console.warn("(element.basic) Element has different parent");
-			return;
+		if(this.$data) {
+			this.data = null;
 		}
 
-		if(element.cleanup) {
-			element.cleanup();
+		this.removeChildren();
+
+		if(this.$flags & this.Flag.ENABLED) {
+			this.$flags &= ~(this.Flag.ENABLED | this.Flag.ACTIVE);
+			this.$parent.$domElement.removeChild(this.$domElement);
 		}
 
-		if(element.$data) {
-			element.data = null;
+		if(this.cleanup) {
+			this.cleanup();
 		}
 
-		if(element.$flags & this.Flag.ENABLED) {
-			element.$flags &= ~(this.Flag.ENABLED | this.Flag.ACTIVE);
-			this.$domElement.removeChild(element.$domElement);
+		if(!skipChildRemove) 
+		{
+			var parentChildren = this.$parent.$children;
+			var index = parentChildren.indexOf(this);
+			if(index > -1) {
+				parentChildren[index] = parentChildren[parentChildren.length - 1];
+				parentChildren.pop();
+			}	
 		}
 
-		element.$parent = null;
-		element.$listeners = null;
-		element.$childrenListeners = null;
-		element.$flags = 0;
+		this.$parent = null;
+		this.$listeners = null;
+		this.$childrenListeners = null;
+	},
 
-		wabi.removeElement(element);
+	removeChildren: function()
+	{
+		if(this.$children) 
+		{
+			if(this.$metadata.elements)
+			{
+				for(var n = 0; n < this.$children.length; n++) {
+					var child = this.$children[n];
+
+					if(child.$flags & this.Flag.ELEMENT) { 
+						child.removeChildren();
+					}
+					else {
+						wabi.removeElement(child, false);
+					}
+				}
+			}
+			else
+			{
+				for(var n = 0; n < this.$children.length; n++) {
+					var child = this.$children[n];
+					if(child.$flags & this.Flag.ELEMENT) { continue; }
+					wabi.removeElement(child, true);
+				}
+
+				this.$children.length = 0;
+			}
+		}
 	},
 
 	remove: function(element)
 	{
-		if(!element)
+		if(!element) {
+			wabi.removeElement(this);
+		}
+		else 
 		{
-			if(this.$parent) {
-				this.$parent.remove(this);
+			if(element.$parent !== this) {
+				console.warn("(wabi.element.basic.remove) Element has different parent");
+				return;
 			}
+
+			wabi.removeElement(element);
 		}
-		else
-		{
-			this.$removeElement(element);
-
-			var index = this.$children.indexOf(element);
-			if(index > -1) {
-				this.$children[index] = this.$children[this.$children.length - 1];
-				this.$children.pop();
-			}
-		}
-	},
-
-	removeAll: function()
-	{
-		if(!this.$children) { return; }
-
-		for(var n = 0; n < this.$children.length; n++) {
-			this.$removeElement(this.$children[n]);
-		}
-
-		this.$children.length = 0;
 	},
 
 	attrib: function(key, value)
@@ -621,7 +643,7 @@ wabi.element("basic",
 			this.$setState(key, value);
 		}
 		else {
-			this.$setState(key, this.$state.value ? this.$state.value : null);
+			this.$setState(key, (this.$state.value !== undefined) ? this.$state.value : null);
 		}		
 	},
 
@@ -817,12 +839,12 @@ wabi.element("basic",
 					this.$data.set(bind, value);
 				}
 				else {
-					this.$setActionState("set", name, value);
+					this.$setActionState("set", key, value);
 				}
 			}
 			else
 			{
-				var dataBindName = bind[name];
+				var dataBindName = bind[key];
 				if(dataBindName) {
 					data.set(dataBindName, value);
 				}
@@ -890,6 +912,12 @@ wabi.element("basic",
 		if(elementKey) {
 			return this.$elements[elementKey].$processState("value", value);
 		}
+		else 
+		{
+			if(this.$state[key] !== value) {
+				this.$state[key] = value;
+			}
+		}
 
 		return value;
 	},
@@ -903,7 +931,8 @@ wabi.element("basic",
 		ACTIVE: 1 << 0,
 		REGION: 1 << 1,
 		ENABLED: 1 << 2,
-		WATCHING: 1 << 3
+		WATCHING: 1 << 3,
+		ELEMENT: 1 << 4
 	},
 
 	//

@@ -18,7 +18,7 @@ wabi.element("list",
 
 	set_value: function(value) 
 	{
-		this.removeAll();
+		this.removeChildren();
 
 		if(value) 
 		{
