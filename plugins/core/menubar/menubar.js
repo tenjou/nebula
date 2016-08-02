@@ -21,6 +21,7 @@ editor.plugin("menubar",
 	onSplashStart: function()
 	{
 		this.template = wabi.createTemplate("topMenubar");
+		this.template.data = editor.dataPrivate.get("user");
 		this.template.appendTo(editor.wrapperElement);
 	},
 

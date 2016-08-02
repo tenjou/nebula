@@ -2,20 +2,15 @@
 
 wabi.element("icon", 
 {
-	setup: function() {
+	setup: function() 
+	{
 		this.state.hidden = true;
-		this.setCls("fa", true);
+		this.attrib("class", "fa");
 	},
 
 	set_value: function(value, prevValue) 
 	{
-		if(prevValue) {
-			this.setCls(prevValue, false)
-		}
-		if(value) {
-			this.setCls(value, true);
-		}
-
+		this.setCls(value, true);
 		this.state.hidden = false;
 	}
 });

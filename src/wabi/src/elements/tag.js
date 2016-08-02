@@ -7,9 +7,7 @@ wabi.element("tag",
 	},
 
 	set_value: function(value)
-	{
-		console.log(value)
-		
+	{		
 		if(!value) 
 		{
 			this.hidden = true;

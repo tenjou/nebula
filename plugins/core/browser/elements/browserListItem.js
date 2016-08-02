@@ -16,9 +16,5 @@ wabi.element("browserListItem", "listItem",
 			type: "tag",
 			bind: "ext"
 		}
-	},
-
-	set_ext: function(ext) {
-		console.log("ext", ext)
 	}
 });
