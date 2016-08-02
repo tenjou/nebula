@@ -156,7 +156,7 @@ var editor =
 		this.loadPlugin("resources");
 		this.loadPlugin("contextmenu");
 		this.loadPlugin("login");
-		// this.loadPlugin("menubar");
+		this.loadPlugin("menubar");
 		this.loadPlugin("projects");
 	},
 
@@ -309,7 +309,7 @@ var editor =
 			if(this.electron)
 			{
 				this.fs.writeBase64(filePath, fileResult.target.result, function(path) {
-					map.set(hash, info);
+					map.add(hash, info);
 					if(callback) {
 						callback(hash, type);
 					}
@@ -319,7 +319,7 @@ var editor =
 			{
 				var blob = dataURItoBlob(fileResult.target.result, file.type);
 				this.fs.writeBlob(filePath, blob, function(path) {
-					map.set(hash, info);
+					map.add(hash, info);
 					if(callback) {
 						callback(hash, type);
 					}

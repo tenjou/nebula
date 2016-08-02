@@ -435,6 +435,11 @@ var wabi =
 		var statesLinked = metadata.statesLinked;
 		var states = metadata.states;
 		var statesProto = {};
+
+		for(var key in statesLinked) {
+			states[key] = null;
+		}
+
 		for(var key in states) 
 		{
 			var link = statesLinked[key];
@@ -452,7 +457,6 @@ var wabi =
 				}
 
 				this.defStateLink(proto, key, link);
-				statesProto[key] = null;
 			}
 			else 
 			{

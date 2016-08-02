@@ -28,20 +28,11 @@ wabi.element.basic = function(parent, params)
 			element.$flags |= this.Flag.ELEMENT;
 			this.$elements[key] = element;
 
-			var bind = this.$metadata.elementsBinded[key];
-			if(bind) {
-				element.$parentLink = bind;
-				element.bind = bind;
-				this.$state[bind] = element;
-			}
-			else
-			{
-				var parentLink = this.$metadata.elementsLinked[key];
-				if(parentLink) {
-					element.$parentLink = parentLink;
-					this.$state[parentLink] = element;
-				}	
-			}
+			var parentLink = this.$metadata.elementsLinked[key];
+			if(parentLink) {
+				element.$parentLink = parentLink;
+				this.$state[parentLink] = element;
+			}	
 		}
 	}
 
@@ -175,7 +166,6 @@ wabi.element("basic",
 
 		this.$parent = null;
 		this.$listeners = null;
-		this.$childrenListeners = null;
 	},
 
 	removeChildren: function()
