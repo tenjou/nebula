@@ -4,21 +4,25 @@ wabi.element("taggedNumber",
 {
 	elements: 
 	{
-		ww: {
+		name: {
 			type: "word",
 			bind: "name"
 		},
-		nn: {
+		number: {
 			type: "number",
 			bind: "value"
 		}
 	},
 
+	set_name: function(name) 
+	{
+		console.log("name", name)
+	},
+
 	set_color: function(value) {
-		this.$elements.ww.style("background-color", value);
+		this.$elements.name.style("background-color", value);
 	},
 
 	//
-	name: "",
 	color: "0x000000"
 });

@@ -28,6 +28,7 @@ meta.loader =
 		this.typeClasses = {
 			texture: meta.Texture,
 			sprite: meta.Sprite,
+			view: meta.View,
 		};
 	},
 
@@ -103,7 +104,16 @@ meta.loader =
 		var item = meta.new(cls);
 		item.data = data;
 		item.texture = texture;
-		meta.view.add(item);		
+		
+		switch(type)
+		{
+			case "sprite":
+				meta.view.add(item);
+				break;
+
+			case "view":
+				break;
+		}		
 	},
 
 	watchHierarchyData: function(action, key, value, index, data)
@@ -115,8 +125,15 @@ meta.loader =
 				break;
 
 			case "remove":
-				meta.view.remove(value.id);
-				break;
+			{
+				var type = value.get("type");
+				switch(type)
+				{
+					case "sprite":
+						meta.view.remove(value.id);
+						break;
+				}
+			} break;
 		}
 	},
 

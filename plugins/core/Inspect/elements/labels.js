@@ -36,8 +36,6 @@ wabi.element("labelNumber",
 	$tag: "label"
 });
 
-"use strict";
-
 wabi.element("labelDropdown",
 {
 	elements: 

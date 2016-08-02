@@ -27,6 +27,10 @@ editor.plugin("meta2d",
 	{
 		var resources = editor.plugins.resources;
 
+		resources.addType("folder", {
+			icon: "fa-folder"
+		});
+
 		resources.addType("sprite", {
 			icon: "fa-rocket"
 		});
@@ -50,6 +54,10 @@ editor.plugin("meta2d",
 					View: {
 						icon: editor.plugins.resources.getIconFromType("view"),
 						func: this.createView.bind(this)
+					},
+					Folder: {
+						icon: editor.plugins.resources.getIconFromType("folder"),
+						func: this.createFolder.bind(this)
 					}
 				}
 			}
@@ -67,66 +75,9 @@ editor.plugin("meta2d",
 		});
 	},
 
-	loadInspect: function()
+	createFolder: function(event)
 	{
-		var inspect = editor.plugins.inspect;
 
-		wabi.addFragment("inspect-sprite", "inspect-general",
-		{
-			type: "section",
-			name: "Transform",
-			value: [		
-				{
-					type: "label",
-					name: "Position",
-					value: [
-						{
-							type: "taggedNumber",
-							bind: "x",
-							name: "x",
-							color: "#D04031"
-						},
-						{
-							type: "taggedNumber",
-							bind: "y",
-							name: "y",
-							color: "#72B529"
-						}
-					]
-				},
-				{
-					type: "labelNumber",
-					bind: "angle",
-					name: "Angle"
-				},
-				{
-					type: "label",
-					name: "Scale",
-					value: [
-						{
-							type: "taggedNumber",
-							bind: "scaleX",
-							name: "x",
-							value: 1.0,
-							color: "#D04031"
-						},
-						{
-							type: "taggedNumber",
-							bind: "scaleY",
-							name: "y",
-							value: 1.0,
-							color: "#72B529"
-						}
-					]
-				},
-				{
-					type: "dropdown",
-					name: "Texture",
-					bind: "texture",
-					dataset: "assets.texture"
-				}
-			]
-		});
 	},
 
 	createSprite: function(event)
