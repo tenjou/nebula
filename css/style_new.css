@@ -203,6 +203,10 @@ header {
 	cursor: default;
 	background: black;
 }
+
+section {
+	padding-bottom: 1px;
+}
 section header caret {
 	width: 12px;
 }

@@ -382,9 +382,9 @@ wabi.element("basic",
 			buffer[n](event);
 		}
 
-		if(this.$parent) {
-			this.$checkParentListeners(eventName, event);
-		}
+		// if(this.$parent) {
+		// 	this.checkParentListeners(eventName, event);
+		// }
 	},
 
 	emitEx: function(event)
@@ -410,7 +410,7 @@ wabi.element("basic",
 		}
 
 		if(this.$parent) {
-			this.$checkParentListeners(eventName, event);
+			this.checkParentListeners(eventName, event);
 		}
 	},
 
@@ -938,6 +938,7 @@ wabi.element("basic",
 	$flags: 0,
 	$tag: null,
 
+	$listeners: null,
 	$children: null,
 	$childrenListeners: null,
 	$preventableEvents: {

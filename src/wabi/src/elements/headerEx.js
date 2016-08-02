@@ -22,6 +22,10 @@ wabi.element("headerEx",
 		this.$elements.caret.toggle();
 	},
 
+	set_open: function(value) {
+		this.emit("open", value);
+	},
+
 	//
 	$tag: "header"
 });

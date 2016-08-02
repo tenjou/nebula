@@ -7,8 +7,7 @@ wabi.element("caret",
 	},
 
 	toggle: function() {
-		this.value = !this.value;	
-		console.log("TOGGLE", this.value)	
+		this.value = !this.value;
 	},
 
 	set_value: function(value)
@@ -25,10 +24,6 @@ wabi.element("caret",
 
 	handle_click: function(event) {
 		this.toggle();
-	},
-
-	set open(value) {
-		console.log("some_open")
 	},
 
 	value: false
