@@ -4,6 +4,7 @@ var texture;
 
 meta.on("preload", function() 
 {
+	meta.camera.draggable = true;
 	texture = meta.resources.loadTexture("cubetexture.png");
 });
 
@@ -38,37 +39,84 @@ meta.loader =
 			return;
 		}
 
-		var resources = meta.resources;
+		data.watch(this.watchAssetType, this);
 
 		var raw = data.raw;
 		for(var key in raw)
 		{
 			var itemData = data.get(key);
 
-			var item = meta.new(cls);
-			item.data = itemData;
-			resources.add(type, item);
+			this.registerItem(itemData, cls);
+		}
+	},
+
+	registerItem: function(data, cls)
+	{
+		var item = meta.new(cls);
+		item.data = data;
+		meta.resources.add(data.raw.type, item);		
+	},
+
+	watchAssetType: function(action, key, value, index, data)
+	{
+		switch(action)
+		{
+			case "add":
+			{
+				var cls = this.typeClasses[value.raw.type];
+				if(!cls) {
+					console.warn("(meta.loader.watchAssetType) Type is unsupported: " + type);
+					break;
+				}
+
+				this.registerItem(value, cls);
+			} break;
+
+			case "remove":
+				meta.resources.remove(value.raw.type, value.id);
+				break;
 		}
 	},
 
 	load: function(data)
 	{
+		data.watch(this.watchHierarchyData, this);
+
 		var raw = data.raw;
 		for(var key in raw) 
 		{
 			var itemData = data.get(key);
-			var type = itemData.raw.type;
+			this.loadItem(itemData);
+		}
+	},
 
-			var cls = this.typeClasses[type];
-			if(!cls) {
-				console.warn("(meta.loader.load) Type is unsupported: " + type);
-				return;
-			}
+	loadItem: function(data)
+	{
+		var type = data.raw.type;
 
-			var item = meta.new(cls);
-			item.data = itemData;
-			item.texture = texture;
-			meta.view.add(item);
+		var cls = this.typeClasses[type];
+		if(!cls) {
+			console.warn("(meta.loader.loadItem) Type is unsupported: " + type);
+			return;
+		}
+
+		var item = meta.new(cls);
+		item.data = data;
+		item.texture = texture;
+		meta.view.add(item);		
+	},
+
+	watchHierarchyData: function(action, key, value, index, data)
+	{
+		switch(action)
+		{
+			case "add":
+				this.loadItem(value);
+				break;
+
+			case "remove":
+				meta.view.remove(value.id);
+				break;
 		}
 	},
 

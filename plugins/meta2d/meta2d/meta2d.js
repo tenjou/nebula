@@ -30,6 +30,10 @@ editor.plugin("meta2d",
 		resources.addType("sprite", {
 			icon: "fa-rocket"
 		});
+
+		resources.addType("view", {
+			icon: "fa-photo"
+		});
 	},
 
 	loadContextMenu: function()
@@ -42,6 +46,10 @@ editor.plugin("meta2d",
 					Sprite: {
 						icon: editor.plugins.resources.getIconFromType("sprite"),
 						func: this.createSprite.bind(this)
+					},
+					View: {
+						icon: editor.plugins.resources.getIconFromType("view"),
+						func: this.createView.bind(this)
 					}
 				}
 			}
@@ -74,24 +82,49 @@ editor.plugin("meta2d",
 					value: [
 						{
 							type: "taggedNumber",
-							bind: "posX",
+							bind: "x",
 							name: "x",
 							color: "#D04031"
 						},
 						{
 							type: "taggedNumber",
-							bind: "posY",
+							bind: "y",
 							name: "y",
 							color: "#72B529"
-						},
-						{
-							type: "taggedNumber",
-							bind: "posZ",
-							name: "z",
-							color: "#2F80AD"
 						}
 					]
 				},
+				{
+					type: "labelNumber",
+					bind: "angle",
+					name: "Angle"
+				},
+				{
+					type: "label",
+					name: "Scale",
+					value: [
+						{
+							type: "taggedNumber",
+							bind: "scaleX",
+							name: "x",
+							value: 1.0,
+							color: "#D04031"
+						},
+						{
+							type: "taggedNumber",
+							bind: "scaleY",
+							name: "y",
+							value: 1.0,
+							color: "#72B529"
+						}
+					]
+				},
+				{
+					type: "dropdown",
+					name: "Texture",
+					bind: "texture",
+					dataset: "assets.texture"
+				}
 			]
 		});
 	},
@@ -100,10 +133,17 @@ editor.plugin("meta2d",
 	{
 		editor.dataPublic.get("hierarchy").add("@", {
 			value: "Sprite",
-			type: "sprite",
-			posX: 300
+			type: "sprite"
 		});
 	},
+
+	createView: function(event)
+	{
+		editor.dataPublic.get("hierarchy").add("@", {
+			value: "View",
+			type: "view"
+		});
+	},	
 
 	deleteItem: function(event)
 	{
