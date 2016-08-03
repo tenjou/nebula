@@ -8,6 +8,21 @@ wabi.element("word",
 		this.attrib("tabindex", "0");
 	},
 
+	set_value: function(value)
+	{
+		this.$domElement.innerHTML = value;
+
+		if(this.value && value) 
+		{
+			this.setCls("highlight", true);
+			
+			var self = this;
+			setTimeout(function() {
+				self.setCls("highlight", false);
+			}, 600);
+		}			
+	},
+
 	set_editable: function(value)
 	{
 		if(!value) {

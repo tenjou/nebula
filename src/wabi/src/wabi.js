@@ -298,6 +298,7 @@ var wabi =
 				else if(item.bind)
 				{
 					statesLinked[item.bind] = key;
+					elementsLinked[key] = item.bind;
 					elementsBinded[key] = item.bind;
 				}
 			}
@@ -457,6 +458,7 @@ var wabi =
 				}
 
 				this.defStateLink(proto, key, link);
+				statesProto[key] = null;
 			}
 			else 
 			{

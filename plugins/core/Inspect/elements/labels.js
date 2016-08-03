@@ -50,6 +50,14 @@ wabi.element("labelDropdown",
 		}
 	},
 
+	set_dataset: function(value) {
+		this.$elements.dropdown.dataset = value;
+	},
+
+	set_emptyOption: function(value) {
+		this.$elements.dropdown.emptyOption = value;
+	},
+
 	//
 	$tag: "label"
 });

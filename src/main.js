@@ -1,20 +1,6 @@
 "use strict";
 
-wabi.element("item",
+meta.onDomLoad(function() 
 {
-	elements: {
-		word: {
-			type: "word",
-			bind: "value"
-		},
-		tag: {
-			type: "tag",
-			bind: "ext"
-		}
-	}
-})
-
-
-meta.onDomLoad(function() {
 	editor.prepare();
 });

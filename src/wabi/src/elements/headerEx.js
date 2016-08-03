@@ -23,7 +23,7 @@ wabi.element("headerEx",
 	},
 
 	set_open: function(value) {
-		this.emit("open", value);
+		this.emit("open");
 	},
 
 	//

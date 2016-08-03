@@ -76,7 +76,7 @@ editor.plugin.meta2d.prototype.loadInspect = function()
 					type: "labelCheckbox",
 					bind: "static",
 					name: "Static"
-				},					
+				}				
 			]
 		},
 		{
@@ -87,7 +87,8 @@ editor.plugin.meta2d.prototype.loadInspect = function()
 					type: "labelDropdown",
 					name: "Texture",
 					bind: "texture",
-					dataset: "assets.texture"
+					dataset: "assets.texture",
+					emptyOption: true
 				},
 				{
 					type: "label",

@@ -5,12 +5,12 @@ wabi.element("taggedNumber",
 	elements: 
 	{
 		name: {
-			type: "word",
-			bind: "name"
+			type: "text",
+			link: "name"
 		},
 		number: {
 			type: "number",
-			bind: "value"
+			link: "value"
 		}
 	},
 

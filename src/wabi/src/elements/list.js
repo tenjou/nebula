@@ -29,13 +29,14 @@ wabi.element("list",
 				if(value instanceof Array)
 				{
 					for(var n = 0; n < value.length; n++) {
-						this.add_value(this.data.get(n));
+						this.add_value(value.get(n));
 					}
 				}
 				else
 				{
-					for(var key in value) {
-						this.add_value(this.data.get(key));
+					var raw = value.raw;
+					for(var key in raw) {
+						this.add_value(value.get(key));
 					}
 				}
 			}
@@ -180,15 +181,16 @@ wabi.element("listItem",
 			}
 
 			cache.selected = this;
+			this.emit("select");
 		}
 		else
 		{
-			if(cache.selected !== this) { return; }
-			cache.selected = null;
+			if(cache.selected !== this) { 
+				cache.selected = null;
+			}
 		}
 
 		this.setCls("selected", value);
-		this.emit("select");
 	},
 
 	set_draggable: function(value)

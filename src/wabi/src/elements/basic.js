@@ -127,8 +127,11 @@ wabi.element("basic",
 
 		this.$parent = parentHolder;
 
-		if(parentHolder.$data && parentHolder.bind !== "*") {
-			this.data = parentHolder.$data;
+		if(parentHolder.$data && parentHolder.bind !== "*") 
+		{
+			if((this.$flags & this.Flag.REGION) === 0) { 
+				this.data = parentHolder.$data;
+			}
 		}
 		
 		if(this.enable && parentHolder.$domElement) {
@@ -226,6 +229,10 @@ wabi.element("basic",
 		return value;
 	},
 
+	removeAttrib: function(key) {
+		this.$domElement.removeAttribute(key);
+	},
+
 	style: function(key, value)
 	{
 		if(this.$domElement.style[key] === void(0)) {
@@ -305,7 +312,7 @@ wabi.element("basic",
 	on: function(event, id, cb, owner)
 	{
 		if(id === undefined) {
-			console.warn("(wabi.on) Invalid callback passed to event: " + event);
+			console.warn("(wabi.element.basic.on) Invalid callback passed to event: " + event);
 			return;
 		}
 
@@ -313,6 +320,11 @@ wabi.element("basic",
 			owner = cb;
 			cb = id;
 			id = null;
+		}
+
+		if(!cb) {
+			console.warn("(wabi.element.basic.on) Invalid callback function: " + event);
+			return;
 		}
 
 		var element, listeners;
@@ -559,7 +571,7 @@ wabi.element("basic",
 
 			if(this.$data && this.$flags & this.Flag.WATCHING) {
 				this.$flags &= ~this.Flag.WATCHING;
-				this.$data.unwatch(this);
+				this.$data.unwatch(this.handleDataChange, this);
 			}
 
 			this.$data = data.instance;
@@ -571,7 +583,7 @@ wabi.element("basic",
 
 			if(this.$data && this.$flags & this.Flag.WATCHING) {
 				this.$flags &= ~this.Flag.WATCHING;
-				this.$data.unwatch(this);
+				this.$data.unwatch(this.handleDataChange, this);
 			}
 
 			this.$data = data;
@@ -620,7 +632,7 @@ wabi.element("basic",
 			{
 				if(this.$data && this.$flags & this.Flag.WATCHING) {
 					this.$flags &= ~this.Flag.WATCHING;
-					this.$data.unwatch(this);
+					this.$data.unwatch(this.handleDataChange, this);
 				}				
 			}
 		}

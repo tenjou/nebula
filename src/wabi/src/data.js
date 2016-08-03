@@ -332,16 +332,16 @@ wabi.data.prototype =
 	get: function(index) 
 	{
 		if(index === "*") {
-			return this.raw;
+			return new wabi.data(this.raw, this.id, this.parent);
 		}
 		else if(index === "@") {
 			return this.id;
 		}
 
 		var data;
-		if(!isNaN(index)) 
+		if(!isNaN(index) && index !== "") 
 		{
-			data = this.raw[parseInt(index)];
+			data = this.raw[index | 0];
 
 			if(typeof(data) === "object" && !(data instanceof wabi.data)) {
 				data = new wabi.data(data, index + "", this);
@@ -382,12 +382,12 @@ wabi.data.prototype =
 	getItem: function(id)
 	{
 		if(id === "*") {
-			return this.raw;
+			return new wabi.data(this.raw, this.id, this.parent);
 		}
 
 		var data;
-		if(!isNaN(id)) {
-			data = this.raw[parseInt(id)];
+		if(!isNaN(id) && id !== "") {
+			data = this.raw[id | 0];
 		}
 		else 
 		{

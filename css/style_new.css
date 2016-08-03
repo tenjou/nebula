@@ -503,6 +503,45 @@ tab.active tab-content {
 	color: white;
 }
 
+word {
+	color: white;
+	background: none;
+	transition: background 0.3s ease-in;	
+	transition: color 0.3s ease-in;	
+	padding: 0 2px 1px 2px;	
+}
+word.highlight {
+	color: black;
+	background: #f5f000;
+	transition: background 0.5s ease-out;	
+	transition: color 0.5s ease-out;
+	text-shadow: none;
+}
+
+/*wordEx {
+	position: relative;
+}
+wordEx highlight {
+	pointer-events: none;
+	position: absolute;
+    left: 0;	
+    color: black;
+    padding-left: 2px;
+    padding-right: 2px;
+    padding-bottom: 1px;
+    border-radius: 2px;
+    font-weight: bold;
+    text-shadow: none;
+    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.65);
+    background: #f5f000;	
+	transition: opacity 0.4s ease-in;	
+	opacity: 0;
+}
+wordEx highlight.active {
+	opacity: 1.0; 
+    transition: opacity 0.4s ease-out;	
+}*/
+
 image {
 	display: flex;
 	align-items: center;
@@ -571,7 +610,7 @@ taggedNumber:last-child input {
 	border-top-right-radius: 2px;
 	border-bottom-right-radius: 2px;
 }
-taggedNumber word {
+taggedNumber text {
     display: block;
     flex: 0 0 12px;
     height: 20px;
