@@ -1,27 +1,5 @@
 "use strict";
 
-wabi.element("staticInput", 
-{
-	prepare: function()
-	{
-		this.attrib("readonly", "");
-	},
-
-	set_value: function(value) 
-	{
-		if(value instanceof wabi.data) {
-			this.$domElement.value = value.raw.value;
-		}
-		else {
-			this.$domElement.value = value;
-		}
-	},
-
-	//
-	$tag: "input",
-	value: ""
-});
-
 wabi.element("dropdown",
 {
 	elements: 
@@ -40,13 +18,15 @@ wabi.element("dropdown",
 
 	prepare: function()
 	{
+		this.$elements.input.$flags |= this.Flag.REGION;
+
 		this.on("click", "staticInput", this.openMenu, this);
 		this.$elements.list.on("click", "*", this.selectOption, this);
 	},
 
 	setup: function()
 	{
-		// this.$elements.input.bind = "value";
+		this.$elements.input.bind = "value";
 		this.$elements.caret.value = "fa-caret-down";
 		this.$elements.list.hidden = true;
 
@@ -55,11 +35,7 @@ wabi.element("dropdown",
 
 	set_value: function(value)
 	{
-
-
-		// console.log("dropdown", value);
-
-		if(this.$dataset && value) 
+		if(this.$dataset) 
 		{
 			var data = this.genDataBuffer();
 			var selectedData = data.get(value);
@@ -114,7 +90,7 @@ wabi.element("dropdown",
 		var raw = this.$dataset.raw;
 
 		if(this.emptyOption) {
-			buffer[""] = {};
+			buffer[""] = { value: "" };
 		}
 
 		for(var key in raw) {

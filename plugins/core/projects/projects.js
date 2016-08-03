@@ -16,6 +16,7 @@ editor.plugin("projects",
 						id: "projects-list",
 						type: "list",
 						bind: "*",
+						itemCls: "editableListItem",
 						placeholder: "No projects found",
 					}
 				},
@@ -48,8 +49,8 @@ editor.plugin("projects",
 	{
 		this.template = wabi.createTemplate("projects");
 		this.template.on("click", "#create", this.createProject, this);
-		this.template.on("dblclick", "listItem", this.openProject, this);
-		this.template.on("contextmenu", "listItem", function(event) {
+		this.template.on("dblclick", "editableListItem", this.openProject, this);
+		this.template.on("contextmenu", "editableListItem", function(event) {
 			event.element.select = true;
 			editor.plugins.contextmenu.show("projectItem", event.x, event.y);
 		});

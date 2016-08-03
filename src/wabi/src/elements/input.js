@@ -4,7 +4,6 @@ wabi.element("input",
 {
 	set_value: function(value) {
 		this.$domElement.value = value;
-		console.log("here")
 	},
 
 	set_inputType: function(value) {
@@ -37,4 +36,25 @@ wabi.element("input",
 	placeholder: null,
 	editable: true,
 	readOnly: false
+});
+
+wabi.element("staticInput", 
+{
+	prepare: function() {
+		this.attrib("readonly", "");
+	},
+
+	set_value: function(value) 
+	{
+		if(value instanceof wabi.data) {
+			this.$domElement.value = value.raw.value;
+		}
+		else {
+			this.$domElement.value = value;
+		}
+	},
+
+	//
+	$tag: "input",
+	value: ""
 });

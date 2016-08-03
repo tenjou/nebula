@@ -13,12 +13,7 @@ wabi.element("taggedNumber",
 			link: "value"
 		}
 	},
-
-	set_name: function(name) 
-	{
-		console.log("name", name)
-	},
-
+	
 	set_color: function(value) {
 		this.$elements.name.style("background-color", value);
 	},

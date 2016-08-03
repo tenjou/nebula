@@ -148,7 +148,7 @@ wabi.element("listItem",
 	elements: 
 	{
 		word: {
-			type: "word",
+			type: "text",
 			bind: "value"
 		}
 	},
@@ -215,4 +215,15 @@ wabi.element("listItem",
 
 	select: false,
 	draggable: false
+});
+
+wabi.element("editableListItem", "listItem",
+{
+	elements: 
+	{
+		word: {
+			type: "word",
+			bind: "value"
+		}
+	}
 });

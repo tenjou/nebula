@@ -174,7 +174,7 @@ checkbox:hover {
 	outline: none;
 }
 
-label text, 
+label > text, 
 desc text {
     font-size: 11px;
     color: #C1C1C1;
@@ -589,7 +589,8 @@ dropdown list {
     box-shadow: 1px 1px 4px rgba(0,0,0,.2);	
     box-sizing: border-box;
 }
-dropdown item {
+dropdown item,
+dropdown text, {
 	color: white;
 }
 dropdown info {
