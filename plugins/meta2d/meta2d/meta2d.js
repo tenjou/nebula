@@ -20,16 +20,12 @@ editor.plugin("meta2d",
 	},
 
 	handleIframeLoad: function() {
-		this.iframe.$wnd.meta.loader.register(editor.dataPublic);
+		this.iframe.$wnd.meta.loader.register(editor);
 	},
 
 	loadTypes: function()
 	{
 		var resources = editor.plugins.resources;
-
-		resources.addType("folder", {
-			icon: "fa-folder"
-		});
 
 		resources.addType("sprite", {
 			icon: "fa-rocket"

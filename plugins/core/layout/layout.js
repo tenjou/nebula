@@ -16,13 +16,23 @@ editor.plugin("layout",
 				{
 					id: "iframe",
 					type: "toolbar",
-					tab: "Scene"
+					tab: "master",
+					value: [
+						{
+							type: "ruler",
+							orientation: "horizontal"
+						},
+						{
+							type: "ruler",
+							orientation: "vertical"
+						}						
+					]
 				},
 				{
 					id: "inspect",
 					type: "toolbar",
 					tab: "Inspect",
-					width: 340
+					width: 380
 				}
 			]
 		});

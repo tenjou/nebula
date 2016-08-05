@@ -24,7 +24,7 @@ editor.plugin.meta2d.prototype.loadInspect = function()
 							bind: "y",
 							name: "y",
 							color: "#72B529"
-						}
+						}					
 					]
 				},
 				{
@@ -71,12 +71,31 @@ editor.plugin.meta2d.prototype.loadInspect = function()
 							color: "#72B529"
 						}
 					]
+				}			
+				// {
+				// 	type: "labelDropdown",
+				// 	name: "Texture",
+				// 	bind: "texture",
+				// 	dataset: [ "NORMAL", "STATIC", "DEBUG" ],
+				// 	emptyOption: true
+				// }				
+			]
+		},
+		{
+			type: "section",
+			name: "Rendering",
+			value: [
+				{
+					type: "labelNumber",
+					bind: "z",
+					name: "Sorting Index"
 				},
 				{
 					type: "labelCheckbox",
-					bind: "static",
-					name: "Static"
-				}				
+					bind: "visible",
+					name: "Visible",
+					value: true
+				}					
 			]
 		},
 		{
@@ -98,19 +117,34 @@ editor.plugin.meta2d.prototype.loadInspect = function()
 							type: "taggedNumber",
 							bind: "pivotX",
 							name: "x",
-							value: 1.0,
+							value: 0.0,
 							color: "#D04031"
 						},
 						{
 							type: "taggedNumber",
 							bind: "pivotY",
 							name: "y",
-							value: 1.0,
+							value: 0.0,
 							color: "#72B529"
 						}
 					]
 				}			
 			]
 		}
+	]);
+
+	wabi.addFragment("inspect-texture", "inspect-general", [
+		{
+			type: "section",
+			name: "General",
+			value: [
+				{
+					type: "labelCheckbox",
+					bind: "premultiplied",
+					name: "premultiplied",
+					value: true
+				}
+			]
+		},
 	]);
 };

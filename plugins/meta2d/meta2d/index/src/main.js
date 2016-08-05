@@ -1,19 +1,19 @@
 "use strict";
 
-var texture;
-
-meta.on("preload", function() 
+meta.on("load", function() 
 {
 	meta.camera.draggable = true;
-	texture = meta.resources.loadTexture("cubetexture.png");
 });
 
 meta.loader = 
 {
-	register: function(data)
+	register: function(editor)
 	{
+		meta.resources.rootPath = editor.projectPath + "/";
+
 		this.registerFuncs();
 
+		var data = editor.dataPublic;
 		var assets = data.get("assets");
 		var assetsRaw = assets.raw;
 		for(var key in assetsRaw) {
@@ -53,9 +53,8 @@ meta.loader =
 
 	registerItem: function(data, cls)
 	{
-		var item = meta.new(cls);
-		item.data = data;
-		meta.resources.add(data.raw.type, item);		
+		var item = meta.new(cls, null, data.id);
+		item.data = data;		
 	},
 
 	watchAssetType: function(action, key, value, index, data)
@@ -103,7 +102,6 @@ meta.loader =
 
 		var item = meta.new(cls);
 		item.data = data;
-		item.texture = texture;
 		
 		switch(type)
 		{

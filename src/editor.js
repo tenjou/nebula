@@ -303,7 +303,8 @@ var editor =
 			var info = {
 				value: idName,
 				ext: ext,
-				type: type
+				type: type,
+				path: filePath
 			};
 
 			if(this.electron)

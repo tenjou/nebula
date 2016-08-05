@@ -31,21 +31,7 @@ wabi.element("tabs",
 
 wabi.element("tab",
 {
-	prepare: function()
-	{
-		var tabInner = document.createElement("tab-inner");
-		this.domContent = document.createElement("tab-content");
-		tabInner.appendChild(this.domContent);
-		this.$domElement.appendChild(tabInner);
-	},
-
-	set_value: function(value)
-	{
-		this.domContent.innerHTML = value;
-	},
-
-	set_active: function(value)
-	{
+	set_active: function(value) {
 		this.setCls("active", true);
 	},
 
