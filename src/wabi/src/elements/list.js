@@ -12,13 +12,14 @@ wabi.element("list",
 		this.$cache = {
 			itemElements: [],
 			selectable: true,
-			selected: null
+			selected: null, 
+			dragging: null
 		};
 	},
 
 	set_value: function(value) 
 	{
-		this.removeChildren();
+		this.removeAll();
 
 		if(value) 
 		{
@@ -51,7 +52,8 @@ wabi.element("list",
 	{
 		this.set_placeholder(null);
 
-		var element = wabi.createElement(this.itemCls, this);
+		var element = wabi.createElement("listItemHolder", this);
+		element.item = this.itemCls;
 		element.data = data;
 	},
 
@@ -143,54 +145,49 @@ wabi.element("list",
 	itemCls: "listItem"
 });
 
-wabi.element("listItem",
+wabi.element("listItemHolder", 
 {
 	elements: 
 	{
-		word: {
-			type: "text",
-			bind: "value"
+		item: {
+			type: "span"
+		},
+		list: {
+			type: "list",
+			bind: "content"
 		}
 	},
 
 	prepare: function()
 	{
-		this.attrib("tabindex", "0");
-		this.$flags |= this.Flag.REGION;
-
-		this.on("click", "*", function() {
-			this.select = true;
-		}, this);
+		// this.$elements.list.watch("open")
 	},
 
-	cleanup: function() 
+	setup: function() {
+		this.$elements.list.$cache = this.$parent.$cache;
+	},
+
+	set_item: function(cls)
 	{
-		if(this.$parent.$cache.selected === this) {
-			this.$parent.$cache.selected = null;
+		var item = this.$elements.item;
+		item.removeAll();
+
+		this.$elements.list.itemCls = cls;
+
+		if(cls) {
+			this.itemElement = wabi.createElement(cls, item);
+			// this.itemElement.watch("open", this.updateOpen, this);
+		}
+		else {
+			this.itemElement = null;
 		}
 	},
 
-	set_select: function(value)
+	set_content: function(value)
 	{
-		var cache = this.$parent.$cache;
-
-		if(value)
-		{
-			if(cache.selected) {
-				cache.selected.select = false;
-			}
-
-			cache.selected = this;
-			this.emit("select");
+		if(this.itemElement) {
+			this.itemElement.folder = value ? true : false;
 		}
-		else
-		{
-			if(cache.selected !== this) { 
-				cache.selected = null;
-			}
-		}
-
-		this.setCls("selected", value);
 	},
 
 	set_draggable: function(value)
@@ -203,24 +200,144 @@ wabi.element("listItem",
 		}
 	},
 
-	handle_click: function(event)
+	handle_dragstart: function(event) 
+	{
+		this.setCls("dragging", true);
+		this.cache.dragging = this;
+
+		event.domEvent.dataTransfer.effectAllowed = "move";
+	},
+
+	handle_dragend: function(event) 
+	{
+		this.setCls("dragging", false)
+	},
+
+	handle_dragenter: function(event) {
+		this.setCls("dragover", true);
+	},
+
+	handle_dragleave: function(event) {
+		this.setCls("dragover", false);
+	},
+
+	handle_dragover: function(event)
+	{
+		event.stop();
+		event.domEvent.dataTransfer.dropEffect = "move";
+	},
+
+	handle_drop: function(event) 
+	{
+		if(this === this.cache.dragging) { return; }
+
+		this.setCls("dragover", false);
+		this.folder = true;
+
+		var cacheData = this.cache.dragging.data;
+		this.data.push("content", cacheData);
+
+		event.stop();
+	},
+
+	updateOpen: function(event) {
+		this.$elements.list.hidden = !this.itemElement.open;
+	},
+
+	//
+	$tag: "holder",
+	itemElement: null,
+	draggable: false,
+	region: true
+});
+
+wabi.element("listItem",
+{
+	elements: 
+	{
+		folder: {
+			type: "caret"
+		},
+		word: {
+			type: "text",
+			bind: "value"
+		}
+	},
+
+	prepare: function()
+	{
+		this.attrib("tabindex", "0");
+
+		this.on("click", "*", function() {
+			this.select = true;
+		}, this);
+	},
+
+	cleanup: function() 
+	{
+		if(this.cache.selected === this) {
+			this.$parent.$parent.selected = null;
+		}
+	},
+
+	set_select: function(value)
+	{
+		if(value)
+		{
+			if(this.cache.selected) {
+				this.cache.selected.select = false;
+			}
+
+			this.cache.selected = this;
+			this.emit("select");
+		}
+		else
+		{
+			if(this.cache.selected !== this) { 
+				this.cache.selected = null;
+			}
+		}
+
+		this.setCls("selected", value);
+	},
+
+	set_folder: function(value) 
+	{
+		if(value) {
+			this.open = false;
+		}
+
+		this.setCls("folder", value);
+	},
+
+	set_open: function(value) {},
+
+	handle_dblclick: function(event)
 	{
 		if(this.folder) {
-			this.folder = !this.folder;
+			this.open = !this.open;
 		}
+	},
+
+	get cache() {
+		return this.$parent.$parent.$parent.$cache;
 	},
 
 	//
 	$tag: "item",
 
 	select: false,
-	draggable: false
+	folder: false,
+	open: false
 });
 
 wabi.element("editableListItem", "listItem",
 {
 	elements: 
 	{
+		folder: {
+			type: "caret"
+		},
 		word: {
 			type: "word",
 			bind: "value"

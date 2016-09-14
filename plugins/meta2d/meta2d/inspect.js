@@ -92,9 +92,8 @@ editor.plugin.meta2d.prototype.loadInspect = function()
 				},
 				{
 					type: "labelCheckbox",
-					bind: "visible",
-					name: "Visible",
-					value: true
+					bind: "hidden",
+					name: "Hidden"
 				}					
 			]
 		},
@@ -131,6 +130,25 @@ editor.plugin.meta2d.prototype.loadInspect = function()
 				}			
 			]
 		}
+	]);
+
+	wabi.addFragment("inspect-layer", "inspect-general", [
+		{
+			type: "section",
+			name: "Rendering",
+			value: [
+				{
+					type: "labelNumber",
+					bind: "z",
+					name: "Sorting Index"
+				},
+				{
+					type: "labelCheckbox",
+					bind: "hidden",
+					name: "Hidden"
+				}
+			]
+		},
 	]);
 
 	wabi.addFragment("inspect-texture", "inspect-general", [

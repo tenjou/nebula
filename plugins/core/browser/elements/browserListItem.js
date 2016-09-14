@@ -4,6 +4,10 @@ wabi.element("browserListItem", "listItem",
 {
 	elements: 
 	{
+		folder: {
+			type: "caret",
+			link: "open"
+		},
 		icon: {
 			type: "type",
 			bind: "type"
@@ -16,5 +20,8 @@ wabi.element("browserListItem", "listItem",
 			type: "tag",
 			bind: "ext"
 		}
-	}
+	},
+
+	//
+	draggable: true
 });

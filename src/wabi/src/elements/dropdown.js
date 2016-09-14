@@ -16,7 +16,7 @@ wabi.element("dropdown",
 		}
 	},
 
-	prepare: function()
+	setup: function()
 	{
 		this.$elements.input.$flags |= this.Flag.REGION;
 
@@ -75,7 +75,7 @@ wabi.element("dropdown",
 		event.stop();
 
 		var list = this.$elements.list;
-		list.removeChildren();
+		list.removeAll();
 
 		if(!this.$dataset) { return; }
 

@@ -48,6 +48,7 @@ var editor =
 		for(var key in this.plugins) 
 		{
 			plugin = this.plugins[key];
+
 			if(plugin.onSplashStart) {
 				plugin.onSplashStart();
 			}

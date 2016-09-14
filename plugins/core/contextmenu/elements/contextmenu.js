@@ -46,6 +46,8 @@ wabi.element("contextmenuItem",
 		this.on("click", "*", this.handle_click, this);
 	},
 
+	set_func: function() {},
+
 	handle_click: function(event)
 	{
 		if(this.func) {
@@ -84,7 +86,7 @@ wabi.element("contextmenuInner",
 {
 	set_value: function(value)
 	{
-		this.removeChildren();
+		this.removeAll();
 
 		if(!value) { return; }
 

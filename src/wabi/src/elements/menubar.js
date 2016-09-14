@@ -18,7 +18,7 @@ wabi.element("menubar",
 		}
 	},
 
-	prepare: function()
+	setup: function()
 	{
 		this.$elements.left.setCls("left", true);
 		this.$elements.center.setCls("center", true);

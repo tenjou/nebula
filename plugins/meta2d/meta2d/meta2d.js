@@ -11,16 +11,42 @@ editor.plugin("meta2d",
 
 	onStart: function()
 	{
-		var parent = editor.plugins.layout.toolbarIFrame.$elements.content;
+		var layout = editor.plugins.layout;
+		this.rulerHorizontal = layout.template.get("#ruler-horizontal");
+		this.rulerVertical = layout.template.get("#ruler-vertical");
 
 		this.iframe = wabi.createElement("iframe");
 		this.iframe.value = "plugins/meta2d/meta2d/index/index.html";
 		this.iframe.on("load", this.handleIframeLoad, this);
-		this.iframe.appendTo(parent);
+		this.iframe.appendTo(layout.toolbarIFrame);
 	},
 
-	handleIframeLoad: function() {
-		this.iframe.$wnd.meta.loader.register(editor);
+	handleIframeLoad: function() 
+	{
+		var wnd = this.iframe.$wnd;
+		wnd.meta.loader.register(editor);
+		wnd.meta.on("camera-move", this.handleCameraMove.bind(this));
+		wnd.addEventListener("mousemove", this.handleMouseMove.bind(this));
+		wnd.addEventListener("resize", this.handleResize.bind(this));
+		this.handleResize(null);
+	},
+
+	handleCameraMove: function(camera)
+	{
+		this.rulerHorizontal.updatePos(camera.x);
+		this.rulerVertical.updatePos(camera.y);
+	},
+
+	handleMouseMove: function(event)
+	{
+		this.rulerHorizontal.updateCursor(event.x);
+		this.rulerVertical.updateCursor(event.y);
+	},
+
+	handleResize: function(event) 
+	{
+		this.rulerHorizontal.updateSize();
+		this.rulerVertical.updateSize();
 	},
 
 	loadTypes: function()
@@ -31,7 +57,7 @@ editor.plugin("meta2d",
 			icon: "fa-rocket"
 		});
 
-		resources.addType("view", {
+		resources.addType("layer", {
 			icon: "fa-photo"
 		});
 	},
@@ -47,9 +73,9 @@ editor.plugin("meta2d",
 						icon: editor.plugins.resources.getIconFromType("sprite"),
 						func: this.createSprite.bind(this)
 					},
-					View: {
-						icon: editor.plugins.resources.getIconFromType("view"),
-						func: this.createView.bind(this)
+					Layer: {
+						icon: editor.plugins.resources.getIconFromType("layer"),
+						func: this.createLayer.bind(this)
 					},
 					Folder: {
 						icon: editor.plugins.resources.getIconFromType("folder"),
@@ -73,7 +99,10 @@ editor.plugin("meta2d",
 
 	createFolder: function(event)
 	{
-
+		editor.dataPublic.get("hierarchy").add("@", {
+			value: "Folder",
+			type: "folder"
+		});
 	},
 
 	createSprite: function(event)
@@ -84,11 +113,12 @@ editor.plugin("meta2d",
 		});
 	},
 
-	createView: function(event)
+	createLayer: function(event)
 	{
+		console.log("layer")
 		editor.dataPublic.get("hierarchy").add("@", {
-			value: "View",
-			type: "view"
+			value: "Layer",
+			type: "layer"
 		});
 	},	
 
@@ -101,5 +131,7 @@ editor.plugin("meta2d",
 	},
 
 	//
-	iframe: null
+	iframe: null,
+	rulerHorizontal: null,
+	rulerVertical: null,
 });

@@ -14,7 +14,7 @@ wabi.element("section",
 		}
 	},
 
-	prepare: function() {
+	setup: function() {
 		this.$elements.header.on("open", this.updateOpen, this);
 	},
 

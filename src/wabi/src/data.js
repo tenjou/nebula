@@ -188,6 +188,24 @@ wabi.data.prototype =
 		}
 	},
 
+	push: function(key, value)
+	{
+		var buffer = this.get(key);
+		if(!buffer) {
+			buffer = new wabi.data([], "content", this);
+			this.raw[key] = buffer;
+		}
+		else
+		{
+			if(!(buffer.raw instanceof Array)) {
+				console.warn("(wabi.data) Key `" + key + "` is not an Array");
+				return;
+			}
+		}
+
+		buffer.add(value);
+	},
+
 	performAdd: function(value)
 	{
 		if(this.raw instanceof Array) 
@@ -355,14 +373,17 @@ wabi.data.prototype =
 			{
 				data = this.raw[index];
 
-				if(typeof data === "object" && !(data instanceof wabi.data)) {
-					data = new wabi.data(data, index + "", this);
-					this.raw[index] = data;
-				}
-				else if(typeof data === "string" && data[0] === "*") {
-					data = new wabi.ref(data, index, this);
-					this.raw[index] = data;
-					return data;
+				if(data)
+				{
+					if(typeof data === "object" && !(data instanceof wabi.data)) {
+						data = new wabi.data(data, index + "", this);
+						this.raw[index] = data;
+					}
+					else if(typeof data === "string" && data[0] === "*") {
+						data = new wabi.ref(data, index, this);
+						this.raw[index] = data;
+						return data;
+					}
 				}
 			}
 			else

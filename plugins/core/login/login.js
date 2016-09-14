@@ -48,7 +48,7 @@ editor.plugin("login",
 	{	
 		editor.connection.off(this);
 
-		wabi.destroyTemplate(this.loginScreen);
+		this.loginScreen.remove();
 	},
 
 	onServer_close: function() 

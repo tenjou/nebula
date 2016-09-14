@@ -4,7 +4,7 @@ wabi.element("row",
 {
 	set_value: function(value) 
 	{
-		this.removeChildren();
+		this.removeAll();
 		
 		if(!value) { return; }
 

@@ -3,6 +3,7 @@
 meta.on("load", function() 
 {
 	meta.camera.draggable = true;
+	meta.renderer.bgColor = "0x333333";
 });
 
 meta.loader = 
@@ -19,6 +20,8 @@ meta.loader =
 		for(var key in assetsRaw) {
 			this.registerItems(key, assets.get(key));
 		}
+
+		this.loadGrid();
 
 		this.load(data.get("hierarchy"));
 	},
@@ -106,7 +109,7 @@ meta.loader =
 		switch(type)
 		{
 			case "sprite":
-				meta.view.add(item);
+				meta.layer.add(item);
 				break;
 
 			case "view":
@@ -128,11 +131,41 @@ meta.loader =
 				switch(type)
 				{
 					case "sprite":
-						meta.view.remove(value.id);
+						meta.layer.remove(value.id);
 						break;
 				}
 			} break;
 		}
+	},
+
+	loadGrid: function()
+	{
+		var gridCanvas = document.createElement("canvas");
+		gridCanvas.width = 128;
+		gridCanvas.height = 96;
+
+		var gridCtx = gridCanvas.getContext("2d");
+
+		gridCtx.beginPath();
+		gridCtx.lineWidth = 2;
+		gridCtx.strokeStyle = "#222";
+		gridCtx.moveTo(0, -0);
+		gridCtx.lineTo(0, 128);
+		gridCtx.moveTo(0, 0);
+		gridCtx.lineTo(128, 0);	
+		gridCtx.stroke();
+
+		var texture = meta.new(meta.Texture, gridCanvas);
+		texture.anisotropy = false;
+
+		var entity = meta.new(meta.Tiling, texture);
+		entity.autoResize = true;
+		entity.z = 10000;
+
+		var gridLayer = meta.createLayer("grid");
+		gridLayer.fixed = true;
+		gridLayer.z = 10000000000;
+		gridLayer.add(entity);
 	},
 
 	//

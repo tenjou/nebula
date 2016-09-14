@@ -16,6 +16,11 @@ body {
 	font-family: "Open Sans", sans-serif;
 }
 
+canvas {
+	display: block;
+	position: absolute;
+}
+
 .hidden {
 	display: none !important;
 }
@@ -93,6 +98,28 @@ list item tag {
 	font-size: 9px;
 	color: #aeaeae;
 	line-height: 11px;
+}
+list item.dragover {
+	background: #7D7D7D;
+	opacity: 1;
+}
+list item.dragging {
+	background: #7AA25A;
+	opacity: 1;
+}
+list item caret {
+	display: none !important;
+    width: 8px;
+    text-align: center;
+    padding-left: 2px;
+}
+list item.folder caret {
+	display: inline-block !important;
+}
+
+holder list {
+	display: block;
+	padding-left: 10px;
 }
 
 content.browser list item type {
@@ -183,6 +210,9 @@ desc text {
 }
 label:first-child {
 	margin-top: 4px;
+}
+label content {
+	flex-direction: row;
 }
 
 desc {
@@ -276,10 +306,11 @@ menubar content.right {
 	text-align: right;
 }
 menubar menuitem {
+	float: right;
 	line-height: 0;
 	display: inline-block;
 	height: 100%;
-	padding-top: 7px;
+	padding-top: 8px;
 	padding-right: 4px;
 	box-sizing: border-box;
 	cursor: pointer;
@@ -624,21 +655,67 @@ taggedNumber text {
     border-right: 1px solid rgba(0, 0, 0, 0.07);
     text-transform: uppercase;
 }
+taggedNumber:first-child text{
+	border-top-left-radius: 2px;
+	border-bottom-left-radius: 2px;
+}
+taggedNumber input {
+	width: 100%;
+}
 
 ruler {
-	position: absolute;
+	position: relative;
 	background: #212121;
 }
+ruler > slot {
+	position: absolute;
+	background: #3e7ac5;
+	pointer-events: none;
+}
 ruler.horizontal {
-	width: 100%;
-	height: 22px;
+	flex: 1 1 100%;
+	height: 21px;
+	border-bottom: 1px solid gray;
+}
+ruler.horizontal > slot {
+	
+	width: 1px;
+	height: 100%;
+	left: -1px;
+	
 }
 ruler.vertical {
-	width: 22px;
+	flex: 0 0 21px;
 	height: 100%;
+	border-right: 1px solid gray;
+}
+ruler.vertical > slot {
+	position: absolute;
+	width: 100%;
+	height: 1px;
+	top: -1;
+	background: #3e7ac5;
+}
+#ruler-row-horizontal {
+	flex: 0 0 22px;
+	width: 100%;
+}
+#ruler-row-horizontal > slot {
+	flex: 0 0 21px;
+	height: 21px;
+	background: #212121;
+	border-right: 1px solid gray;
+	border-bottom: 1px solid gray;
 }
 
+
+#iframe {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
 #iframe iframe {
-	padding-top: 22px;
-	padding-left: 22px;
+	position: absolute;
+	width: 100%;
+	height: 100%;
 }

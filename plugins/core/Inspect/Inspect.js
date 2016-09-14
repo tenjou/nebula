@@ -59,6 +59,7 @@ editor.plugin("inspect",
 		this.content.data = null;
 		this.content.value = props;
 		this.content.data = data;
+		window.g = this.content;
 	},
 
 	//

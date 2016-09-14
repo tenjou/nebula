@@ -4,7 +4,7 @@ wabi.element("content",
 {
 	set_value: function(value) 
 	{
-		this.removeChildren();
+		this.removeAll();
 
 		this.$loadValue(value);
 	},

@@ -37,39 +37,11 @@ var wabi =
 			return null;
 		}
 
-		var template;
-		var buffer = this.templatesCached[id];
-		if(buffer) 
-		{
-			template = buffer.pop();
-			if(template) 
-			{
-				if(template.setup()) {
-					template.setup();
-				}
-				return template;
-			}
-		}
-
 		var template = wabi.createElement(props.type);
 		template.state = props;
 		template.$flags |= template.Flag.REGION;
 
 		return template;
-	},
-
-	destroyTemplate: function(template)
-	{
-		template.parent = null;
-
-		var buffer = this.templatesCached[template.id];
-		if(buffer) {
-			buffer.push(template);
-		}
-		else {
-			buffer = [ template ];
-			this.templatesCached[template.id] = buffer;
-		}
 	},
 
 	addFragment: function(id, extend, props)
@@ -146,7 +118,7 @@ var wabi =
 		return props;
 	},
 
-	createElement: function(name, parent, params, autoSetup)
+	createElement: function(name, parent, params)
 	{
 		var element;
 		var buffer = this.elementsCached[name];
@@ -156,7 +128,10 @@ var wabi =
 			if(element) 
 			{
 				element.$flags |= element.Flag.ACTIVE;
-				element.parent = parent;
+
+				if(parent) {
+					element.parent = parent;
+				}
 			}
 		}
 		else 
@@ -171,21 +146,18 @@ var wabi =
 			element.$flags |= element.Flag.ACTIVE;
 		}
 
-		if(autoSetup !== false) 
-		{
-			if(element.$setup) {
-				element.$setup();
-			}
-		}
+		element.$setup();
 
 		return element;
 	},
 
-	removeElement: function(element, skipChildRemove)
+	removeElement: function(element)
 	{
-		if((element.$flags & element.Flag.ACTIVE) === 0) { return; }
-		element.$flags &= ~element.Flag.ACTIVE;
-		element.$remove(skipChildRemove);
+		if(!element || !(element instanceof wabi.element.basic)) {
+			return console.warn("(wabi.removeElement) Invalid element passed");
+		}
+
+		element.$remove();
 
 		var buffer = this.elementsCached[element.$metadata.name];
 		if(!buffer) {
@@ -199,6 +171,11 @@ var wabi =
 
 	on: function(name, func, owner)
 	{
+		if(!func) {
+			console.warn("(wabi.on) Invalid callback function passed");
+			return;
+		}
+
 		var buffer = this.listeners[name];
 		if(!buffer) 
 		{
@@ -260,14 +237,15 @@ var wabi =
 	{
 		if(extend) 
 		{
-			var extendedDef = this.elementDefs[extend]
+			var extendedDef = this.elementDefs[extend];
 			if(!extendedDef) {
 				console.warn("(wabi.genPrototype) Extended class not found: " + extend);
 				return;
 			}
 
-			var newProps = Object.assign({}, extendedDef.props);
-			Object.assign(newProps, props);
+			var newProps = {};
+			this.assignObj(newProps, extendedDef.props);
+			this.assignObj(newProps, props);
 			props = newProps;
 		}		
 
@@ -280,6 +258,7 @@ var wabi =
 		var events = [];
 		var proto = {};
 		var numElements = 0;
+		var valueLinked = false;
 
 		if(props.elements) 
 		{
@@ -287,19 +266,45 @@ var wabi =
 			for(var key in elementsProps)
 			{
 				var item = elementsProps[key];
-				elements[key] = item.type;
+
+				if(!item) 
+				{
+					item = {
+						type: null
+					};
+				}
+				else if(typeof item === "string") 
+				{
+					item = {
+						type: item
+					};
+				}
+
+				elements[key] = { 
+					type: item.type,
+					slot: numElements
+				};
+
 				numElements++;
 
 				if(item.link)
 				{
 					statesLinked[item.link] = key;
 					elementsLinked[key] = item.link;
+
+					if(item.link === "value") {
+						valueLinked = true;
+					}
 				}
 				else if(item.bind)
 				{
 					statesLinked[item.bind] = key;
 					elementsLinked[key] = item.bind;
 					elementsBinded[key] = item.bind;
+
+					if(item.bind === "value") {
+						valueLinked = true;
+					}					
 				}
 			}
 
@@ -363,9 +368,10 @@ var wabi =
 			// Discard unhandled states:
 			for(var key in states)
 			{
-				if(!statesHandled[key] && !basicStates[key]) { 
+				if(statesHandled[key] === undefined && basicStates[key] === undefined) { 
 					proto[key] = states[key];
 					delete states[key];
+					delete statesProto[key];
 				}
 			}	
 		}
@@ -379,6 +385,7 @@ var wabi =
 				if(!statesHandled[key]) { 
 					proto[key] = states[key];
 					delete states[key];
+					delete statesProto[key];
 				}
 			}			
 		}
@@ -392,6 +399,10 @@ var wabi =
 
 		if(numElements > 0) {
 			metadata.elements = elements;
+
+			if(!valueLinked && !props.set_value) {
+				proto.set_value = undefined;
+			}
 		}
 		if(events.length > 0) {
 			metadata.events = events;
@@ -515,6 +526,20 @@ var wabi =
 		}
 	},
 
+	assignObj: function(target, src)
+	{
+		for(var key in src) 
+		{
+			var prop = Object.getOwnPropertyDescriptor(src, key);
+			if(prop.get || prop.set) {
+				Object.defineProperty(target, key, prop);
+				continue;
+			}
+
+			target[key] = src[key];
+		}
+	},
+
 	metadata: function(name) 
 	{
 		this.name = name;
@@ -567,7 +592,5 @@ var wabi =
 
 	fragments: {},
 	templates: {},
-	templatesCached: {},
-	listeners: {},
-	
+	listeners: {}
 };

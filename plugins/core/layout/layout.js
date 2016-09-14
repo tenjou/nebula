@@ -14,18 +14,38 @@ editor.plugin("layout",
 					width: 270
 				},
 				{
-					id: "iframe",
 					type: "toolbar",
 					tab: "master",
 					value: [
 						{
-							type: "ruler",
-							orientation: "horizontal"
+							id: "ruler-row-horizontal",
+							type: "row",
+							value: [
+								{
+									type: "slot"
+								},
+								{
+									id: "ruler-horizontal",
+									type: "ruler",
+									orientation: "horizontal"
+								},
+							]
 						},
 						{
-							type: "ruler",
-							orientation: "vertical"
+							type: "row",
+							value: [
+								{
+									id: "ruler-vertical",
+									type: "ruler",
+									orientation: "vertical"
+								},
+								{
+									id: "iframe",
+									type: "slot"
+								}
+							]
 						}						
+						
 					]
 				},
 				{

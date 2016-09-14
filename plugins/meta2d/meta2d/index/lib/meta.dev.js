@@ -2,8 +2,8 @@
 
 var meta = {
     version: "0.9",
-    view: null,
-    views: {},
+    layer: null,
+    layers: {},
     flags: {
         autoPowTwo: true
     },
@@ -300,10 +300,10 @@ meta.engine = {
         meta.camera = new meta.Camera();
         meta.emit("setup");
         this.addListeners();
-        var masterView = new meta.View("master");
-        masterView.$activate();
-        meta.views.master = masterView;
-        meta.view = masterView;
+        var masterLayer = new meta.Layer("master");
+        masterLayer.$activate();
+        meta.layers.master = masterLayer;
+        meta.layer = masterLayer;
         meta.renderer.setup();
         this.updateResolution();
         this.flags |= this.Flag.SETUPED;
@@ -376,6 +376,7 @@ meta.engine = {
         this.canvas.style.width = width * this.scaleX + "px";
         this.canvas.style.height = height * this.scaleY + "px";
         meta.renderer.onResize();
+        meta.emit("resize", this);
     },
     $updateOffset: function() {
         this.offsetLeft = 0;
@@ -1509,27 +1510,28 @@ meta.delete = function(obj) {
 
 "use strict";
 
-meta.View = function(name) {
-    this.name = name;
+meta.Layer = function(id) {
+    this.id = id;
     this.flags = 0;
     this.entities = [];
+    this.entitiesRemove = [];
     this.children = {};
     this.$position = new meta.Vector2(0, 0);
     this.$z = 0;
 };
 
-meta.View.prototype = {
+meta.Layer.prototype = {
     add: function(entity) {
-        if (entity.$view) {
-            if (entity.$view === this) {
-                console.warn("(meta.View.add) Entity is already added to this view");
+        if (entity.$layer) {
+            if (entity.$layer === this) {
+                console.warn("(meta.Layer.add) Entity is already added to this layer");
             } else {
-                console.warn("(meta.View.add) Entity is already added to some other view");
+                console.warn("(meta.Layer.add) Entity is already added to some other layer");
             }
             return;
         }
         entity.flags |= entity.Flag.ROOT;
-        entity.$view = this;
+        entity.$setLayer(this);
         if (this.$position.x !== 0 || this.$position.y !== 0) {
             entity.updatePosition();
         }
@@ -1545,26 +1547,60 @@ meta.View.prototype = {
     $addChildren: function(children) {},
     remove: function(entity) {
         if (entity instanceof meta.Sprite) {
-            if (entity.$view !== this) {
-                console.warn("(meta.view.remove) Entity has different view: ", entity.$view.id);
+            if (entity.$layer !== this) {
+                console.warn("(meta.Layer.remove) Entity has different layer: ", entity.$layer.id);
                 return;
             }
             var index = this.entities.indexOf(entity);
             if (index === -1) {
-                console.warn("(meta.view.remove) Entity not found: ", entity.id);
+                console.warn("(meta.Layer.remove) Entity not found: ", entity.id);
                 return;
             }
             this.entitiesRemove.push(entity);
         } else if (typeof entity === "string") {
-            if (entity.$view !== this) {
-                console.warn("(meta.view.remove) Entity has different view: ", entity.$view.id);
+            if (entity.$layer !== this) {
+                console.warn("(meta.Layer.remove) Entity has different layer: ", entity.$layer.id);
                 return;
             }
         } else {
-            console.warn("(meta.view.remove) Invalid entity or id passed");
-            return;
+            return console.warn("(meta.Layer.remove) Invalid entity or id passed");
         }
         meta.renderer.removeEntity(entity);
+    },
+    attach: function(layer) {
+        if (!layer) {
+            return console.warn("(meta.Layer.attach) Invalid layer passed");
+        }
+        if (layer.parent) {
+            if (layer.parent === this) {
+                return;
+            }
+            layer.detach();
+            layer.attach(this);
+        }
+        this.children[layer.id] = layer;
+        if (this.flags & this.Flag.ACTIVE) {
+            layer.$activate();
+        }
+    },
+    detach: function(layer) {
+        if (!layer) {
+            if (!layer.parent) {
+                return console.warn("(meta.Layer.detach) Layer does not have parent: ", layer);
+            }
+            layer.parent.detach(this);
+            return;
+        }
+        if (layer.parent !== this) {
+            return console.warn("(meta.Layer.detach) Layer `" + layer.id + "` has not been attached to parent `" + this.id + "`");
+        }
+        if (!this.children[layer.id]) {
+            return console.error(" (logic error) (meta.Layer.detach) Layer `" + layer.id + "` has not been attached to parent `" + this.id + "`");
+        }
+        delete this.children[layer.id];
+        if (this.flags & this.Flag.ACTIVE) {
+            layer.$deactivate();
+        }
     },
     $activate: function() {
         this.flags |= this.Flag.ACTIVE;
@@ -1595,14 +1631,62 @@ meta.View.prototype = {
     get active() {
         return (this.flags & this.Flag.ACTIVE) === this.Flag.ACTIVE;
     },
+    set fixed(value) {
+        if (value) {
+            if (this.flags & this.Flag.FIXED) {
+                return;
+            }
+            this.flags |= this.Flag.FIXED;
+            if (this.flags & this.Flag.ACTIVE) {
+                meta.renderer.needRender = true;
+            }
+        } else {
+            if ((this.flags & this.Flag.FIXED) === 0) {
+                return;
+            }
+        }
+        this.updateFixed();
+    },
+    get fixed() {
+        return (this.flags & this.Flag.FIXED) === this.Flag.FIXED;
+    },
+    updateFixed: function() {
+        if (this.parent) {
+            if (this.flags & this.Flag.FIXED && this.parent.flags & this.Flag.INSTANCE_FIXED) {
+                this.flags |= this.Flag.INSTANCE_FIXED;
+            } else {
+                this.flags &= ~this.Flag.INSTANCE_FIXED;
+            }
+        } else {
+            if (this.flags & this.Flag.FIXED) {
+                this.flags |= this.Flag.INSTANCE_FIXED;
+            } else {
+                this.flags &= ~this.Flag.INSTANCE_FIXED;
+            }
+        }
+        if (this.children) {
+            for (var key in this.children) {
+                this.children[key].updateStatic();
+            }
+        }
+    },
     Flag: {
         HIDDEN: 1 << 0,
         INSTANCE_HIDDEN: 1 << 1,
         ACTIVE: 1 << 2,
-        STATIC: 1 << 3,
-        DEBUGGER: 1 << 4
+        INSTANCE_FIXED: 1 << 3,
+        FIXED: 1 << 4,
+        DEBUGGER: 1 << 5
     }
 };
+
+meta.createLayer = function createLayer(id) {
+    var layer = meta.new(meta.Layer, id);
+    meta.layer.attach(layer);
+    return layer;
+};
+
+meta.destroyLayer = function destroyLayer(layer) {};
 
 "use strict";
 
@@ -1869,18 +1953,37 @@ meta.AABB.prototype = {
         this.y = y || 0;
         this.width = width || 0;
         this.height = height || 0;
+        this.minX = this.x;
+        this.minY = this.y;
+        this.maxX = this.x + this.width;
+        this.maxY = this.y + this.height;
+    },
+    reset: function() {
+        this.x = this.y = 0;
+        this.width = this.height = 0;
+        this.minX = this.minY = this.maxX = this.maxY = 0;
     },
     resize: function(width, height) {
         this.width = width;
         this.height = height;
+        this.maxX = this.x + this.width;
+        this.maxY = this.y + this.height;
     },
     move: function(diffX, diffY) {
         this.x += diffX;
         this.y += diffY;
+        this.minX = this.x;
+        this.minY = this.y;
+        this.maxX = this.x + this.width;
+        this.maxY = this.y + this.height;
     },
     position: function(x, y) {
         this.x = x;
         this.y = y;
+        this.minX = this.x;
+        this.minY = this.y;
+        this.maxX = this.x + this.width;
+        this.maxY = this.y + this.height;
     }
 };
 
@@ -2157,12 +2260,6 @@ meta.renderer = {
         gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
         gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
         gl.blendFuncSeparate(gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-        var spriteShader = meta.new(meta.Shader, {
-            id: "sprite",
-            vertexShader: [ "#define PI 3.1415926535897932384626433832795", "attribute vec3 vertexPos;", "attribute vec2 uvCoords;", "uniform mat4 modelViewMatrix;", "uniform mat4 projMatrix;", "uniform float angle;", "varying highp vec2 var_uvCoords;", "void main(void) {", "	float angleX = sin(angle);", "	float angleY = cos(angle);", "	vec2 rotatedPos = vec2(vertexPos.x * angleY + vertexPos.y * angleX, vertexPos.y * angleY - vertexPos.x * angleX);", "	gl_Position = projMatrix * modelViewMatrix * vec4(rotatedPos, vertexPos.z, 1.0);", "	var_uvCoords = uvCoords;", "}" ],
-            fragmentShader: [ "varying highp vec2 var_uvCoords;", "uniform sampler2D texture;", "void main(void) {", "	gl_FragColor = texture2D(texture, vec2(var_uvCoords.s, var_uvCoords.t));", "}" ]
-        });
-        spriteShader.use();
         this.entities.length = 16;
         this.entitiesRemove.length = 8;
         meta.on("update", this.update, this);
@@ -2202,50 +2299,40 @@ meta.renderer = {
     },
     render: function() {
         var gl = this.gl;
+        var fixed = false;
         gl.clear(gl.COLOR_BUFFER_BIT);
         var projMatrix = new meta.Matrix4();
         projMatrix.ortho(0, meta.engine.width, meta.engine.height, 0, 0, 1);
         projMatrix.translate(-meta.camera.x, -meta.camera.y, 0);
-        gl.uniformMatrix4fv(this.currShader.uniform.projMatrix, false, projMatrix.m);
-        gl.uniform1i(this.currShader.uniform.texture, 0);
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
-        gl.vertexAttribPointer(this.currShader.attrib.vertexPos, 2, gl.FLOAT, false, 0, 0);
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.uv);
-        gl.vertexAttribPointer(this.currShader.attrib.uvCoords, 2, gl.FLOAT, false, 0, 0);
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indiceBuffer);
+        var staticProjMatrix = new meta.Matrix4();
+        staticProjMatrix.ortho(0, meta.engine.width, meta.engine.height, 0, 0, 1);
         for (var n = 0; n < this.numEntities; n++) {
             var entity = this.entities[n];
-            var texture = entity.texture;
-            if (!texture) {
-                return;
+            var shader = entity.$shader;
+            if (!shader) {
+                continue;
             }
-            if (!texture.loaded) {
-                return;
+            if (shader !== this.currShader) {
+                this.currShader = shader;
+                this.currShader.use();
+                gl.uniform1i(this.currShader.uniform.texture, 0);
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+                gl.vertexAttribPointer(this.currShader.attrib.vertexPos, 2, gl.FLOAT, false, 0, 0);
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.uv);
+                gl.vertexAttribPointer(this.currShader.attrib.uvCoords, 2, gl.FLOAT, false, 0, 0);
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indiceBuffer);
             }
-            var width = texture.width * entity.$scaleX;
-            var height = texture.height * entity.$scaleY;
-            var minX = -width * entity.$pivotX;
-            var minY = -height * entity.$pivotY;
-            var maxX = minX + width;
-            var maxY = minY + height;
-            this.vertices[0] = minX;
-            this.vertices[1] = minY;
-            this.vertices[2] = maxX;
-            this.vertices[3] = minY;
-            this.vertices[4] = maxX;
-            this.vertices[5] = maxY;
-            this.vertices[6] = minX;
-            this.vertices[7] = maxY;
+            var layer = entity.$layer;
+            if (layer.flags & layer.Flag.INSTANCE_FIXED) {
+                gl.uniformMatrix4fv(this.currShader.uniform.projMatrix, false, staticProjMatrix.m);
+            } else {
+                gl.uniformMatrix4fv(this.currShader.uniform.projMatrix, false, projMatrix.m);
+            }
             gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
-            gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.DYNAMIC_DRAW);
-            gl.bindTexture(gl.TEXTURE_2D, entity.texture.instance);
-            var modelViewMatrix = new meta.Matrix4();
-            modelViewMatrix.translate(entity.$x, entity.$y, 0);
-            gl.uniformMatrix4fv(this.currShader.uniform.modelViewMatrix, false, modelViewMatrix.m);
-            gl.uniform1f(this.currShader.uniform.angle, entity.$angle);
-            gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+            entity.render(gl, this.vertices);
         }
         this.needRender = false;
+        this.currShader = null;
     },
     sortFunc: function(a, b) {
         return a.totalZ - b.totalZ;
@@ -2272,6 +2359,7 @@ meta.renderer = {
             this.entities.length += 8;
         }
         this.entities[this.numEntities++] = entity;
+        this.needSort = true;
     },
     removeEntity: function(entity) {
         if ((entity.flags & entity.Flag.RENDERING) === 0) {
@@ -2365,6 +2453,21 @@ meta.resources = {
         }
         resource.$remove();
     },
+    move: function(resource, newId) {
+        if (!resource) {
+            return console.warn("(meta.resources.move) Invalid resource passed");
+        }
+        if ((resource.flags & resource.Flag.ADDED) === 0) {
+            return console.warn("(meta.resources.move) Resource has not been added to manager");
+        }
+        var buffer = this.table[resource.type];
+        if (!buffer || !buffer[resource.$id]) {
+            return console.warn("(meta.resources.move) No such resource found: " + resource.$id);
+        }
+        delete buffer[resource.$id];
+        resource.$id = newId;
+        buffer[newId] = resource;
+    },
     load: function(type, cls, params) {
         var buffer = this.table[type];
         if (!buffer) {
@@ -2375,11 +2478,6 @@ meta.resources = {
         if (!resource.id) {
             meta.delete(resource);
             console.warn("(meta.resources.load) Created resource with invalid ID from params: `" + params + "`");
-            return null;
-        }
-        if (buffer[resource.id]) {
-            meta.delete(resource);
-            console.warn("(meta.resources.load) There is already resource with id: `" + resource.id + "` that has type: `" + resource.type + "`");
             return null;
         }
         buffer[resource.id] = resource;
@@ -2444,6 +2542,8 @@ meta.class("meta.Resource", {
             } else {
                 this.id = meta.genUniqueId();
             }
+        } else {
+            this.id = id;
         }
         if (this.setup) {
             this.setup(params);
@@ -2464,6 +2564,10 @@ meta.class("meta.Resource", {
         this.emit("removed");
         if (this.cleanup) {
             this.cleanup();
+        }
+        this.$id = null;
+        if (this.watchers) {
+            this.watchers.length = 0;
         }
     },
     loadParams: function(params) {
@@ -2500,6 +2604,19 @@ meta.class("meta.Resource", {
             watcher.func.call(watcher.owner, event);
         }
     },
+    set id(id) {
+        if (id === this.$id) {
+            return;
+        }
+        if (this.$id) {
+            meta.resources.move(this, id);
+        } else {
+            this.$id = id;
+        }
+    },
+    get id() {
+        return this.$id;
+    },
     get loaded() {
         return (this.flags & this.Flag.LOADED) === this.Flag.LOADED;
     },
@@ -2510,9 +2627,6 @@ meta.class("meta.Resource", {
             }
             this.flags |= this.Flag.LOADING;
         } else {
-            if ((this.flags & this.Flag.LOADING) === 0) {
-                return;
-            }
             this.flags &= ~this.Flag.LOADING;
             this.flags |= this.Flag.LOADED;
             this.emit("loaded");
@@ -2557,7 +2671,7 @@ meta.class("meta.Resource", {
         LOADED: 1 << 1,
         LOADING: 1 << 2
     },
-    id: null,
+    $id: null,
     type: null,
     $data: null,
     watchers: null,
@@ -2567,15 +2681,20 @@ meta.class("meta.Resource", {
 "use strict";
 
 meta.class("meta.Texture", "meta.Resource", {
-    setup: function(params) {
-        var self = this;
+    setup: function() {
         this.instance = meta.engine.gl.createTexture();
-        this.image = new Image();
-        this.image.onload = function() {
-            self.$load();
-        };
-        if (typeof params === "string") {
-            this.path = params;
+    },
+    loadParams: function(params) {
+        if (params instanceof HTMLCanvasElement) {
+            this.createFromImage(params);
+        } else {
+            if (typeof params === "string") {
+                this.path = params;
+            } else if (params instanceof Object) {
+                for (var key in params) {
+                    this[key] = params[key];
+                }
+            }
         }
     },
     cleanup: function() {
@@ -2586,48 +2705,30 @@ meta.class("meta.Texture", "meta.Resource", {
         this.height = 0;
     },
     load: function(path) {
-        if (!params) {
-            console.warn("(meta.Texture.load) Invalid path passed");
-            return;
-        }
-        this.$path = path;
-        this.ext = meta.getExtFromPath(params);
-        this.image.src = meta.resources.rootPath + path;
-        var path;
-        if (params) {
-            if (typeof params === "string") {
-                path = params;
-                this.id = meta.getNameFromPath(params);
-            } else {
-                if (!params.path) {
-                    return;
-                }
-                path = params.path;
-                this.id = params.id || meta.getNameFromPath(path);
-            }
-            this.ext = meta.getExtFromPath(params);
-            if (this.ext) {
-                this.path = params;
-            } else {
-                this.ext = "png";
-                this.path = params + ".png";
-            }
-            this.image.src = meta.resources.rootPath + path;
-        }
-    },
-    load: function(path) {
         if (this.loading) {
             return;
         }
         this.loading = true;
+        if (!this.image) {
+            var self = this;
+            this.image = new Image();
+            this.image.onload = function() {
+                self.createFromImage(self.image);
+            };
+        }
         if (!path) {
+            this.ext = null;
+            this.$path = null;
             this.image.src = "";
-            this.$load();
+            this.createFromImage(this.image);
         } else {
+            this.ext = meta.getExtFromPath(path);
+            this.$path = path;
             this.image.src = meta.resources.rootPath + path;
         }
     },
-    $load: function() {
+    createFromImage: function(img) {
+        this.image = img;
         this.width = this.image.width;
         this.height = this.image.height;
         var gl = meta.engine.gl;
@@ -2648,14 +2749,14 @@ meta.class("meta.Texture", "meta.Resource", {
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.image);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
             }
         }
-        this.image.src = null;
-        var ext = meta.getExt("EXT_texture_filter_anisotropic");
-        if (ext) {
-            gl.texParameterf(gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, meta.getExtParam(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT));
+        this.image.src = "";
+        if (this.$anisotropy) {
+            var ext = meta.getExt("EXT_texture_filter_anisotropic");
+            if (ext) {
+                gl.texParameterf(gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, meta.getExtParam(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT));
+            }
         }
         gl.bindTexture(gl.TEXTURE_2D, null);
         this.loading = false;
@@ -2695,6 +2796,28 @@ meta.class("meta.Texture", "meta.Resource", {
     get path() {
         return this.$path;
     },
+    set anisotropy(value) {
+        if (this.$anisotropy === value) {
+            return;
+        }
+        this.$anisotropy = value;
+        if (this.instance) {
+            var ext = meta.getExt("EXT_texture_filter_anisotropic");
+            if (!ext) {
+                return;
+            }
+            var gl = meta.engine.gl;
+            gl.bindTexture(gl.TEXTURE_2D, this.instance);
+            if (value) {
+                gl.texParameterf(gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, meta.getExtParam(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT));
+            } else {
+                gl.texParameterf(gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, 1);
+            }
+        }
+    },
+    get anisotropy() {
+        return this.$anisotropy;
+    },
     type: "texture",
     instance: null,
     image: null,
@@ -2703,7 +2826,8 @@ meta.class("meta.Texture", "meta.Resource", {
     fullWidth: 0,
     fullHeight: 0,
     ext: null,
-    $path: null
+    $path: null,
+    $anisotropy: true
 });
 
 "use strict";
@@ -2776,7 +2900,6 @@ meta.class("meta.Shader", "meta.Resource", {
     },
     use: function() {
         meta.engine.gl.useProgram(this.program);
-        meta.renderer.currShader = this;
     },
     loadAttribs: function() {
         this.attrib = {};
@@ -2852,27 +2975,43 @@ meta.class("meta.Shader", "meta.Resource", {
     $fragmentShader: null
 });
 
+meta.on("preload", function() {
+    meta.new(meta.Shader, {
+        id: "sprite",
+        vertexShader: [ "attribute vec3 vertexPos;", "attribute vec2 uvCoords;", "uniform mat4 projMatrix;", "uniform float angle;", "varying highp vec2 var_uvCoords;", "void main(void) {", "	float angleX = sin(angle);", "	float angleY = cos(angle);", "	vec2 rotatedPos = vec2(vertexPos.x * angleY + vertexPos.y * angleX, vertexPos.y * angleY - vertexPos.x * angleX);", "	gl_Position = projMatrix * vec4(rotatedPos, vertexPos.z, 1.0);", "	var_uvCoords = vec2(uvCoords.s, uvCoords.t);", "}" ],
+        fragmentShader: [ "varying highp vec2 var_uvCoords;", "uniform sampler2D texture;", "void main(void) {", "	gl_FragColor = texture2D(texture, vec2(var_uvCoords.s, var_uvCoords.t));", "}" ]
+    });
+    meta.new(meta.Shader, {
+        id: "tiling",
+        vertexShader: [ "#define PI 3.1415926535897932384626433832795", "attribute vec3 vertexPos;", "attribute vec2 uvCoords;", "uniform mat4 projMatrix;", "uniform float tilesX;", "uniform float tilesY;", "uniform float offsetX;", "uniform float offsetY;", "varying highp vec2 var_uvCoords;", "void main(void) {", "	gl_Position = projMatrix * vec4(vertexPos, 1.0);", "	var_uvCoords = vec2(uvCoords.s * tilesX + offsetX, uvCoords.t * tilesY + offsetY);", "}" ],
+        fragmentShader: [ "varying highp vec2 var_uvCoords;", "uniform sampler2D texture;", "void main(void) {", "	gl_FragColor = texture2D(texture, vec2(var_uvCoords.s, var_uvCoords.t));", "}" ]
+    });
+});
+
 "use strict";
 
 meta.class("meta.Sprite", {
     init: function(params) {
-        this.$volume = new meta.AABB(0, 0, 0, 0);
+        this.volume = new meta.AABB(0, 0, 0, 0);
         this.create(params);
     },
     create: function(params) {
         this.flags = 0;
         this.loadParams(params);
+        if (!this.$shader) {
+            this.$shader = meta.resources.get("shader", "sprite");
+        }
     },
     cleanup: function() {
         if (this.flags & this.Flag.REMOVED) {
             return;
         }
         this.flags |= this.Flag.REMOVED;
-        this.$x = this.$y = this.$z = 0;
+        this.volume.reset();
     },
     remove: function() {
-        if (this.$view) {
-            this.$view.remove(this);
+        if (this.$layer) {
+            this.$layer.remove(this);
         } else {
             this.cleanup();
         }
@@ -2891,14 +3030,46 @@ meta.class("meta.Sprite", {
             }
         }
     },
+    render: function(gl, buffer) {
+        if (!this.texture) {
+            return;
+        }
+        if (!this.texture.loaded) {
+            return;
+        }
+        buffer[0] = this.volume.minX;
+        buffer[1] = this.volume.minY;
+        buffer[2] = this.volume.maxX;
+        buffer[3] = this.volume.minY;
+        buffer[4] = this.volume.maxX;
+        buffer[5] = this.volume.maxY;
+        buffer[6] = this.volume.minX;
+        buffer[7] = this.volume.maxY;
+        gl.bufferData(gl.ARRAY_BUFFER, buffer, gl.DYNAMIC_DRAW);
+        gl.bindTexture(gl.TEXTURE_2D, this.texture.instance);
+        gl.uniform1f(this.$shader.uniform.angle, this.$angle);
+        var numTilesX = this.volume.width / this.texture.width;
+        gl.uniform1f(this.$shader.uniform.tilesX, numTilesX);
+        var numTilesY = this.volume.height / this.texture.height;
+        gl.uniform1f(this.$shader.uniform.tilesY, numTilesY);
+        var offsetX = meta.camera.x % 256;
+        if (offsetX !== 0) {
+            offsetX = 1 / 256 * offsetX;
+        }
+        var offsetY = meta.camera.y % 256;
+        if (offsetY !== 0) {
+            offsetY = 1 / 256 * offsetY;
+        }
+        gl.uniform1f(this.$shader.uniform.offsetX, offsetX);
+        gl.uniform1f(this.$shader.uniform.offsetY, offsetY);
+        gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+    },
     position: function(x, y) {
-        this.$x = 0;
-        this.$y = 0;
+        this.volume.position(x, y);
         this.updatePosition();
     },
     move: function(deltaX, deltaY) {
-        this.$x += deltaX;
-        this.$y += deltaY;
+        this.volume.move(deltaX, deltaY);
         this.updatePosition();
     },
     updatePosition: function() {},
@@ -2906,19 +3077,19 @@ meta.class("meta.Sprite", {
         this.totalZ = this.$z;
         meta.renderer.needSort = true;
     },
-    set x(value) {
-        this.$x = value;
+    set x(x) {
+        this.volume.position(x, this.volume.y);
         this.updatePosition();
     },
-    set y(value) {
-        this.$y = value;
+    set y(y) {
+        this.volume.position(this.volume.x, y);
         this.updatePosition();
     },
     get x() {
-        return this.$x;
+        return this.volume.x;
     },
     get y() {
-        return this.$y;
+        return this.volume.y;
     },
     set z(value) {
         this.$z = value;
@@ -2946,7 +3117,56 @@ meta.class("meta.Sprite", {
     get angleRad() {
         return this.$angle;
     },
-    anchor: function(x, y) {},
+    resize: function(width, height) {
+        this.volume.resize(width, height);
+        this.updateAnchor();
+    },
+    set width(width) {
+        if (this.volume.width === width) {
+            return;
+        }
+        this.volume.resize(width, this.volume.height);
+        this.updateAnchor();
+    },
+    set height(height) {
+        if (this.volume.height === height) {
+            return;
+        }
+        this.volume.resize(this.volume.width, height);
+        this.updateAnchor();
+    },
+    get width() {
+        return this.volume.width;
+    },
+    get height() {
+        return this.volume.height;
+    },
+    anchor: function(x, y) {
+        this.$anchorX = x;
+        this.$anchorY = y;
+        this.updateAnchor();
+    },
+    set anchorX(x) {
+        if (this.$anchorX === x) {
+            return;
+        }
+        this.$anchorX = x;
+        this.updateAnchor();
+    },
+    set anchorY(y) {
+        if (this.$anchorY === y) {
+            return;
+        }
+        this.$anchorY = y;
+        this.updateAnchor();
+    },
+    get anchorX() {
+        return this.$anchorX;
+    },
+    get anchorY() {
+        return this.$anchorY;
+    },
+    updateAnchor: function() {},
     pivot: function(x, y) {
         if (this.$pivotX === x && this.$pivotY === y) {
             return;
@@ -2999,6 +3219,23 @@ meta.class("meta.Sprite", {
     },
     onClick: null,
     onPress: null,
+    set layer(layer) {
+        if (this.$layer) {
+            this.$layer.remove(this);
+        }
+        this.$setLayer(layer);
+    },
+    get layer() {
+        return this.$layer;
+    },
+    $setLayer: function(layer) {
+        this.$layer = layer;
+        if (this.children) {
+            for (var n = 0; n < this.children.n++; n++) {
+                this.children[n].$setLayer(layer);
+            }
+        }
+    },
     set texture(texture) {
         if (typeof texture === "string") {
             if (texture === "") {
@@ -3015,6 +3252,9 @@ meta.class("meta.Sprite", {
         }
         this.$texture = texture;
         if (this.$texture) {
+            if (this.$texture.loaded) {
+                this.updateFromTexture();
+            }
             this.$texture.watch(this.handleTexture, this);
         }
     },
@@ -3023,10 +3263,13 @@ meta.class("meta.Sprite", {
     },
     handleTexture: function(event) {
         if (event === "loaded" || event === "updated") {
-            this.$volume.resize(this.$texture.width, this.$texture.height);
+            this.updateFromTexture();
         }
     },
-    set shader(id) {
+    updateFromTexture: function() {
+        this.volume.resize(this.$texture.width, this.$texture.height);
+    },
+    set shader(shader) {
         if (typeof shader === "string") {
             shader = meta.resources.getShader(shader);
         }
@@ -3089,12 +3332,11 @@ meta.class("meta.Sprite", {
         ROOT: 1 << 4,
         RENDERING: 1 << 5
     },
-    $view: null,
+    $layer: null,
     parent: null,
-    $volume: null,
+    children: null,
+    volume: null,
     flags: 0,
-    $x: 0,
-    $y: 0,
     $z: 0,
     totalZ: 0,
     $angle: null,
@@ -3107,6 +3349,81 @@ meta.class("meta.Sprite", {
     $pivotX: 0,
     $pivotY: 0,
     $data: null
+});
+
+"use strict";
+
+meta.class("meta.Tiling", "meta.Sprite", {
+    create: function(params) {
+        this.$shader = meta.resources.get("shader", "tiling");
+        this._super(params);
+    },
+    cleanup: function() {
+        this._super();
+        if (this.$autoResize) {
+            meta.off("resize", this.updateAutoResize, this);
+        }
+    },
+    render: function(gl, buffer) {
+        if (!this.texture) {
+            return;
+        }
+        if (!this.texture.loaded) {
+            return;
+        }
+        buffer[0] = this.volume.minX;
+        buffer[1] = this.volume.minY;
+        buffer[2] = this.volume.maxX;
+        buffer[3] = this.volume.minY;
+        buffer[4] = this.volume.maxX;
+        buffer[5] = this.volume.maxY;
+        buffer[6] = this.volume.minX;
+        buffer[7] = this.volume.maxY;
+        gl.bufferData(gl.ARRAY_BUFFER, buffer, gl.DYNAMIC_DRAW);
+        gl.bindTexture(gl.TEXTURE_2D, this.texture.instance);
+        var width = this.texture.width;
+        var height = this.texture.height;
+        var numTilesX = this.volume.width / width;
+        gl.uniform1f(this.$shader.uniform.tilesX, numTilesX);
+        var numTilesY = this.volume.height / height;
+        gl.uniform1f(this.$shader.uniform.tilesY, numTilesY);
+        var offsetX = meta.camera.x % width;
+        if (offsetX !== 0) {
+            offsetX = 1 / width * offsetX;
+        }
+        var offsetY = meta.camera.y % height;
+        if (offsetY !== 0) {
+            offsetY = 1 / height * offsetY;
+        }
+        gl.uniform1f(this.$shader.uniform.offsetX, offsetX);
+        gl.uniform1f(this.$shader.uniform.offsetY, offsetY);
+        gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+    },
+    updateFromTexture: function() {
+        this._super();
+        if (this.$autoResize) {
+            this.updateAutoResize(meta.engine);
+        }
+    },
+    set autoResize(value) {
+        if (this.$autoResize === value) {
+            return;
+        }
+        this.$autoResize = value;
+        if (value) {
+            meta.on("resize", this.updateAutoResize, this);
+            this.updateAutoResize(meta.engine);
+        } else {
+            meta.off("resize", this.updateAutoResize, this);
+        }
+    },
+    get autoResize() {
+        return this.$autoResize;
+    },
+    updateAutoResize: function(engine) {
+        this.resize(engine.width, engine.height);
+    },
+    $autoResize: false
 });
 
 "use strict";

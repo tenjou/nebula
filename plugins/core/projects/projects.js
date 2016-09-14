@@ -64,7 +64,7 @@ editor.plugin("projects",
 	},
 
 	onSplashEnd: function() {
-		wabi.destroyTemplate(this.template);
+		this.template.remove();
 	},
 
 	createProject: function(event) {
