@@ -6,23 +6,23 @@ wabi.element.basic = function(parent, params)
 		this.create(params);
 	}
 	
-	if(!this.$domElement) {
-		this.$domElement = document.createElement(this.$tag ? this.$tag : this.$metadata.name);
+	if(!this.domElement) {
+		this.domElement = document.createElement(this.tag ? this.tag : this._metadata.name);
 	}
 
-	this.$domElement.holder = this;
-	this.$state = new this.$metadata.stateCls();
+	this.domElement.holder = this;
+	this._$ = new this._metadata.stateCls();
 
 	if(parent) {
 		this.parent = parent;
 	}
 
 	// Load events:
-	var events = this.$metadata.events;
+	var events = this._metadata.events;
 	if(events)
 	{
 		for(var n = 0; n < events.length; n++) {
-			this.$addEvent(events[n]);
+			this._addEvent(events[n]);
 		}		
 	}
 
@@ -37,71 +37,131 @@ wabi.element("basic",
 
 	prepare: null,
 
-	$createSlot: function(element, slotId)
+	initElement: function(elementSlotId)
 	{
-		var prevElement = this.$elements[slotId];
-		if(prevElement === void(0)) {
-			console.warn("(wabi.element.basic.$createSlot) Invalid slot id: " + slotId);
-			return null;
+		var slotDef = this._metadata.elements[elementSlotId];
+		if(!slotDef) {
+			return console.warn("(wabi.element.basic.initElement) No such slot defined: " + elementSlotId);
 		}
 
+		if(!slotDef.type) {
+			return console.warn("(wabi.element.basic.initElement) Element slot `" + elementSlotId + "` is not initializable because type is not defined");
+		}
+
+		var element = this.createElement(slotDef.type, elementSlotId);
+		if(!element) {
+			this.elements[elementSlotId] = null;
+		}
+
+		if(slotDef.state) {
+			element.$ = slotDef.state;
+		}	
+
+		var bind = this._metadata.elementsBinded[elementSlotId];
+		if(bind) {
+			element.bind = bind;
+		}
+	},
+
+	deinitElement: function(elementSlotId)
+	{
+		if(!this.elements) {
+			return console.warn("(wabi.element.basic.deinitElement) No elements created");
+		}
+
+		var element = this.elements[elementSlotId];
+		if(element === undefined) {
+			return console.warn("(wabi.element.basic.initElement) Such element does not exist: " + elementSlotId);
+		}
+
+		element.remove();
+	},
+
+	createElement: function(element, elementSlotId)
+	{
+		var prevElement = this.elements[elementSlotId];
 		if(prevElement) {
 			prevElement.remove();
+		}
+		else if(!this._metadata.elements[elementSlotId]) {
+			console.warn("(wabi.element.basic.createElement) Invalid slot id: " + elementSlotId);
+			return null;
 		}
 
 		if(typeof element === "string")
 		{
-			element = wabi.createElement(element, this, null);
+			element = wabi.createElement(element, this);
 			if(!element) { 
 				return null; 
 			}
 		}
 		else if(!(element instanceof wabi.element.basic)) {
-			console.warn("(wabi.element.basic.$createSlot) Invalid element passed should be string or extend `wabi.element.basic`");
+			console.warn("(wabi.element.basic.createElement) Invalid element passed should be string or extend `wabi.element.basic`");
 			return null;
 		}
 
-		element.$flags |= (this.Flag.ELEMENT | this.Flag.SLOT);
-		element.$slotId = slotId;
-		this.$elements[slotId] = element;
+		element.flags |= (this.Flag.SLOT);
+		element.slotId = elementSlotId;
+		this.elements[elementSlotId] = element;
 
-		var parentLink = this.$metadata.elementsLinked[slotId];
+		var parentLink = this._metadata.elementsLinked[elementSlotId];
 		if(parentLink) 
 		{
-			if(this["set_" + parentLink]) {
-				element.$parentLink = parentLink;
-			}
-			
-			this.$state[parentLink] = element;
+			element._parentLink = parentLink;
+			this._$[parentLink] = element;
 		}
 
 		return element;
 	},
 
-	$setup: function()
+	element: function(id, element)
 	{
-		// Load slots:
-		var elements = this.$metadata.elements;
+		if(element === void(0)) 
+		{
+			if(!this.elements) { return null; }
+
+			element = this.elements[id];
+			return element ? element : null;
+		}
+
+		if(typeof element === "string") {
+			element = wabi.createElement(element);
+		}
+
+		var element = this.createElement(element, id);
+		if(!element) { return null; }
+
+		var slotId = this._metadata.elements[id].slot;
+		var elementBefore = this.domElement.childNodes[slotId];
+		if(elementBefore) {
+			this.appendBefore(element, elementBefore.holder);
+		}
+		else {
+			element.appendTo(this);
+		}
+
+		return element;
+	},	
+
+	_setup: function()
+	{
+		// Create elements:
+		var elements = this._metadata.elements;
 		if(elements) 
 		{
-			this.$elements = {};
-
-			for(var key in elements)
-			{
-				this.$elements[key] = null;
-
-				var type = elements[key].type;
-				if(!type) { continue; }
-
-				var element = this.$createSlot(type, key);
-				this.$setupElement(element);
+			if(!this.elements) {
+				this.elements = {};
+			}
+			
+			for(var key in elements) {
+				this.initElement(key);
 			}
 		}
 
 		// Process initial state:
-		var states = this.$metadata.states;
+		var states = this._metadata.states;
 		for(var key in states) {
-			this.$processState(key, states[key]);
+			this._processState(key, states[key]);
 		}
 
 		if(this.setup) {
@@ -109,13 +169,13 @@ wabi.element("basic",
 		}		
 	},
 
-	$setupElement: function(element)
+	_setupElement: function(element)
 	{
 		if(!element) { return; }
 
-		var elementsBinded = this.$metadata.elementsBinded;
-		if(elementsBinded[element.$slotId]) {
-			element.$state.bind = elementsBinded[element.$slotId];
+		var elementsBinded = this._metadata.elementsBinded;
+		if(elementsBinded[element.slotId]) {
+			element._bind = elementsBinded[element.slotId];
 		}
 	},
 
@@ -128,13 +188,11 @@ wabi.element("basic",
 	appendTo: function(parent)
 	{
 		if(!parent) {
-			console.warn("(element.basic.appendTo) Invalid parent passed");
-			return;
+			return console.warn("(wabi.element.basic.appendTo) Invalid parent passed");
 		}
 
-		if(this.$parent) {
-			console.warn("(element.basic.appendTo) Element is already added to different parent");
-			return;
+		if(this._parent) {
+			return console.warn("(wabi.element.basic.appendTo) Element is already added to different parent");
 		}
 
 		var parentHolder;
@@ -148,55 +206,53 @@ wabi.element("basic",
 		}
 		else {
 			parentHolder = parent;
-		}	
+		}
 
-		if(!parentHolder.$children) {
-			parentHolder.$children = [ this ];
+		if(!parentHolder.children) {
+			parentHolder.children = [ this ];
 		}
 		else {
-			parentHolder.$children.push(this);
+			parentHolder.children.push(this);
 		}
 
-		this.$parent = parentHolder;
+		this._parent = parentHolder;
 
-		if(parentHolder.$data && parentHolder.bind !== "*") 
+		if(parentHolder._data && parentHolder.bind !== "*") 
 		{
 			if(!this.region) { 
-				this.data = parentHolder.$data;
+				this.data = parentHolder._data;
 			}
 		}
 		
-		if(this.enable && parentHolder.$domElement) {
-			this.$flags |= this.Flag.ENABLED;
-			parentHolder.$domElement.appendChild(this.$domElement);
+		if(parentHolder.domElement && (this.flags & this.Flag.ENABLED)) {
+			parentHolder.domElement.appendChild(this.domElement);
 		}
 	},
 
 	appendBefore: function(element, elementBefore)
 	{
-		if(!this.$children) {
+		if(!this.children) {
 			return console.error("(wabi.element.")
 		}
 		else {
-			this.$children.push(element);
+			this.children.push(element);
 		}
 
-		if(this.$data && this.bind !== "*") 
+		if(this._data && this.bind !== "*") 
 		{
 			if(!element.region) { 
-				element.data = this.$data;
+				element.data = this._data;
 			}
 		}
 
-		element.$parent = this;
+		element._parent = this;
 
-		if(element.enable) {
-			element.$flags |= this.Flag.ENABLED;
-			this.$domElement.insertBefore(element.$domElement, elementBefore.$domElement);
+		if(this.flags & this.Flag.ENABLED) {
+			this.domElement.insertBefore(element.domElement, elementBefore.domElement);
 		}
 	},
 
-	$remove: function()
+	_remove: function()
 	{
 		this.removeAll();
 
@@ -204,49 +260,49 @@ wabi.element("basic",
 			this.cleanup();
 		}
 
-		if(this.$data) {
+		if(this._data) {
 			this.data = null;
 		}
 
-		if(this.$flags & this.Flag.ENABLED) 
+		if(this.flags & this.Flag.ENABLED) 
 		{
-			if(this.$parent) {
-				this.$parent.$domElement.removeChild(this.$domElement);
+			if(this._parent) {
+				this._parent.domElement.removeChild(this.domElement);
 			}
 		}
 
-		if(this.$parent) 
+		if(this._parent) 
 		{
-			var parentChildren = this.$parent.$children;
+			var parentChildren = this._parent.children;
 			var index = parentChildren.indexOf(this);
 			if(index > -1) {
 				parentChildren[index] = parentChildren[parentChildren.length - 1];
 				parentChildren.pop();
 			}
 
-			if(this.$parentLink) {
-				this.$parent.$state[this.$parentLink] = null;
-				this.$parentLink = null;
+			if(this._parentLink) {
+				this._parent._$[this._parentLink] = null;
+				this._parentLink = null;
 			}
 			
-			if(this.$slotId) {
-				this.$parent.$elements[this.$slotId] = null;
-				this.$slotId = null;
+			if(this.slotId) {
+				this._parent.elements[this.slotId] = null;
+				this.slotId = null;
 			}
 			
-			this.$parent = null;
+			this._parent = null;
 		}
 
-		this.$flags = 0;
-		this.$listeners = null;
+		this.flags = 0;
+		this._listeners = null;
 	},
 
 	removeAll: function()
 	{
-		if(this.$children) 
+		if(this.children) 
 		{
-			for(var n = this.$children.length - 1; n > -1; n--) {
-				wabi.removeElement(this.$children[n]);
+			for(var n = this.children.length - 1; n > -1; n--) {
+				wabi.removeElement(this.children[n]);
 			}
 		}
 	},
@@ -258,7 +314,7 @@ wabi.element("basic",
 		}
 		else 
 		{
-			if(element.$parent !== this) {
+			if(element._parent !== this) {
 				return console.warn("(wabi.element.basic.remove) Element has different parent");
 			}
 
@@ -266,55 +322,34 @@ wabi.element("basic",
 		}
 	},
 
-	slot: function(id, element)
-	{
-		if(typeof element === "string") {
-			element = wabi.createElement(element);
-		}
-
-		var element = this.$createSlot(element, id);
-		if(!element) { return null; }
-
-		var slotId = this.$metadata.elements[id].slot;
-		var elementBefore = this.$domElement.childNodes[slotId];
-		if(elementBefore) {
-			this.appendBefore(element, elementBefore.holder);
-		}
-		else {
-			element.appendTo(this);
-		}
-
-		return element;
-	},
-
 	attrib: function(key, value)
 	{
 		if(value === void(0)) {
-			return this.$domElement.getAttribute(key);
+			return this.domElement.getAttribute(key);
 		}
 		else {
-			this.$domElement.setAttribute(key, value);
+			this.domElement.setAttribute(key, value);
 		}
 		
 		return value;
 	},
 
 	removeAttrib: function(key) {
-		this.$domElement.removeAttribute(key);
+		this.domElement.removeAttribute(key);
 	},
 
 	style: function(key, value)
 	{
-		if(this.$domElement.style[key] === void(0)) {
+		if(this.domElement.style[key] === void(0)) {
 			console.warn("(wabi.element.basic.style) Invalid DOM style:", key);
 			return null;
 		}
 
 		if(value === void(0)) {
-			return this.$domElement.style[key];
+			return this.domElement.style[key];
 		}
 		else {
-			this.$domElement.style[key] = value;
+			this.domElement.style[key] = value;
 		}
 		
 		return value;
@@ -323,10 +358,10 @@ wabi.element("basic",
 	setCls: function(name, state) 
 	{
 		if(state) {
-			this.$domElement.classList.add(name);
+			this.domElement.classList.add(name);
 		}
 		else {
-			this.$domElement.classList.remove(name);
+			this.domElement.classList.remove(name);
 		}
 	},
 
@@ -334,7 +369,7 @@ wabi.element("basic",
 	{
 		if(id[0] === "#")
 		{
-			var domElement = this.$domElement.querySelector(id);
+			var domElement = this.domElement.querySelector(id);
 			if(domElement) {
 				return domElement.holder;
 			}
@@ -343,9 +378,9 @@ wabi.element("basic",
 		{
 			if(typeof id === "function")
 			{
-				var tag = id.prototype.$tag || id.prototype.$metadata.name;
+				var tag = id.prototype.tag || id.prototype._metadata.name;
 
-				var buffer = this.$domElement.querySelectorAll(tag);
+				var buffer = this.domElement.querySelectorAll(tag);
 				var num = buffer.length;
 				if(num > 0) 
 				{
@@ -362,7 +397,7 @@ wabi.element("basic",
 			}
 			else
 			{
-				var buffer = this.$domElement.querySelectorAll(id);
+				var buffer = this.domElement.querySelectorAll(id);
 				var num = buffer.length;
 				if(num > 0) 
 				{
@@ -408,18 +443,18 @@ wabi.element("basic",
 			}
 			else
 			{
-				if(!this.$childrenListeners) {
-					this.$childrenListeners = {};
+				if(!this.childrenListeners) {
+					this.childrenListeners = {};
 				}
 
 				if(id instanceof Array) 
 				{
 					for(var n = 0; n < id.length; n++) {
-						this.$onChildListen(event, id[n], cb, owner);
+						this._onChildListen(event, id[n], cb, owner);
 					}
 				}
 				else {
-					this.$onChildListen(event, id, cb, owner)
+					this._onChildListen(event, id, cb, owner)
 				}
 
 				return;
@@ -430,17 +465,17 @@ wabi.element("basic",
 			element = this;	
 		}
 
-		listeners = element.$listeners;
+		listeners = element._listeners;
 		if(!listeners) {
 			listeners = {};
-			element.$listeners = listeners;
+			element._listeners = listeners;
 		}
 
 		var buffer = listeners[event];
 		if(!buffer) {
 			buffer = [];
 			listeners[event] = buffer;
-			element.$addEvent(event);
+			element._addEvent(event);
 		}
 
 		buffer.push(cb.bind(owner));			
@@ -450,13 +485,13 @@ wabi.element("basic",
 	{
 		var event;
 
-		if(this.$listeners)
+		if(this._listeners)
 		{
-			var buffer = this.$listeners[eventName];
+			var buffer = this._listeners[eventName];
 			if(buffer)
 			{
 				event = new wabi.event(eventName, this, domEvent);
-				if(this.$preventableEvents[eventName]) {
+				if(this._preventableEvents[eventName]) {
 					domEvent.preventDefault();
 				}
 
@@ -466,12 +501,12 @@ wabi.element("basic",
 			}
 		}
 
-		// if(this.$parent) 
+		// if(this._parent) 
 		// {
 		// 	if(!event) 
 		// 	{
 		// 		event = new wabi.event(eventName, this, domEvent);
-		// 		if(this.$preventableEvents[eventName]) {
+		// 		if(this._$preventableEvents[eventName]) {
 		// 			domEvent.preventDefault();
 		// 		}
 		// 	}
@@ -482,9 +517,9 @@ wabi.element("basic",
 
 	emitEx: function(event)
 	{
-		if(!this.$listeners) { return; }
+		if(!this._listeners) { return; }
 
-		var buffer = this.$listeners[event.name];
+		var buffer = this._listeners[event.name];
 		if(!buffer) { return; }
 
 		for(var n = 0; n < buffer.length; n++) {
@@ -494,7 +529,7 @@ wabi.element("basic",
 
 	checkParentListeners: function(eventName, event)
 	{
-		var buffer = this.$childrenListeners[eventName];
+		var buffer = this.childrenListeners[eventName];
 		if(buffer)
 		{
 			for(var n = 0; n < buffer.length; n++) {
@@ -502,17 +537,17 @@ wabi.element("basic",
 			}
 		}
 
-		if(this.$parent) {
+		if(this._parent) {
 			this.checkParentListeners(eventName, event);
 		}
 	},
 
-	$onChildListen: function(event, id, cb, owner)
+	_onChildListen: function(event, id, cb, owner)
 	{
-		var map = this.$childrenListeners[id];
+		var map = this.childrenListeners[id];
 		if(!map) {
 			map = {};
-			this.$childrenListeners[id] = map;
+			this.childrenListeners[id] = map;
 		}
 
 		var buffer = map[event];
@@ -524,8 +559,8 @@ wabi.element("basic",
 			buffer.push(cb.bind(owner));
 		}
 
-		if(this.$domElement["on" + event] === null) {
-			this.$addEvent(event);
+		if(this.domElement["on" + event] === null) {
+			this._addEvent(event);
 		}
 	},
 
@@ -534,27 +569,31 @@ wabi.element("basic",
 
 	},
 
-	set_id: function(id) 
+	set id(id) 
 	{
 		if(id) {
-			this.$domElement.id = id;
+			this.domElement.id = id;
 		}
 		else {
-			this.$domElement.removeAttribute("id");
+			this.domElement.removeAttribute("id");
 		}
 	},
 
-	set_bind: function(bind)
+	get id() {
+		return this._id;
+	},
+
+	set bind(bind)
 	{
 		if(bind)
 		{
-			var statesLinked = this.$metadata.statesLinked;
+			var statesLinked = this._metadata.statesLinked;
 
 			if(typeof(bind) === "string") 
 			{
 				var element = statesLinked.value;
 				if(element !== undefined) {
-					this.$elements[element].bind = bind;
+					this.elements[element].bind = bind;
 					bind = null;
 				}
 			}
@@ -564,119 +603,138 @@ wabi.element("basic",
 				{
 					var element = statesLinked[key];
 					if(element !== undefined) {
-						this.$elements[element].bind = bind[key];
+						this.elements[element].bind = bind[key];
 						delete bind[key];
 					}
 				}
 			}
 		}
-		
-		this.$updateBindings(bind);
 
-		return bind;
+		this._bind = bind;
+		this.updateBindings();
 	},
 
-	set_hidden: function(hidden)
-	{
-		if(hidden) {
-			this.$domElement.classList.add("hidden");
-		}
-		else {
-			this.$domElement.classList.remove("hidden");
-		}
+	get bind() {
+		return this._bind;
 	},
 
-	set_enable: function(enable)
+	set hidden(value)
 	{
-		if(!this.$parent) { return; }
-
-		if(enable) 
+		if(value) 
 		{
-			if(this.$flags & this.Flag.ENABLED) { return; }
-			this.$flags |= this.Flag.ENABLED;
-			this.$parent.$domElement.appendChild(this.$domElement);
+			if(this.flags & this.Flag.HIDDEN) { return; }
+			this.flags |= this.Flag.HIDDEN;
+
+			this.domElement.classList.add("hidden");
 		}
 		else 
 		{
-			if((this.$flags & this.Flag.ENABLED) === 0) { return; }
-			this.$flags &= ~this.Flag.ENABLED;
-			this.$parent.$domElement.removeChild(this.$domElement);
+			if((this.flags & this.Flag.HIDDEN) === 0) { return; }
+			this.flags &= ~this.Flag.HIDDEN;
+
+			this.domElement.classList.remove("hidden");
 		}
 	},
 
-	set_value: function(value) {
-		this.$domElement.innerHTML = value;
+	get hidden() {
+		return ((this.flags & this.Flag.HIDDEN) === this.Flag.HIDDEN);
 	},
 
-	set state(state)
+	set enabled(value)
+	{
+		if(value) 
+		{
+			if(this.flags & this.Flag.ENABLED) { return; }
+			this.flags |= this.Flag.ENABLED;
+
+			if(this._parent) {
+				this._parent.domElement.appendChild(this.domElement);
+			}
+		}
+		else 
+		{
+			if((this.flags & this.Flag.ENABLED) === 0) { return; }
+			this.flags &= ~this.Flag.ENABLED;
+
+			if(this._parent) {
+				this._parent.domElement.removeChild(this.domElement);
+			}
+		}
+	},
+
+	get enabled() {
+		return ((this.flags & this.Flag.ENABLED) === this.Flag.ENABLED);
+	},
+
+	set $(state)
 	{
 		if(typeof(state) === "object")
 		{
 			for(var key in state) {
-				this.$setState(key, state[key]);
+				this.setState(key, state[key]);
 			}
 		}
 		else {
-			this.$setState("value", state);
+			this.setState("value", state);
 		}
 	},
 
-	get state() {
-		return this.$state;
+	get $() {
+		return this._$;
 	},
 
 	set parent(parent)
 	{	
-		if(this.$parent === parent) { return; }
+		if(this._parent === parent) { return; }
 
 		if(parent) {
 			this.appendTo(parent);
 		}
 		else 
 		{
-			if(this.$parent) {
-				this.$parent.remove(this);
+			if(this._parent) {
+				this._parent.remove(this);
 			}
 		}
 	},
 
 	get parent() {
-		return this.$parent;
+		return this._parent;
 	},
 
 	set data(data)
 	{
 		if(data instanceof wabi.ref)
 		{
-			if(this.$data === data.instance) { return; }
+			if(this._data === data.instance) { return; }
 
-			if(this.$data && this.$flags & this.Flag.WATCHING) {
-				this.$flags &= ~this.Flag.WATCHING;
-				this.$data.unwatch(this.handleDataChange, this);
+			if(this._data && this.flags & this.Flag.WATCHING) {
+				this.flags &= ~this.Flag.WATCHING;
+				this._data.unwatch(this.handleDataChange, this);
 			}
 
-			this.$data = data.instance;
+			this._data = data.instance;
 			this.ref = data;
 		}
 		else 
 		{
-			if(this.$data === data) { return; }
+			if(this._data === data) { return; }
 
-			if(this.$data && this.$flags & this.Flag.WATCHING) {
-				this.$flags &= ~this.Flag.WATCHING;
-				this.$data.unwatch(this.handleDataChange, this);
+			if(this._data && this.flags & this.Flag.WATCHING) {
+				this.flags &= ~this.Flag.WATCHING;
+				this._data.unwatch(this.handleDataChange, this);
 			}
 
-			this.$data = data;
+			this._data = data;
 		}
 
-		this.$updateBindings(this.$state.bind);
+		this.updateBindings();
 		
-		if(this.$children)
+		if(this.children)
 		{
-			for(var n = 0; n < this.$children.length; n++) 
+			for(var n = 0; n < this.children.length; n++) 
 			{
-				var child = this.$children[n];
+				var child = this.children[n];
 				if(child.region) { continue; }
 
 				child.data = data;
@@ -685,88 +743,92 @@ wabi.element("basic",
 	},
 
 	get data() {
-		return this.$data;
+		return this._data;
 	},
 
-	$updateBindings: function(bind)
+	html: function(value) {
+		this.domElement.innerHTML = value;
+	},
+
+	updateBindings: function()
 	{
-		if(this.$data)
+		if(this._data)
 		{
-			if(bind)
+			if(this._bind)
 			{
-				if((this.$flags & this.Flag.WATCHING) === 0) {
-					this.$flags |= this.Flag.WATCHING;
-					this.$data.watch(this.handleDataChange, this);
+				if((this.flags & this.Flag.WATCHING) === 0) {
+					this.flags |= this.Flag.WATCHING;
+					this._data.watch(this.handleDataChange, this);
 				}
 				
-				if(typeof(bind) === "string") {
-					this.$updateDataValue("value", bind);
+				if(typeof(this._bind) === "string") {
+					this.updateDataValue("value", this._bind);
 				}
 				else
 				{
-					for(var key in bind) {
-						this.$updateDataValue(key, bind[key]);
+					for(var key in this._bind) {
+						this.updateDataValue(key, this._bind[key]);
 					}
 				}
 			}
 			else
 			{
-				if(this.$data && this.$flags & this.Flag.WATCHING) {
-					this.$flags &= ~this.Flag.WATCHING;
-					this.$data.unwatch(this.handleDataChange, this);
+				if(this._data && this.flags & this.Flag.WATCHING) {
+					this.flags &= ~this.Flag.WATCHING;
+					this._data.unwatch(this.handleDataChange, this);
 				}				
 			}
 		}
 	},
 
-	$updateDataValue: function(key, bind)
+	updateDataValue: function(key, bind)
 	{
-		var value = this.$data.get(bind);
+		var value = this._data.get(bind);
 		if(value !== undefined) {
-			this.$setState(key, value);
+			this.setState(key, value);
 		}
 		else {
-			this.$setState(key, (this.$state.value !== undefined) ? this.$state.value : null);
+			this.setState(key, (this._$.value !== undefined) ? this._$.value : null);
 		}		
 	},
 
-	$addEvent: function(eventName) 
+	_addEvent: function(eventName) 
 	{
 		var func = this["handle_" + eventName];
 
 		if(eventName === "click") 
 		{
-			this.$domElement.onclick = this.$processClick.bind(this);
+			this.domElement.onclick = this._processClick.bind(this);
 			if(func) {
-				this.$onClick = func.bind(this);
+				this._onClick = func.bind(this);
 			}
 		}
 		else if(eventName === "dblclick") 
 		{
-			this.$domElement.onclick = this.$processClicking.bind(this);
+			this.domElement.onclick = this._processClicking.bind(this);
 			if(func) {
-				this.$onDblClick = func.bind(this);
+				this._onDblClick = func.bind(this);
 			}
 		}
 		else 
 		{
 			var eventKey = "on" + eventName;
 
-			if(this.$domElement[eventKey] === null) 
+			if(this.domElement[eventKey] === null) 
 			{
 				var self = this;
-				this.$domElement[eventKey] = function(domEvent) {
-					self.$processEvent(eventName, func, domEvent);
+				this.domElement[eventKey] = function(domEvent) {
+					self._processEvent(eventName, func, domEvent);
 				}
 			}
 		}
 	},
 
-	$onClick: null,
+	_onClick: null,
 
-	$onDblClick: null,
+	_onDblClick: null,
 
-	$processClick: function(domEvent)
+	_processClick: function(domEvent)
 	{
 		var event = new wabi.event("click", this, domEvent);
 
@@ -775,20 +837,20 @@ wabi.element("basic",
 		{
 			event.element = element;
 
-			this.$processChildEvent(element.$metadata.name, event);
-			this.$processChildEvent("*", event);
+			this._processChildEvent(element._metadata.name, event);
+			this._processChildEvent("*", event);
 			this.emitEx(event);
 			return;
 		}
 
-		if(this.$onClick) {
-			this.$onClick(event);
+		if(this._onClick) {
+			this._onClick(event);
 		}
 
 		this.emitEx(event);
 	},
 
-	$processClicking: function(domEvent)
+	_processClicking: function(domEvent)
 	{
 		var event;
 		if(domEvent.detail % 2 === 0) {
@@ -803,33 +865,33 @@ wabi.element("basic",
 		{
 			event.element = element;
 
-			this.$processChildEvent(element.$metadata.name, event);
-			this.$processChildEvent("*", event);
+			this._processChildEvent(element._metadata.name, event);
+			this._processChildEvent("*", event);
 			return;
 		}
 
 		if(domEvent.detail % 2 === 0) 
 		{
-			if(this.$onDblClick) {
-				this.$onDblClick(event);
+			if(this._onDblClick) {
+				this._onDblClick(event);
 			}
 
 			this.emitEx(event);
 		}
 		else 
 		{
-			if(this.$onClick) {
-				this.$onClick(event);
+			if(this._onClick) {
+				this._onClick(event);
 			}
 
 			this.emitEx(event);
 		}
 	},
 
-	$processEvent: function(eventName, func, domEvent)
+	_processEvent: function(eventName, func, domEvent)
 	{
 		var event = new wabi.event(eventName, this, domEvent);
-		if(this.$preventableEvents[eventName]) {
+		if(this._preventableEvents[eventName]) {
 			domEvent.preventDefault();
 			domEvent.stopPropagation();
 		}		
@@ -839,8 +901,8 @@ wabi.element("basic",
 		{
 			event.element = element;
 
-			this.$processChildEvent(element.$metadata.name, event);
-			this.$processChildEvent("*", event);
+			this._processChildEvent(element._metadata.name, event);
+			this._processChildEvent("*", event);
 			return;
 		}
 
@@ -851,11 +913,11 @@ wabi.element("basic",
 		this.emitEx(event);		
 	},
 
-	$processChildEvent: function(id, event)
+	_processChildEvent: function(id, event)
 	{
-		if(!this.$childrenListeners) { return; }
+		if(!this.childrenListeners) { return; }
 
-		var map = this.$childrenListeners[id];
+		var map = this.childrenListeners[id];
 		if(!map) { return; }
 
 		var buffer = map[event.name];
@@ -871,27 +933,27 @@ wabi.element("basic",
 
 	handleDataChange: function(action, key, value, id)
 	{
-		var bind = this.$state.bind;
+		var bind = this._bind;
 		var type = typeof(bind);
 
 		if(type === "string") 
 		{
 			if(key !== bind && bind !== "*") { return; }
 
-			this.$setActionState(action, "value", value, id);
+			this._setActionState(action, "value", value, id);
 		}
 		else if(type === "object")
 		{
 			if(bind[key] === void(0)) { return; }
 
-			this.$setActionState(action, bind[key], value, id);
+			this._setActionState(action, bind[key], value, id);
 		}
 	},
 
-	$updateParentStateFunc: function(key, value)
+	_updateParentStateFunc: function(key, value)
 	{
-		if(this.$parentLink && key === "value") {
-			value = this.$parent.$updateParentStateFunc(this.$parentLink, value);
+		if(this._parentLink && key === "value") {
+			value = this._parent._updateParentStateFunc(this._parentLink, value);
 		}
 
 		var func = this["set_" + key];
@@ -906,45 +968,43 @@ wabi.element("basic",
 		return value;
 	},
 
-	$updateState: function(key, value)
+	_updateState: function(key, value)
 	{
-		if(this.$parentLink && key === "value") {
-			value = this.$parent.$updateParentStateFunc(this.$parentLink, value);
+		if(this._parentLink && key === "value") {
+			value = this._parent._updateParentStateFunc(this._parentLink, value);
 		}
 
-		var bind = this.$state.bind;
-
-		if(this.$data && bind) 
+		if(this._data && this._bind) 
 		{
-			if(typeof(bind) === "string")
+			if(typeof(this._bind) === "string")
 			{
 				if(key === "value") {
-					this.$data.set(bind, value);
+					this._data.set(this._bind, value);
 				}
 				else {
-					this.$setActionState("set", key, value);
+					this._setActionState("set", key, value);
 				}
 			}
 			else
 			{
-				var dataBindName = bind[key];
+				var dataBindName = this._bind[key];
 				if(dataBindName) {
 					data.set(dataBindName, value);
 				}
 				else {
-					this.$setActionState("set", dataBindName, value);
+					this._setActionState("set", dataBindName, value);
 				}
 			}
 		}
 		else 
 		{
-			this.$setActionState("set", key, value);
+			this._setActionState("set", key, value);
 		}
 	},
 
-	$setActionState: function(action, key, value, index)
+	_setActionState: function(action, key, value, index)
 	{
-		if(this.$state[key] === undefined) { return; }
+		if(this._$[key] === undefined) { return; }
 
 		var func = this[action + "_" + key];
 		if(func) 
@@ -955,16 +1015,16 @@ wabi.element("basic",
 			}
 		}
 
-		this.$state[key] = value;
+		this._$[key] = value;
 	},
 
-	$setState: function(key, value)
+	setState: function(key, value)
 	{
-		var stateValue = this.$state[key];
+		var stateValue = this._$[key];
 		if(stateValue === undefined) { return; }
 
-		if(this.$parentLink && key === "value") {
-			value = this.$parent.$setStateParent(this.$parentLink, value);
+		if(this._parentLink && key === "value") {
+			value = this._parent.setStateParent(this._parentLink, value);
 		}
 
 		var func = this["set_" + key];
@@ -977,17 +1037,17 @@ wabi.element("basic",
 		}
 
 		if(stateValue instanceof wabi.element.basic) {
-			stateValue.$setState("value", value);
+			stateValue.setState("value", value);
 		}
 		else {
-			this.$state[key] = value;
+			this._$[key] = value;
 		}
 	},
 
-	$setStateParent: function(key, value)
+	setStateParent: function(key, value)
 	{
-		if(this.$parentLink && key === "value") {
-			value = this.$parent.$setStateParent(this.$parentLink, value);
+		if(this._parentLink && key === "value") {
+			value = this._parent.setStateParent(this._parentLink, value);
 		}
 
 		var func = this["set_" + key];
@@ -1002,8 +1062,11 @@ wabi.element("basic",
 		return value;
 	},
 
-	$processState: function(key, value)
+	_processState: function(key, value)
 	{
+		if(value === undefined) { return; }
+		if(this._$[key] === value) { return; }
+
 		var func = this["set_" + key];
 		if(func) 
 		{
@@ -1013,15 +1076,12 @@ wabi.element("basic",
 			}
 		}
 
-		var elementKey = this.$metadata.statesLinked[key];
+		var elementKey = this._metadata.statesLinked[key];
 		if(elementKey) {
-			return this.$elements[elementKey].$processState("value", value);
+			return this.elements[elementKey]._processState("value", value);
 		}
-		else 
-		{
-			if(this.$state[key] !== value) {
-				this.$state[key] = value;
-			}
+		else {
+			this._$[key] = value;
 		}
 
 		return value;
@@ -1078,7 +1138,7 @@ wabi.element("basic",
 	// },
 
 	toJSON: function() {
-		return this.$state;
+		return this._$;
 	},
 
 	Flag: {
@@ -1086,37 +1146,37 @@ wabi.element("basic",
 		ENABLED: 1 << 1,
 		WATCHING: 1 << 2,
 		ELEMENT: 1 << 3,
-		SLOT: 1 << 4
+		SLOT: 1 << 4,
+		HIDDEN: 1 << 5
 	},
 
 	//
-	$metadata: null,
-	$domElement: null,
-	$slotId: null,
+	_metadata: null,
+	elements: null,
+	domElement: null,
 
-	$state: null,
-	$parent: null,
-	$data: null,
+	_id: "",
+	_$: null,
+	_parent: null,
+	_data: null,
 	ref: null,
-	$parentLink: null,
+	_parentLink: null,
+
+	slotId: null,
 
 	watchers: null,
 	watching: null,
 
-	$flags: 0,
-	$tag: null,
+	flags: 0,
+	tag: null,
 
-	$listeners: null,
-	$children: null,
-	$childrenListeners: null,
-	$preventableEvents: {
+	_listeners: null,
+	children: null,
+	childrenListeners: null,
+	_preventableEvents: {
 		"contextmenu": true
 	},
-
-	id: "",
-	hidden: false,
-	enable: true,
-	value: null,
+	
 	region: false
 });
 

@@ -149,9 +149,7 @@ wabi.element("listItemHolder",
 {
 	elements: 
 	{
-		item: {
-			type: "span"
-		},
+		item: null,
 		list: {
 			type: "list",
 			bind: "content"
@@ -169,25 +167,15 @@ wabi.element("listItemHolder",
 
 	set_item: function(cls)
 	{
-		var item = this.$elements.item;
-		item.removeAll();
-
 		this.$elements.list.itemCls = cls;
-
-		if(cls) {
-			this.itemElement = wabi.createElement(cls, item);
-			// this.itemElement.watch("open", this.updateOpen, this);
-		}
-		else {
-			this.itemElement = null;
-		}
+		this.slot("item", cls);
 	},
 
 	set_content: function(value)
 	{
-		if(this.itemElement) {
-			this.itemElement.folder = value ? true : false;
-		}
+		// if(this.itemElement) {
+		// 	this.itemElement.folder = value ? true : false;
+		// }
 	},
 
 	set_draggable: function(value)
@@ -255,9 +243,7 @@ wabi.element("listItem",
 {
 	elements: 
 	{
-		folder: {
-			type: "caret"
-		},
+		folder: null,
 		word: {
 			type: "text",
 			bind: "value"
@@ -301,13 +287,18 @@ wabi.element("listItem",
 		this.setCls("selected", value);
 	},
 
+	set_editable: function(value)
+	{
+
+	},
+
 	set_folder: function(value) 
 	{
+		this.slot("folder", value ? "caret" : null);
+
 		if(value) {
 			this.open = false;
 		}
-
-		this.setCls("folder", value);
 	},
 
 	set_open: function(value) {},
@@ -320,7 +311,7 @@ wabi.element("listItem",
 	},
 
 	get cache() {
-		return this.$parent.$parent.$parent.$cache;
+		return this.$parent.$parent.$cache;
 	},
 
 	//
@@ -328,19 +319,6 @@ wabi.element("listItem",
 
 	select: false,
 	folder: false,
+	editable: false,
 	open: false
-});
-
-wabi.element("editableListItem", "listItem",
-{
-	elements: 
-	{
-		folder: {
-			type: "caret"
-		},
-		word: {
-			type: "word",
-			bind: "value"
-		}
-	}
 });

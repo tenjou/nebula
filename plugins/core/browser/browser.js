@@ -28,7 +28,8 @@ editor.plugin("browser",
 					bind: "*"
 				},
 				{
-					type: "upload"
+					type: "upload",
+					hidden: true
 				}
 			]
 		});

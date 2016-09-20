@@ -38,8 +38,8 @@ var wabi =
 		}
 
 		var template = wabi.createElement(props.type);
-		template.state = props;
-		template.$flags |= template.Flag.REGION;
+		template.$ = props;
+		template.flags |= template.Flag.REGION;
 
 		return template;
 	},
@@ -127,7 +127,7 @@ var wabi =
 			element = buffer.pop();
 			if(element) 
 			{
-				element.$flags |= element.Flag.ACTIVE;
+				element.flags = element.flagsInitial;
 
 				if(parent) {
 					element.parent = parent;
@@ -143,10 +143,9 @@ var wabi =
 			}
 
 			element = new this.element[name](parent, params);
-			element.$flags |= element.Flag.ACTIVE;
 		}
 
-		element.$setup();
+		element._setup();
 
 		return element;
 	},
@@ -157,12 +156,12 @@ var wabi =
 			return console.warn("(wabi.removeElement) Invalid element passed");
 		}
 
-		element.$remove();
+		element._remove();
 
-		var buffer = this.elementsCached[element.$metadata.name];
+		var buffer = this.elementsCached[element._metadata.name];
 		if(!buffer) {
 			buffer = [ element ];
-			this.elementsCached[element.$metadata.name] = buffer;
+			this.elementsCached[element._metadata.name] = buffer;
 		}
 		else {
 			buffer.push(element);
@@ -250,7 +249,6 @@ var wabi =
 		}		
 
 		var states = {};
-		var statesHandled = {};
 		var statesLinked = {};
 		var elementsLinked = {};
 		var elementsBinded = {};
@@ -263,54 +261,69 @@ var wabi =
 		if(props.elements) 
 		{
 			var elementsProps = props.elements;
-			for(var key in elementsProps)
+			for(var elementKey in elementsProps)
 			{
-				var item = elementsProps[key];
+				var elementSlotId = elementKey;
+				var item = elementsProps[elementSlotId];
+				var state = {};
 
-				if(!item) 
-				{
-					item = {
-						type: null
-					};
+				var link = null;
+				var type = null;
+				var bind = null;
+
+				if(!item) {}
+				else if(typeof item === "string") {
+					type = item;
 				}
-				else if(typeof item === "string") 
+				else
 				{
-					item = {
-						type: item
-					};
-				}
+					if(item.type) { type = item.type; }
+					if(item.link) { link = item.link; }
+					if(item.bind) { bind = item.bind; }
 
-				elements[key] = { 
-					type: item.type,
-					slot: numElements
-				};
+					for(var key in item)
+					{
+						if(key === "type" || key === "link") { continue; }
 
-				numElements++;
-
-				if(item.link)
-				{
-					statesLinked[item.link] = key;
-					elementsLinked[key] = item.link;
-
-					if(item.link === "value") {
-						valueLinked = true;
+						if(key[0] === "$") {
+							state[key.slice(1)] = item[key];
+						}
 					}
 				}
-				else if(item.bind)
-				{
-					statesLinked[item.bind] = key;
-					elementsLinked[key] = item.bind;
-					elementsBinded[key] = item.bind;
 
-					if(item.bind === "value") {
-						valueLinked = true;
-					}					
+				var newItem = { 
+					type: type,
+					link: link,
+					slot: numElements++,
+					state: state
+				};
+
+				if(link)
+				{
+					statesLinked[link] = elementKey;
+					elementsLinked[elementKey] = link;
 				}
+
+				if(bind) {
+					elementsBinded[elementKey] = bind;
+				}
+
+				elements[elementSlotId] = newItem;
 			}
 
 			delete props.elements;
 		}
 
+		// Defines states:
+		var statesDefined = props.state;
+		if(statesDefined)
+		{
+			for(var key in statesDefined) {
+				states[key] = statesDefined[key];
+			}
+		}
+
+		// Define properties:
 		for(var key in props)
 		{
 			var p = Object.getOwnPropertyDescriptor(props, key);
@@ -331,63 +344,32 @@ var wabi =
 
 					if(buffer[0] !== "handle") 
 					{
-						if(!states[stateName])
-						{
+						if(!states[stateName]) {
 							states[stateName] = null;
-							statesHandled[stateName] = true;
 						}
 					}
 					else {
 						events.push(stateName);
 					}
 				}
+			}
 
-				proto[key] = variable;
-			}
-			else 
-			{
-				if(key[0] === "$") {
-					proto[key] = variable;
-				}
-				else {
-					states[key] = variable;
-				}
-			}
+			proto[key] = variable;
 		}
 
 		var statesProto;
 
 		if(name !== "basic")
 		{
-			var basicMetadata = this.element.basic.prototype.$metadata;
+			var basicMetadata = this.element.basic.prototype._metadata;
 			var basicStates = basicMetadata.states;
 
 			statesProto = Object.assign({}, basicStates);
 			statesProto = Object.assign(statesProto, states);
-
-			// Discard unhandled states:
-			for(var key in states)
-			{
-				if(statesHandled[key] === undefined && basicStates[key] === undefined) { 
-					proto[key] = states[key];
-					delete states[key];
-					delete statesProto[key];
-				}
-			}	
 		}
-		else
+		else 
 		{
-			statesProto = states;
-
-			// Discard unhandled states:
-			for(var key in states)
-			{
-				if(!statesHandled[key]) { 
-					proto[key] = states[key];
-					delete states[key];
-					delete statesProto[key];
-				}
-			}			
+			statesProto = states;			
 		}
 
 		// Create metadata:
@@ -399,22 +381,21 @@ var wabi =
 
 		if(numElements > 0) {
 			metadata.elements = elements;
-
-			if(!valueLinked && !props.set_value) {
-				proto.set_value = undefined;
-			}
 		}
 		if(events.length > 0) {
 			metadata.events = events;
 		}
 
-		proto.$metadata = metadata;
+		proto._metadata = metadata;
 		return proto;
 	},
 
 	compileBasicElement: function(props, extend)
 	{
 		var proto = this.genPrototype("basic", extend, props);
+
+		proto.flagsInitial = (proto.Flag.ENABLED);
+		proto.flags = proto.flagsInitial;
 
 		this.element.basic.prototype = proto;
 	},	
@@ -443,39 +424,80 @@ var wabi =
 		}
 
 		// Generate setters:
-		var metadata = elementProto.$metadata;
+		var metadata = elementProto._metadata;
 		var statesLinked = metadata.statesLinked;
 		var states = metadata.states;
 		var statesProto = {};
 
-		for(var key in statesLinked) {
-			states[key] = null;
+		for(var key in statesLinked) 
+		{
+			if(!states[key]) {
+				states[key] = undefined;
+			}
 		}
 
 		for(var key in states) 
 		{
-			var link = statesLinked[key];
-			if(link) 
-			{
-				if(key === "value") 
-				{
-					if(elementProto.set_value === undefined) {
-						proto.set_value = null;
-					}
-					if(elementProto.value === undefined) {
-						elementProto.value = undefined;
-						delete states.value;
-					}
-				}
+			var stateValue = states[key];
+			var stateValueType = typeof stateValue;
 
-				this.defStateLink(proto, key, link);
+			var link = statesLinked[key];
+			if(link) {
 				statesProto[key] = null;
+				this.defStateLink(proto, key, link);
 			}
 			else 
 			{
+				switch(stateValueType)
+				{
+					case "string":
+					case "object":
+						statesProto[key] = null;
+						break;
+
+					case "number":
+						statesProto[key] = 0;
+						break;
+
+					case "boolean":
+						statesProto[key] = false;
+						break;
+
+					default:
+						console.warn("(wabi.compileElement) Unhandled stateValueType `" + stateValueType + "` for element: " + name);
+						statesProto[key] = null;
+						break;
+				}
+
 				this.defState(proto, key);
-				statesProto[key] = states[key];
 			}
+			
+			// var link = statesLinked[key];
+			// if(link) 
+			// {
+			// 	if(key === "value") 
+			// 	{
+			// 		if(elementProto.set_value === undefined) {
+			// 			proto.set_value = null;
+			// 		}
+			// 		if(elementProto.value === undefined) {
+			// 			elementProto.value = undefined;
+			// 			delete states.value;
+			// 		}
+			// 	}
+
+			// 	this.defStateLink(proto, key, link);
+			// 	statesProto[key] = null;
+			// }
+			// else 
+			// {
+			// 	this.defState(proto, key);
+			// 	statesProto[key] = states[key];
+			// }
+		}
+
+		if(name === "test") {
+			console.log(statesProto)
 		}
 
 		function state() {};
@@ -487,26 +509,26 @@ var wabi =
 
 	defState: function(proto, key)
 	{
-		Object.defineProperty(proto, key, 
+		Object.defineProperty(proto, "$" + key, 
 		{
 			set: function(value) {
-				this.$updateState(key, value);
+				this._updateState(key, value);
 			},
 			get: function() {
-				return this.$state[key];
+				return this._$[key];
 			}
 		});	
 	},
 
 	defStateLink: function(proto, key, link)
 	{
-		Object.defineProperty(proto, key, 
+		Object.defineProperty(proto, "$" + key, 
 		{
 			set: function(value) {
-				this.$elements[link].value = value;
+				this.elements[link].$value = value;
 			},
 			get: function() {
-				return this.$elements[link].value;
+				return this.elements[link].$value;
 			}
 		});	
 	},

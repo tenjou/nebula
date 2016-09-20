@@ -10,19 +10,17 @@ wabi.element("upload",
 	},
 
 	set_value: function(value) {
-		this.$domElement.value = value;
+		this.domElement.value = value;
 	},
 
 	open: function() {
-		this.$domElement.click();
+		this.domElement.click();
 	},
 
 	get files() {
-		return this.$domElement.files;
+		return this.domElement.files;
 	},
 
 	//
-	$tag: "input",
-
-	hidden: true
+	tag: "input"
 });
