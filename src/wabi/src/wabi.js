@@ -266,6 +266,7 @@ var wabi =
 				var elementSlotId = elementKey;
 				var item = elementsProps[elementSlotId];
 				var state = {};
+				var watch = {};
 
 				var link = null;
 				var type = null;
@@ -281,12 +282,19 @@ var wabi =
 					if(item.link) { link = item.link; }
 					if(item.bind) { bind = item.bind; }
 
+					var watchKeyword = "watch_";
+					var watchKeywordLength = watchKeyword.length;
+
 					for(var key in item)
 					{
 						if(key === "type" || key === "link") { continue; }
 
 						if(key[0] === "$") {
 							state[key.slice(1)] = item[key];
+						}
+
+						if(key.indexOf(watchKeyword) > -1) {
+							watch[key.slice(watchKeywordLength)] = item[key];
 						}
 					}
 				}
@@ -295,7 +303,8 @@ var wabi =
 					type: type,
 					link: link,
 					slot: numElements++,
-					state: state
+					state: state,
+					watch: watch
 				};
 
 				if(link)

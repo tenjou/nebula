@@ -53,9 +53,24 @@ wabi.element("basic",
 			this.elements[elementSlotId] = null;
 		}
 
+		var watch = slotDef.watch;
+		for(var key in watch) 
+		{
+			var funcName = watch[key];
+			var func = this[funcName];
+			if(!func) 
+			{
+				console.warn("(wabi.element.basic.initElement) Slot `" + elementSlotId + "` watching on `" + 
+					key + "` uses undefined function: " + funcName);
+				continue;
+			}
+
+			element.watch(key, func, this);
+		}
+
 		if(slotDef.state) {
 			element.$ = slotDef.state;
-		}	
+		}
 
 		var bind = this._metadata.elementsBinded[elementSlotId];
 		if(bind) {
@@ -294,7 +309,8 @@ wabi.element("basic",
 		}
 
 		this.flags = 0;
-		this._listeners = null;
+		if(this._watching) { this._watching = null; }
+		if(this._listeners) { this._listeners = null; }
 	},
 
 	removeAll: function()
@@ -1015,6 +1031,14 @@ wabi.element("basic",
 			}
 		}
 
+		if(this.watching)
+		{
+			var func = this.watching[key];
+			if(func) {
+				func.call(this._parent, value);
+			}
+		}
+
 		this._$[key] = value;
 	},
 
@@ -1039,7 +1063,20 @@ wabi.element("basic",
 		if(stateValue instanceof wabi.element.basic) {
 			stateValue.setState("value", value);
 		}
-		else {
+		else 
+		{
+			if(this.watching)
+			{
+				var func = this.watching[key];
+				if(func) 
+				{
+					var newValue = func.call(this._parent, value);
+					if(newValue !== undefined) {
+						value = newValue;
+					}
+				}
+			}
+
 			this._$[key] = value;
 		}
 	},
@@ -1051,12 +1088,8 @@ wabi.element("basic",
 		}
 
 		var func = this["set_" + key];
-		if(func) 
-		{
-			var newValue = func.call(this, value);
-			if(newValue !== undefined) {
-				value = newValue;
-			}
+		if(func) {
+			func.call(this, value);
 		}
 		
 		return value;
@@ -1080,62 +1113,37 @@ wabi.element("basic",
 		if(elementKey) {
 			return this.elements[elementKey]._processState("value", value);
 		}
-		else {
+		else 
+		{
+			if(this.watching)
+			{
+				var func = this.watching[key];
+				if(func) {
+					func.call(this._parent, value);
+				}
+			}
+
 			this._$[key] = value;
 		}
 
 		return value;
 	},
 
-	// watch: function(name, func, owner)
-	// {
-	// 	if(!this.watchers) {
-	// 		this.watchers = {};
-	// 	}
+	watch: function(name, func)
+	{
+		if(!this.watching) {
+			this.watching = {};
+		}
 
-	// 	var buffer = this.watchers[name];
-	// 	var watcher = new wabi.Watcher(owner, func);
-	// 	if(!buffer) {
-	// 		buffer = [ watcher];
-	// 	}
-	// 	else {
-	// 		buffer.push(watcher);
-	// 	}
+		this.watching[name] = func;
+	},
 
-	// 	if(!owner.watching) {
-	// 		owner.watching = [ watcher ];
-	// 	}
-	// 	else {
-	// 		owner.watching.push(watcher);
-	// 	}
-	// },
-
-	// unwatch: function(name, func, owner)
-	// {
-	// 	var buffer = this.watchers[name];
-	// 	if(!buffer) {
-	// 		return console.warn("(wabi.element.basic.unwatch) Invalid buffer: " + name);
-	// 	}
-
-	// 	var num = buffer.length;
-	// 	for(var n = 0; n < num; n++)
-	// 	{
-	// 		var item = buffer[n];
-	// 		if(item.owner === owner && item.func === func) {
-	// 			buffer[n] = buffer[num - 1];
-	// 			buffer.pop();
-	// 			break;
-	// 		}
-	// 	}
-
-	// 	var watching = owner.watching;
-	// 	if(!watching) {
-	// 		return console.warn("(wabi.element.basic.unwatch) Invalid buffer: " + name);
-	// 	}
-
-	// 	num = watching.length;
-	// 	for(var )
-	// },
+	unwatch: function(name, func)
+	{
+		if(this.watching[name]) {
+			this.watching[name] = null;
+		}
+	},
 
 	toJSON: function() {
 		return this._$;
