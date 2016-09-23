@@ -6,13 +6,13 @@ editor.plugin("projects",
 	{
 		wabi.addTemplate("projects", {
 			type: "panel",
-			header: "Projects",
 			width: 300,
-			value: [
+			$header: "Projects",
+			$value: [
 				{
 					type: "content",
 					height: 400,
-					value: {
+					$value: {
 						id: "projects-list",
 						type: "list",
 						bind: "*",
@@ -23,7 +23,7 @@ editor.plugin("projects",
 				{
 					id: "create",
 					type: "button",
-					value: "Create"
+					$value: "Create"
 				},
 				{
 					id: "loader",
@@ -59,7 +59,6 @@ editor.plugin("projects",
 
 		this.data = editor.connection.get("private.projects", this.handleData, this);
 		this.template.data = this.data;
-
 		this.template.appendTo(editor.overlayElement);
 	},
 

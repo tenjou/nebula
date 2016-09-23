@@ -53,10 +53,15 @@ wabi.element("content",
 		var element = wabi.createElement(state.type, this);
 		if(!element) { return; }
 
-		element.state = state;		
+		for(var key in state)
+		{
+			if(key === "type") { continue; }
+
+			element[key] = state[key];
+		}
 	},
 
-	set_padding: function(value) 
+	set padding(value) 
 	{
 		if(value > 0) {
 			this.style("margin", value + "px");
@@ -66,13 +71,20 @@ wabi.element("content",
 		}
 	},
 
-	set_height: function(value) 
-	{
-		if(value) {
-			this.style("height", value + "px");
-		}
+	get padding() {
+		return this._padding;
 	},
 
-	padding: 0,
-	height: 0	
+	set height(value) 
+	{
+		this.style("height", value + "px");
+	},
+
+	get height() {
+		return this._height;
+	},
+
+	//
+	_padding: 0,
+	_height: 0	
 });

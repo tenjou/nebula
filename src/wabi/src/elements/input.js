@@ -3,58 +3,57 @@
 wabi.element("input", 
 {
 	set_value: function(value) {
-		this.$domElement.value = value;
+		this.domElement.value = value;
 	},
 
-	set_inputType: function(value) {
+	set inputType(value) {
 		this.attrib("type", value);
 	},
 
-	set_placeholder: function(value) 
+	get inputType() {
+		return this.attrib("type");
+	},
+
+	set placeholder(value) 
 	{
 		if(value) {
-			this.$domElement.placeholder = value;
+			this.domElement.placeholder = value;
 		}
 		else {
-			this.$domElement.placeholder = "";
+			this.domElement.placeholder = "";
 		}
 	},
 
-	set_readOnly: function(value) {
-		this.$domElement.readOnly = value;
+	get placeholder() {
+		return this.domElement.placeholder;
+	},
+
+	set readOnly(value) {
+		this.domElement.readOnly = value;
+	},
+
+	get readOnly() {
+		return this.domElement.readOnly;
+	},
+
+	set editable(value) 
+	{
+		if(value) {
+			this.attrib("readonly", "");
+		}
+		else {
+			this.removeAttrib("readonly");
+		}
+	},
+
+	get editable() {
+		return (this.attrib("readonly") !== undefined);
 	},
 
 	handle_change: function(event) {
-		this.value = this.$domElement.value;
+		this.value = this.domElement.value;
 	},
 
 	//
-	$tag: "input",
-
-	inputType: "name",
-	value: "",
-	placeholder: null,
-	editable: true,
-	readOnly: false
-});
-
-wabi.element("staticInput", 
-{
-	prepare: function() {
-		this.attrib("readonly", "");
-	},
-
-	set_value: function(value) 
-	{
-		if(value instanceof wabi.data) {
-			this.$domElement.value = value.raw.value;
-		}
-		else {
-			this.$domElement.value = value;
-		}
-	},
-
-	//
-	$tag: "input",
-	value: ""
+	tag: "input"
 });

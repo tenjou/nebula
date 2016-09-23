@@ -9,7 +9,7 @@ wabi.element("list",
 
 	setup: function()
 	{
-		this.$cache = {
+		this.cache = {
 			itemElements: [],
 			selectable: true,
 			selected: null, 
@@ -53,17 +53,17 @@ wabi.element("list",
 		this.set_placeholder(null);
 
 		var element = wabi.createElement("listItemHolder", this);
-		element.item = this.itemCls;
+		element.$item = this.itemCls;
 		element.data = data;
 	},
 
 	remove_value: function(value)
 	{
-		if(!this.$children) { return; }
+		if(!this.children) { return; }
 
-		for(var n = 0; n < this.$children.length; n++) 
+		for(var n = 0; n < this.children.length; n++) 
 		{
-			var child = this.$children[n];
+			var child = this.children[n];
 			if(child.data === value) {
 				this.remove(child);
 				return;
@@ -75,17 +75,17 @@ wabi.element("list",
 	{
 		if(value)
 		{
-			if(!this.$domElement.innerHTML) {
+			if(!this.domElement.innerHTML) {
 				this.setCls("empty", true);
-				this.$domElement.innerHTML = value;
+				this.html(value);
 			}
 		}
 		else
 		{
 			this.setCls("empty", false);
 
-			if(!this.$children || this.$children.length === 0) {
-				this.$domElement.innerHTML = "";
+			if(!this.children || this.children.length === 0) {
+				this.html("")
 			}
 		}
 	},
@@ -116,31 +116,31 @@ wabi.element("list",
 
 	set select(element)
 	{
-		if(!this.$cache.selectable) { return; }
+		if(!this.cache.selectable) { return; }
 
 		element.select = true;
 	},
 
 	get select() {
-		return this.$cache.selected;
+		return this.cache.selected;
 	},
 
 	set selectable(value)
 	{
-		if(this.$cache.selectable === value) { return; }
-		this.$cache.selectable = value;
+		if(this.cache.selectable === value) { return; }
+		this.cache.selectable = value;
 
 		if(!value && this.cache.selected) {
-			this.$cache.selected = false;
+			this.cache.selected = false;
 		}
 	},
 
 	get selectable() {
-		return this.$cache.selectable;
+		return this.cache.selectable;
 	},
 
 	//
-	$cache: null,
+	cache: null,
 
 	itemCls: "listItem"
 });
@@ -162,13 +162,13 @@ wabi.element("listItemHolder",
 	},
 
 	setup: function() {
-		this.$elements.list.$cache = this.$parent.$cache;
+		this.elements.list.cache = this.parent.cache;
 	},
 
 	set_item: function(cls)
 	{
-		this.$elements.list.itemCls = cls;
-		this.slot("item", cls);
+		this.elements.list.itemCls = cls;
+		this.element("item", cls);
 	},
 
 	set_content: function(value)
@@ -229,11 +229,11 @@ wabi.element("listItemHolder",
 	},
 
 	updateOpen: function(event) {
-		this.$elements.list.hidden = !this.itemElement.open;
+		this.elements.list.hidden = !this.itemElement.open;
 	},
 
 	//
-	$tag: "holder",
+	tag: "holder",
 	itemElement: null,
 	draggable: false,
 	region: true
@@ -246,6 +246,7 @@ wabi.element("listItem",
 		folder: null,
 		word: {
 			type: "text",
+			link: "value",
 			bind: "value"
 		}
 	},
@@ -259,14 +260,18 @@ wabi.element("listItem",
 		}, this);
 	},
 
+	setup: function() {
+		this.editable = false;
+	},
+
 	cleanup: function() 
 	{
 		if(this.cache.selected === this) {
-			this.$parent.$parent.selected = null;
+			this.parent.parent.selected = null;
 		}
 	},
 
-	set_select: function(value)
+	set select(value)
 	{
 		if(value)
 		{
@@ -275,7 +280,6 @@ wabi.element("listItem",
 			}
 
 			this.cache.selected = this;
-			this.emit("select");
 		}
 		else
 		{
@@ -287,9 +291,8 @@ wabi.element("listItem",
 		this.setCls("selected", value);
 	},
 
-	set_editable: function(value)
-	{
-
+	get select() {
+		return false;
 	},
 
 	set_folder: function(value) 
@@ -303,6 +306,10 @@ wabi.element("listItem",
 
 	set_open: function(value) {},
 
+	handle_click: function(event) {
+		this.select = true;
+	},
+
 	handle_dblclick: function(event)
 	{
 		if(this.folder) {
@@ -311,14 +318,22 @@ wabi.element("listItem",
 	},
 
 	get cache() {
-		return this.$parent.$parent.$cache;
+		return this.parent.parent.cache;
 	},
 
 	//
-	$tag: "item",
+	tag: "item"
+});
 
-	select: false,
-	folder: false,
-	editable: false,
-	open: false
+wabi.element("editableListItem", "listItem",
+{
+	elements: 
+	{
+		folder: null,
+		word: {
+			type: "word",
+			link: "value",
+			bind: "value"
+		}
+	}
 });

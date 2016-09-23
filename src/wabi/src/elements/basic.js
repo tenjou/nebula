@@ -168,8 +168,11 @@ wabi.element("basic",
 				this.elements = {};
 			}
 			
-			for(var key in elements) {
-				this.initElement(key);
+			for(var key in elements) 
+			{
+				if(elements[key].type) {
+					this.initElement(key);
+				}
 			}
 		}
 
@@ -762,8 +765,13 @@ wabi.element("basic",
 		return this._data;
 	},
 
-	html: function(value) {
-		this.domElement.innerHTML = value;
+	html: function(value) 
+	{
+		if(value === undefined) {
+			return this.domElement.innerHTML;
+		}
+
+		return this.domElement.innerHTML = value;
 	},
 
 	updateBindings: function()
@@ -1167,6 +1175,7 @@ wabi.element("basic",
 	_$: null,
 	_parent: null,
 	_data: null,
+	_bind: null,
 	ref: null,
 	_parentLink: null,
 

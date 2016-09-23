@@ -2,7 +2,8 @@
 
 wabi.element("desc",
 {
-	elements: {
+	elements: 
+	{
 		content: {
 			type: "content",
 			link: "value"

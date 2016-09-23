@@ -206,6 +206,7 @@ checkbox:hover {
 label > text, 
 desc text {
     font-size: 11px;
+    line-height: 20px;
     color: #C1C1C1;
 }
 label:first-child {
@@ -217,7 +218,7 @@ label content {
 
 desc {
 	display: flex;
-	margin: 2px;
+	margin: 3px;
 }
 desc content {
 	flex: 1 1;
@@ -333,7 +334,7 @@ error {
 	background: black;
 	color: white;
 	padding: 4px;
-	margin: 3px 4px 1px 4px;
+	margin: 1px 3px 1px 3px;
 	font-size: 12px;
 	font-family: Helvetica;
 	border-left: 4px solid red;	

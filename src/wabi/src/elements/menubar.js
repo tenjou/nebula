@@ -20,8 +20,8 @@ wabi.element("menubar",
 
 	setup: function()
 	{
-		this.$elements.left.setCls("left", true);
-		this.$elements.center.setCls("center", true);
-		this.$elements.right.setCls("right", true);
+		this.elements.left.setCls("left", true);
+		this.elements.center.setCls("center", true);
+		this.elements.right.setCls("right", true);
 	}
 });

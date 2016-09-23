@@ -92,7 +92,7 @@ editor.plugin("login",
 		this.userData.performSetKey("error", "");
 		
 		this.loginScreen.data = this.userData;
-		this.loginScreen.value = "loginScreen.login";
+		this.loginScreen.$value = "loginScreen.login";
 		this.loginScreen.on("click", "#register", this.handleRegisterAccount, this);
 		this.loginScreen.on("click", "#login", this.handleLogin, this);
 
@@ -104,7 +104,7 @@ editor.plugin("login",
 	showRegister: function() 
 	{
 		this.loginScreen.data = this.registerData;
-		this.loginScreen.value = "loginScreen.register";
+		this.loginScreen.$value = "loginScreen.register";
 		this.loginScreen.on("click", "#back", this.handleBack, this);	
 		this.loginScreen.on("click", "#register", this.handleCreateAccount, this);		
 	},
@@ -181,14 +181,14 @@ editor.plugin("login",
 		wabi.addTemplate("loginScreen", {
 			id: "loginScreen",
 			type: "panel",
-			header: "Login",
-			width: 300
+			width: 300,
+			$header: "Login"
 		});
 
 		wabi.addFragment("loginScreen.error", {
 			type: "error",
 			bind: "error",
-			types: {
+			$types: {
 				AccountExist: "There is already an account registered with that name.",
 				RequiredFields: "All fields must be filled.",
 				NoServer: "Could not connect to server.",
@@ -211,11 +211,11 @@ editor.plugin("login",
 			},
 			{
 				type: "content",
-				value: [
+				$value: [
 					{
 						type: "desc",
-						name: "Remember Me",
-						value: [
+						$name: "Remember Me",
+						$value: [
 							{
 								type: "checkbox",
 								bind: "remember"
@@ -228,22 +228,21 @@ editor.plugin("login",
 			"loginScreen.error",		
 			{
 				type: "row",
-				value: [
+				$value: [
 					{
 						type: "button",
-						value: "Guest"
+						$value: "Guest"
 					},					
 					{
 						id: "register",
 						type: "button",
-						value: "Register"
+						$value: "Register"
 					},
 					{
 						id: "login",
 						type: "button",
-						value: "Login"
-					},
-
+						$value: "Login"
+					}
 				]
 			},
 			{
@@ -268,7 +267,7 @@ editor.plugin("login",
 			"loginScreen.error",
 			{
 				type: "row",
-				value: [
+				$value: [
 					{
 						id: "back",
 						type: "button",

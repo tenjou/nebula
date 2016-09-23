@@ -2,6 +2,10 @@
 
 wabi.element("checkbox", 
 {
+	state: {
+		value: false
+	},
+
 	prepare: function() {
 		this.attrib("tabindex", "0");
 	},
@@ -23,8 +27,5 @@ wabi.element("checkbox",
 
 	toggle: function() {
 		this.value = !this.value;
-	},
-
-	//
-	value: false
+	}
 });

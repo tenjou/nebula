@@ -10,9 +10,9 @@ wabi.element("word",
 
 	set_value: function(value)
 	{
-		this.$domElement.innerHTML = value;
+		this.html(value);
 
-		if(this.value && value) 
+		if(this.$value && value) 
 		{
 			this.setCls("highlight", true);
 			
@@ -23,30 +23,37 @@ wabi.element("word",
 		}			
 	},
 
-	set_editable: function(value)
+	set editable(value)
 	{
+		if(this._editable === value) { return; }
+		this._editable = value;
+
 		if(!value) {
-			this.$domElement.contentEditable = "false";
+			this.domElement.contentEditable = "false";
 		}
+	},
+
+	get editable() {
+		return this._editable;
 	},
 
 	handle_dblclick: function(event)
 	{
 		if(this.editable) {
-			this.$domElement.contentEditable = "true";
-			this.$domElement.focus();
-			meta.selectElementContents(this.$domElement);
+			this.domElement.contentEditable = "true";
+			this.domElement.focus();
+			meta.selectElementContents(this.domElement);
 		}
 	},
 
 	handle_blur: function(event)
 	{
-		var newValue = this.$domElement.innerHTML;
-		this.$domElement.innerHTML = this.value;
-		this.value = newValue;
+		var newValue = this.html();
+		this.html(this.value);
+		this.$value = newValue;
 
 		if(this.editable) {
-			this.$domElement.contentEditable = "false";
+			this.domElement.contentEditable = "false";
 		}
 	},
 
@@ -76,17 +83,17 @@ wabi.element("word",
 		}
 		// Enter
 		else if(keyCode === 13) {
-			this.$domElement.blur();
-			this.$domElement.scrollIntoView(true);
+			this.domElement.blur();
+			this.domElement.scrollIntoView(true);
 		}
 
 		event.domEvent.preventDefault();
 	},
 
 	handle_change: function(event) {
-		this.value = this.$domElement.innerHTML;
+		this.$value = this.html();
 	},
 
 	//
-	editable: true
+	_editable: true
 });

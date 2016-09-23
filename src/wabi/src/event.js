@@ -31,7 +31,7 @@ wabi.event.prototype =
 
 		if(this.element)
 		{
-			var domElement = this.element.$domElement;
+			var domElement = this.element.domElement;
 			if(domElement.offsetParent)
 			{
 				do 
@@ -45,9 +45,9 @@ wabi.event.prototype =
 			}
 		}
 
-		if(this.element && this.element.$domElement.tagName === "IFRAME") 
+		if(this.element && this.element.domElement.tagName === "IFRAME") 
 		{
-			var rect = this.element.$domElement.getBoundingClientRect();
+			var rect = this.element.domElement.getBoundingClientRect();
 			this.x += rect.left;
 			this.y += rect.top;
 		}

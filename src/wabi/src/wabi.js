@@ -38,8 +38,14 @@ var wabi =
 		}
 
 		var template = wabi.createElement(props.type);
-		template.$ = props;
 		template.flags |= template.Flag.REGION;
+
+		for(var key in props) 
+		{
+			if(key === "type") { continue; }
+			
+			template[key] = props[key];
+		}
 
 		return template;
 	},

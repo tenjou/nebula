@@ -2,6 +2,10 @@
 
 wabi.element("panel", 
 {
+	state: {
+		header: "Panel"
+	},
+
 	elements: 
 	{
 		header: { 
@@ -14,23 +18,25 @@ wabi.element("panel",
 		}
 	},
 
-	set_width: function(width) 
+	set width(width) 
 	{
-		if(width > 0) {
-			this.style("width", width + "px");
-		}
+		this.style("width", width + "px");
 	},
 
-	set_height: function(height) 
+	get width() {
+		return this._width;
+	},
+
+	set height(height) 
 	{
-		if(height > 0) {
-			this.style("min-height", height + "px");
-		}
-		
+		this.style("min-height", height + "px");		
+	},
+
+	get height() {
+		return this._height;
 	},
 
 	//
-	header: "Panel",
-	width: 0,
-	height: 0
+	_width: 0,
+	_height: 0
 });

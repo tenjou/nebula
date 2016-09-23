@@ -2,29 +2,30 @@
 
 wabi.element("error", 
 {
+	state: {
+		types: {}
+	},
+
 	set_value: function(value)
 	{
 		if(!value) {
-			this.$domElement.innerHTML = "";
+			this.html("");
 			return;
 		}
 
-		var text = this.types[value];
+		var text = this.$types[value];
 		if(!text) {
-			this.$domElement.innerHTML = "";
+			this.html("");
 			return; 
 		}
 
-		this.$domElement.innerHTML = text;
+		this.html(text);
 	},
 
 	set_types: function(value)
 	{
-		if(this.value) {
-			this.set_value(this.value);
+		if(this.$value) {
+			this.set_value(this.$value);
 		}
-	},
-
-	//
-	types: {}
+	}
 });

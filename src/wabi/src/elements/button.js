@@ -2,6 +2,10 @@
 
 wabi.element("button",
 {
+	set_value: function(value) {
+		this.html(value);
+	},
+
 	set_width: function(value) 
 	{
 		if(value > 0) {

@@ -17,7 +17,12 @@ wabi.element("row",
 				continue;
 			}
 
-			element.state = elementCfg;
+			for(var key in elementCfg) 
+			{
+				if(key === "type") { continue; }
+
+				element[key] = elementCfg[key];
+			}
 		}	
 	}
 });
