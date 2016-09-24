@@ -35,17 +35,13 @@ wabi.element("iframe",
 	// },
 
 	set_value: function(value) {
-		this.$domElement.src = value;
+		this.domElement.src = value;
 	},
 
 	handle_load: function(event) {
-		this.$wnd = this.$domElement.contentWindow;
-	},
-
-	get wnd() {
-		return this.$wnd;
+		this.wnd = this.domElement.contentWindow;
 	},
 
 	//
-	$wnd: null
+	wnd: null
 });

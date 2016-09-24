@@ -14,7 +14,7 @@ wabi.element("toolbar",
 		}
 	},
 
-	set_width: function(value) 
+	set width(value) 
 	{
 		if(value > 0)
 		{
@@ -22,6 +22,10 @@ wabi.element("toolbar",
 		}
 	},
 
+	get width() {
+		return this._width;
+	},
+
 	//
-	width: 0
+	_width: 0
 });

@@ -49,8 +49,12 @@ wabi.element("word",
 	handle_blur: function(event)
 	{
 		var newValue = this.html();
-		this.html(this.value);
-		this.$value = newValue;
+		if(newValue) {
+			this.$value = newValue;
+		}
+		else {
+			this.html(this.$value);
+		}
 
 		if(this.editable) {
 			this.domElement.contentEditable = "false";

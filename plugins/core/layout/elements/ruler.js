@@ -4,17 +4,12 @@ wabi.element("ruler",
 {
 	elements:
 	{
-		canvas: {
-			type: "canvas"
-		},
-		cursor: {
-			type: "slot"
-		}
+		canvas: "canvas",
+		cursor: "slot"
 	},
 
 	prepare: function() 
 	{
-		wabi.on("resize", this.updateResize, this);
 		this.on("mousemove", "*", this.updateMouseMove, this);
 	},
 
@@ -26,14 +21,9 @@ wabi.element("ruler",
 		this.attrib("class", value);
 	},
 
-	updateResize: function(event)
-	{
-
-	},
-
 	updateMouseMove: function(event)
 	{
-		var bounds = event.element.$domElement.getBoundingClientRect();
+		var bounds = event.element.domElement.getBoundingClientRect();
 		var cursor;
 
 		switch(this.orientation)
@@ -55,19 +45,19 @@ wabi.element("ruler",
 		switch(this.orientation)
 		{
 			case "horizontal":
-				this.$elements.cursor.style("left", cursor + "px");
+				this.elements.cursor.style("left", cursor + "px");
 				break;
 
 			case "vertical":
-				this.$elements.cursor.style("top", cursor + "px");
+				this.elements.cursor.style("top", cursor + "px");
 				break;
 		}
 	},
 
 	redrawRegion: function(from, to)
 	{
-		var canvas = this.$elements.canvas;
-		var canvasElement = canvas.$domElement;
+		var canvas = this.elements.canvas;
+		var canvasElement = canvas.domElement;
 
 		var ctx = canvas.ctx;
 		ctx.clearRect(from, 0, to, canvasElement.height);
@@ -155,9 +145,9 @@ wabi.element("ruler",
 
 	updateSize: function() 
 	{
-		var canvasElement = this.$elements.canvas.$domElement;
-		canvasElement.width = this.$domElement.offsetWidth;
-		canvasElement.height = this.$domElement.offsetHeight;
+		var canvasElement = this.elements.canvas.domElement;
+		canvasElement.width = this.domElement.offsetWidth;
+		canvasElement.height = this.domElement.offsetHeight;
 
 		switch(this.orientation) 
 		{
@@ -175,7 +165,7 @@ wabi.element("ruler",
 	{
 		this.position = -position;
 
-		var canvasElement = this.$elements.canvas.$domElement;
+		var canvasElement = this.elements.canvas.domElement;
 
 		switch(this.orientation) 
 		{
@@ -193,31 +183,3 @@ wabi.element("ruler",
 	orientation: "",
 	position: 0
 });
-
-
-function drawSomeText(ctx, x, y, text, maxWidth) {
-    //metric will receive the measures of the text
-    var metric = ctx.measureText(text); 
-    console.log("metrics", metric.width);
-    
-    ctx.save(); // this will "save" the normal canvas to return to
-    if(maxWidth != null && metric.width > maxWidth) {
-        // These two methods will change EVERYTHING
-        // drawn on the canvas from this point forward
-        // Since we only want them to apply to this one fillText,
-        // we use save and restore before and after
-        
-        // We want to find the center of the text (or whatever point you want) and rotate about it
-        var tx = x + (metric.width/2);
-        var ty = y + 5;
-        
-        // Translate to near the center to rotate about the center
-        ctx.translate(tx,ty);
-        // Then rotate...
-        ctx.rotate(Math.PI / 2);
-        // Then translate back to draw in the right place!
-        ctx.translate(-tx,-ty);
-    }
-    ctx.fillText(text, x, y);
-    ctx.restore(); // This will un-translate and un-rotate the canvas
-}

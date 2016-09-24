@@ -7,12 +7,12 @@ editor.plugin.meta2d.prototype.loadInspect = function()
 	wabi.addFragment("inspect-sprite", "inspect-general", [
 		{
 			type: "section",
-			name: "Transform",
-			value: [		
+			$name: "Transform",
+			$value: [		
 				{
 					type: "label",
 					name: "Position",
-					value: [
+					$value: [
 						{
 							type: "taggedNumber",
 							bind: "x",

@@ -16,14 +16,14 @@ editor.plugin("meta2d",
 		this.rulerVertical = layout.template.get("#ruler-vertical");
 
 		this.iframe = wabi.createElement("iframe");
-		this.iframe.value = "plugins/meta2d/meta2d/index/index.html";
+		this.iframe.$value = "plugins/meta2d/meta2d/index/index.html";
 		this.iframe.on("load", this.handleIframeLoad, this);
 		this.iframe.appendTo(layout.toolbarIFrame);
 	},
 
 	handleIframeLoad: function() 
 	{
-		var wnd = this.iframe.$wnd;
+		var wnd = this.iframe.wnd;
 		wnd.meta.loader.register(editor);
 		wnd.meta.on("camera-move", this.handleCameraMove.bind(this));
 		wnd.addEventListener("mousemove", this.handleMouseMove.bind(this));
@@ -100,25 +100,24 @@ editor.plugin("meta2d",
 	createFolder: function(event)
 	{
 		editor.dataPublic.get("hierarchy").add("@", {
-			value: "Folder",
-			type: "folder"
+			$value: "Folder",
+			$type: "folder"
 		});
 	},
 
 	createSprite: function(event)
 	{
 		editor.dataPublic.get("hierarchy").add("@", {
-			value: "Sprite",
-			type: "sprite"
+			$value: "Sprite",
+			$type: "sprite"
 		});
 	},
 
 	createLayer: function(event)
 	{
-		console.log("layer")
 		editor.dataPublic.get("hierarchy").add("@", {
-			value: "Layer",
-			type: "layer"
+			$value: "Layer",
+			$type: "layer"
 		});
 	},	
 

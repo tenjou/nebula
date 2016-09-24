@@ -2,21 +2,15 @@
 
 wabi.element("tag",
 {
-	setup: function() {
-		this.hidden = true;
-	},
-
 	set_value: function(value)
-	{		
-		if(!value) 
-		{
-			this.hidden = true;
-			this.$domElement.innerHTML = "";
+	{
+		console.log("tag", value)
+
+		if(!value) {
+			this.html("");
 		}
-		else 
-		{
-			this.hidden = false;
-			this.$domElement.innerHTML = value;
+		else {
+			this.html(value);
 		}
 	}
 });

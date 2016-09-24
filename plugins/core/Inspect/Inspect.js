@@ -32,7 +32,7 @@ editor.plugin("inspect",
 
 	onStart: function()
 	{
-		var toolbarContent = editor.plugins.layout.toolbarInspect.$elements.content;
+		var toolbarContent = editor.plugins.layout.toolbarInspect.elements.content;
 
 		this.content = wabi.createElement("content");
 		this.content.appendTo(toolbarContent);
@@ -46,7 +46,7 @@ editor.plugin("inspect",
 	show: function(data)
 	{
 		if(!data) {
-			this.content.value = "";
+			this.content.$value = "";
 			this.content.data = null;
 			return;
 		}
@@ -57,9 +57,8 @@ editor.plugin("inspect",
 		}
 
 		this.content.data = null;
-		this.content.value = props;
+		this.content.$value = props;
 		this.content.data = data;
-		window.g = this.content;
 	},
 
 	//

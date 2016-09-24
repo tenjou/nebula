@@ -15,17 +15,18 @@ wabi.element("section",
 	},
 
 	setup: function() {
-		this.$elements.header.on("open", this.updateOpen, this);
+		this.elements.header.on("open", this.updateOpen, this);
 	},
 
 	updateOpen: function(event, value) {
-		this.$elements.content.hidden = event.element.open;
+		this.elements.content.hidden = event.element.open;
 	},
 
-	set_open: function(value) {
-		this.$elements.header.open = value;
+	set open(value) {
+		this.elements.header.open = value;
 	},
 
-	//
-	open: true
+	get open() {
+		return this.elements.header.open;
+	}
 });

@@ -6,8 +6,8 @@ editor.plugin("browser",
 	{
 		wabi.addTemplate("browserHierarchy", {
 			type: "panel",
-			header: "Hierarchy",
-			value: [
+			$header: "Hierarchy",
+			$value: [
 				{
 					id: "hierarchy",
 					type: "list",
@@ -19,8 +19,8 @@ editor.plugin("browser",
 
 		wabi.addTemplate("browserResources", {
 			type: "panel",
-			header: "Resources",
-			value: [
+			$header: "Resources",
+			$value: [
 				{
 					id: "resources",
 					type: "list",
@@ -36,8 +36,8 @@ editor.plugin("browser",
 
 		wabi.addTemplate("browserDefs", {
 			type: "panel",
-			header: "Defs",
-			value: [
+			$header: "Defs",
+			$value: [
 				{
 					id: "defs",
 					type: "list",
@@ -94,12 +94,12 @@ editor.plugin("browser",
 	{
 		this.loadData();
 
-		var content = editor.plugins.layout.toolbarBrowser.$elements.content;
+		var content = editor.plugins.layout.toolbarBrowser.elements.content;
 		content.setCls("browser", true);
 
 		this.createHierarchyPanel(content, this.cache);
 
-		this.cache = this.browserHierarchy.get("#hierarchy").$cache;
+		this.cache = this.browserHierarchy.get("#hierarchy").cache;
 
 		this.createResourcePanel(content, this.cache);
 		this.createDefsPanel(content, this.cache);
@@ -122,7 +122,7 @@ editor.plugin("browser",
 	createResourcePanel: function(parent, cache)
 	{
 		this.browserResources = wabi.createTemplate("browserResources");
-		this.browserResources.get("#resources").$cache = this.cache;
+		this.browserResources.get("#resources").cache = this.cache;
 		this.browserResources.data = this.resources;
 		this.browserResources.on("drop", [ "list", "browserListItem" ], this.handleResourceDrop, this);
 		this.browserResources.on("dragenter", [ "list", "browserListItem" ], this.handleDragEnter, this);

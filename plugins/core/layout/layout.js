@@ -6,21 +6,21 @@ editor.plugin("layout",
 	{
 		wabi.addTemplate("layout", {
 			type: "content",
-			value: [
+			$value: [
 				{
 					id: "browser",
 					type: "toolbar",
-					tab: "Project",
+					$tab: "Project",
 					width: 270
 				},
 				{
 					type: "toolbar",
-					tab: "master",
-					value: [
+					$tab: "master",
+					$value: [
 						{
 							id: "ruler-row-horizontal",
 							type: "row",
-							value: [
+							$value: [
 								{
 									type: "slot"
 								},
@@ -31,28 +31,28 @@ editor.plugin("layout",
 								},
 							]
 						},
-						{
-							type: "row",
-							value: [
-								{
-									id: "ruler-vertical",
-									type: "ruler",
-									orientation: "vertical"
-								},
+						// {
+						// 	type: "row",
+						// 	$value: [
+						// 		{
+						// 			id: "ruler-vertical",
+						// 			type: "ruler",
+						// 			orientation: "vertical"
+						// 		},
 								{
 									id: "iframe",
 									type: "slot"
 								}
-							]
-						}						
+						// 	]
+						// }						
 						
 					]
 				},
 				{
 					id: "inspect",
 					type: "toolbar",
-					tab: "Inspect",
-					width: 380
+					width: 380,
+					$tab: "Inspect"
 				}
 			]
 		});

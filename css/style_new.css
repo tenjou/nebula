@@ -679,11 +679,9 @@ ruler.horizontal {
 	border-bottom: 1px solid gray;
 }
 ruler.horizontal > slot {
-	
 	width: 1px;
 	height: 100%;
 	left: -1px;
-	
 }
 ruler.vertical {
 	flex: 0 0 21px;

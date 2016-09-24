@@ -1,5 +1,7 @@
 "use strict";
 
+// TODO: If slot element is not created - bindings should be on parent instead of child element.
+
 wabi.element.basic = function(parent, params)
 {
 	if(this.create) {
@@ -131,12 +133,19 @@ wabi.element("basic",
 
 	element: function(id, element)
 	{
-		if(element === void(0)) 
+		if(!element) 
 		{
-			if(!this.elements) { return null; }
+			var prevElement = this.elements[id];
+			if(prevElement === undefined) {
+				console.warn("(wabi.element.basic.element) Invalid slot id");
+				return null;
+			}
 
-			element = this.elements[id];
-			return element ? element : null;
+			if(prevElement) {
+				prevElement.remove();
+			}
+			
+			return null;
 		}
 
 		if(typeof element === "string") {
@@ -172,6 +181,9 @@ wabi.element("basic",
 			{
 				if(elements[key].type) {
 					this.initElement(key);
+				}
+				else {
+					this.elements[key] = null;
 				}
 			}
 		}
@@ -606,13 +618,19 @@ wabi.element("basic",
 	{
 		if(bind)
 		{
+			var element;
 			var statesLinked = this._metadata.statesLinked;
 
 			if(typeof(bind) === "string") 
 			{
 				var element = statesLinked.value;
-				if(element !== undefined) {
-					this.elements[element].bind = bind;
+				if(element !== undefined)
+				{
+					element = this.elements[element];
+					if(element) {
+						element.bind = bind;
+					}
+
 					bind = null;
 				}
 			}
@@ -620,10 +638,14 @@ wabi.element("basic",
 			{
 				for(var key in bind)
 				{
-					var element = statesLinked[key];
-					if(element !== undefined) {
-						this.elements[element].bind = bind[key];
-						delete bind[key];
+					var elementLinked = statesLinked[key];
+					if(elementLinked !== undefined) 
+					{
+						var element = this.elements[elementLinked];
+						if(element) {
+							element.bind = bind[key];
+							delete bind[key];
+						}
 					}
 				}
 			}
@@ -812,7 +834,7 @@ wabi.element("basic",
 			this.setState(key, value);
 		}
 		else {
-			this.setState(key, (this._$.value !== undefined) ? this._$.value : null);
+			// this.setState(key, (this._$.value !== undefined) ? this._$.value : null);
 		}		
 	},
 
