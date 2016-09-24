@@ -331,6 +331,7 @@ var wabi =
 
 		// Defines states:
 		var statesDefined = props.state;
+		var statesInitial = statesDefined;
 		if(statesDefined)
 		{
 			for(var key in statesDefined) {
@@ -359,7 +360,7 @@ var wabi =
 
 					if(buffer[0] !== "handle") 
 					{
-						if(!states[stateName]) {
+						if(states[stateName] === undefined) {
 							states[stateName] = null;
 						}
 					}
@@ -391,6 +392,7 @@ var wabi =
 		var metadata = new this.metadata(name);
 		metadata.states = statesProto;
 		metadata.statesLinked = statesLinked;
+		metadata.statesInitial = statesInitial;
 		metadata.elementsLinked = elementsLinked;
 		metadata.elementsBinded = elementsBinded;
 

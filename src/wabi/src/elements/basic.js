@@ -189,9 +189,22 @@ wabi.element("basic",
 		}
 
 		// Process initial state:
-		var states = this._metadata.states;
-		for(var key in states) {
-			this._processState(key, states[key]);
+		if(this.flags & this.Flag.INITIAL_SETUP_DONE) 
+		{
+			var states = this._metadata.states;
+			for(var key in states) {
+				this._processState(key, states[key]);
+			}
+		}
+		else 
+		{
+			var states = this._metadata.statesInitial;
+			for(var key in states) {
+				console.log(key)
+				this._processState(key, states[key], true);
+			}
+
+			this.flags |= this.Flag.INITIAL_SETUP_DONE;
 		}
 
 		if(this.setup) {
@@ -1125,10 +1138,11 @@ wabi.element("basic",
 		return value;
 	},
 
-	_processState: function(key, value)
+	_processState: function(key, value, initial)
 	{
 		if(value === undefined) { return; }
-		if(this._$[key] === value) { return; }
+
+		if(!initial && this._$[key] === value) { return; }
 
 		var func = this["set_" + key];
 		if(func) 
@@ -1185,7 +1199,8 @@ wabi.element("basic",
 		WATCHING: 1 << 2,
 		ELEMENT: 1 << 3,
 		SLOT: 1 << 4,
-		HIDDEN: 1 << 5
+		HIDDEN: 1 << 5,
+		INITIAL_SETUP_DONE: 1 << 6
 	},
 
 	//

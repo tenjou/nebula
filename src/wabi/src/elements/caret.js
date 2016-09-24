@@ -2,12 +2,16 @@
 
 wabi.element("caret", 
 {
+	state: {
+		value: false
+	},
+
 	prepare: function() {
 		this.setCls("fa", true);
 	},
 
 	toggle: function() {
-		this.value = !this.value;
+		this.$value = !this.$value;
 	},
 
 	set_value: function(value)
@@ -24,7 +28,5 @@ wabi.element("caret",
 
 	handle_click: function(event) {
 		this.toggle();
-	},
-
-	value: false
+	}
 });
