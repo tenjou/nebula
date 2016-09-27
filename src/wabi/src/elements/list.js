@@ -152,7 +152,8 @@ wabi.element("listItemHolder",
 		item: null,
 		list: {
 			type: "list",
-			bind: "content"
+			bind: "content",
+			link: "content"
 		}
 	},
 
@@ -173,6 +174,7 @@ wabi.element("listItemHolder",
 
 	set_content: function(value)
 	{
+		this.elements.item.$folder = value ? true : false;
 		// if(this.itemElement) {
 		// 	this.itemElement.folder = value ? true : false;
 		// }
@@ -267,7 +269,7 @@ wabi.element("listItem",
 	cleanup: function() 
 	{
 		if(this.cache.selected === this) {
-			this.parent.parent.selected = null;
+			this.cache.selected = null;
 		}
 	},
 
@@ -292,7 +294,7 @@ wabi.element("listItem",
 	},
 
 	get select() {
-		return false;
+		return (this === this.cache.selected);
 	},
 
 	set_folder: function(value) 

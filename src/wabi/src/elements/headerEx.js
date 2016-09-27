@@ -19,13 +19,9 @@ wabi.element("headerEx",
 	},
 
 	handle_click: function(event) {
-		this.$elements.caret.toggle();
-	},
-
-	set_open: function(value) {
-		this.emit("open");
+		this.elements.caret.toggle();
 	},
 
 	//
-	$tag: "header"
+	tag: "header"
 });

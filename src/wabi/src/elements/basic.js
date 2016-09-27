@@ -126,6 +126,11 @@ wabi.element("basic",
 		{
 			element._parentLink = parentLink;
 			this._$[parentLink] = element;
+
+			var binds = this._metadata.elementsBinded[elementSlotId];
+			if(binds) {
+				element.bind = binds;
+			}
 		}
 
 		return element;
@@ -200,7 +205,6 @@ wabi.element("basic",
 		{
 			var states = this._metadata.statesInitial;
 			for(var key in states) {
-				console.log(key)
 				this._processState(key, states[key], true);
 			}
 
@@ -642,9 +646,8 @@ wabi.element("basic",
 					element = this.elements[element];
 					if(element) {
 						element.bind = bind;
-					}
-
-					bind = null;
+						bind = null;
+					}					
 				}
 			}
 			else 
@@ -806,7 +809,13 @@ wabi.element("basic",
 			return this.domElement.innerHTML;
 		}
 
-		return this.domElement.innerHTML = value;
+		if(this.children && this.children.length > 0) {
+			console.warn("(wabi.element.basic.html) Can`t set html content for element `" + this._metadata.name + "` that has children");
+			return null;
+		}
+
+		this.domElement.innerHTML = value
+		return value;
 	},
 
 	updateBindings: function()
@@ -1021,6 +1030,14 @@ wabi.element("basic",
 			var newValue = func.call(this, value);
 			if(newValue !== undefined) {
 				value = newValue;
+			}
+		}
+
+		if(this.watching)
+		{
+			var func = this.watching[key];
+			if(func) {
+				func.call(this._parent, value);
 			}
 		}
 

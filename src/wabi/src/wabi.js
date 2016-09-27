@@ -388,6 +388,11 @@ var wabi =
 			statesProto = states;			
 		}
 
+		var bindsForElement = {};
+		for(var key in elementsBinded) {
+			bindsForElement[elementsBinded[key]] = key; 
+		}
+
 		// Create metadata:
 		var metadata = new this.metadata(name);
 		metadata.states = statesProto;
@@ -395,6 +400,7 @@ var wabi =
 		metadata.statesInitial = statesInitial;
 		metadata.elementsLinked = elementsLinked;
 		metadata.elementsBinded = elementsBinded;
+		metadata.bindsForElement = bindsForElement;
 
 		if(numElements > 0) {
 			metadata.elements = elements;
@@ -541,8 +547,15 @@ var wabi =
 	{
 		Object.defineProperty(proto, "$" + key, 
 		{
-			set: function(value) {
-				this.elements[link].$value = value;
+			set: function(value) 
+			{
+				var element = this.elements[link];
+				if(element) {
+					element.$value = value;
+				}
+				else {
+					this._updateState(key, value);
+				}
 			},
 			get: function() {
 				return this.elements[link].$value;

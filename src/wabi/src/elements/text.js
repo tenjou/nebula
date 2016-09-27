@@ -2,7 +2,11 @@
 
 wabi.element("text", 
 {
+	state: {
+		value: ""
+	},
+
 	set_value: function(value) {
-		this.domElement.innerHTML = value;
+		this.html(value);
 	}
 });

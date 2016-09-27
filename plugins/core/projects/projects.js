@@ -78,7 +78,7 @@ editor.plugin("projects",
 
 	deleteProject: function(event) 
 	{
-		var selectedItem = this.template.get("#projects-list").$cache.selected;
+		var selectedItem = this.template.get("#projects-list").cache.selected;
 		if(!selectedItem) { return; }
 		
 		this.data.remove(selectedItem.data);

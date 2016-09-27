@@ -6,18 +6,15 @@ wabi.element("wordEx",
 	{
 		word: {
 			type: "word",
-			link: "value"
+			link: "value",
+			bind: "value"
 		},
 		highlight: {
 			type: "highlight"
 		}
 	},
 
-	setup: function() {
-		this.$elements.word.bind = "value"
-	},
-
 	set_value: function(value) {
-		this.$elements.highlight.value = value;
+		this.elements.highlight.$value = value;
 	}
 });

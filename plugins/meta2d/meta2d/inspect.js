@@ -154,13 +154,13 @@ editor.plugin.meta2d.prototype.loadInspect = function()
 	wabi.addFragment("inspect-texture", "inspect-general", [
 		{
 			type: "section",
-			name: "General",
-			value: [
+			$name: "General",
+			$value: [
 				{
 					type: "labelCheckbox",
 					bind: "premultiplied",
-					name: "premultiplied",
-					value: true
+					$name: "premultiplied",
+					$value: true
 				}
 			]
 		},

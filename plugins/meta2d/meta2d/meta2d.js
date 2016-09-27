@@ -100,24 +100,24 @@ editor.plugin("meta2d",
 	createFolder: function(event)
 	{
 		editor.dataPublic.get("hierarchy").add("@", {
-			$value: "Folder",
-			$type: "folder"
+			value: "Folder",
+			type: "folder"
 		});
 	},
 
 	createSprite: function(event)
 	{
 		editor.dataPublic.get("hierarchy").add("@", {
-			$value: "Sprite",
-			$type: "sprite"
+			value: "Sprite",
+			type: "sprite"
 		});
 	},
 
 	createLayer: function(event)
 	{
 		editor.dataPublic.get("hierarchy").add("@", {
-			$value: "Layer",
-			$type: "layer"
+			value: "Layer",
+			type: "layer"
 		});
 	},	
 

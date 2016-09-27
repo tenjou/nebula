@@ -51,9 +51,6 @@ wabi.element("input",
 	},
 
 	handle_change: function(event) {
-		this.value = this.domElement.value;
-	},
-
-	//
-	tag: "input"
+		this.$value = this.domElement.value;
+	}
 });

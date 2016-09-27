@@ -15,7 +15,7 @@ wabi.element("labelName",
 	},
 
 	//
-	$tag: "label"
+	tag: "label"
 });
 
 wabi.element("labelNumber",
@@ -33,7 +33,7 @@ wabi.element("labelNumber",
 	},
 
 	//
-	$tag: "label"
+	tag: "label"
 });
 
 wabi.element("labelDropdown",
@@ -51,15 +51,15 @@ wabi.element("labelDropdown",
 	},
 
 	set_dataset: function(value) {
-		this.$elements.dropdown.dataset = value;
+		this.elements.dropdown.dataset = value;
 	},
 
 	set_emptyOption: function(value) {
-		this.$elements.dropdown.emptyOption = value;
+		this.elements.dropdown.emptyOption = value;
 	},
 
 	//
-	$tag: "label"
+	tag: "label"
 });
 
 wabi.element("labelCheckbox",
@@ -77,6 +77,6 @@ wabi.element("labelCheckbox",
 	},
 
 	//
-	$tag: "label"
+	tag: "label"
 });
 

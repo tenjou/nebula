@@ -7,12 +7,12 @@ editor.plugin("inspect",
 		wabi.addFragment("inspect-general",
 		{
 			type: "section",
-			name: "General",
-			value: [
+			$name: "General",
+			$value: [
 				{
 					type: "labelName",
 					bind: "value",
-					name: "Name"
+					$name: "Name"
 				}						
 			]
 		});
@@ -20,8 +20,8 @@ editor.plugin("inspect",
 		wabi.addFragment("inspect-texture", "inspect-general",
 		{
 			type: "section",
-			name: "Texture",
-			value: [
+			$name: "Texture",
+			$value: [
 				{
 					type: "image",
 					bind: "@",

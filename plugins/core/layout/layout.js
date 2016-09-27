@@ -18,19 +18,24 @@ editor.plugin("layout",
 					$tab: "master",
 					$value: [
 						{
-							id: "ruler-row-horizontal",
-							type: "row",
-							$value: [
-								{
-									type: "slot"
-								},
-								{
-									id: "ruler-horizontal",
-									type: "ruler",
-									orientation: "horizontal"
-								},
-							]
-						},
+							id: "ruler-horizontal",
+							type: "ruler",
+							orientation: "horizontal"
+						},					
+						// {
+						// 	id: "ruler-row-horizontal",
+						// 	type: "row",
+						// 	$value: [
+						// 		{
+						// 			type: "slot"
+						// 		},
+						// 		{
+						// 			id: "ruler-horizontal",
+						// 			type: "ruler",
+						// 			orientation: "horizontal"
+						// 		},
+						// 	]
+						// },
 						// {
 						// 	type: "row",
 						// 	$value: [
@@ -39,10 +44,10 @@ editor.plugin("layout",
 						// 			type: "ruler",
 						// 			orientation: "vertical"
 						// 		},
-								{
-									id: "iframe",
-									type: "slot"
-								}
+								// {
+								// 	id: "iframe",
+								// 	type: "slot"
+								// }
 						// 	]
 						// }						
 						

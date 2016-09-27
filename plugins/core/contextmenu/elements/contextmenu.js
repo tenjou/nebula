@@ -2,6 +2,11 @@
 
 wabi.element("contextmenu",
 {
+	state: {
+		x: 0,
+		y: 0
+	},
+
 	elements: 
 	{
 		inner: {
@@ -11,25 +16,25 @@ wabi.element("contextmenu",
 	},
 
 	position: function(x, y) {
-		this.x = x;
-		this.y = y;
+		this.$x = x;
+		this.$y = y;
 	},
 
 	set_x: function(value) {
-		this.$domElement.style.left = value + "px";
+		this.style("left", value + "px");
 	},
 
 	set_y: function(value) {
-		this.$domElement.style.top = value + "px";
-	},
-
-	//
-	x: 0,
-	y: 0
+		this.style("top", value + "px");
+	}
 });
 
 wabi.element("contextmenuItem",
 {
+	state: {
+		func: null
+	},
+
 	elements: 
 	{
 		icon: {
@@ -46,18 +51,15 @@ wabi.element("contextmenuItem",
 		this.on("click", "*", this.handle_click, this);
 	},
 
-	set_func: function() {},
-
 	handle_click: function(event)
 	{
-		if(this.func) {
-			this.func(event);
+		if(this.$func) {
+			this.$func(event);
 		}
 	},
 
 	//
-	$tag: "item",
-	func: null
+	tag: "item"
 });
 
 wabi.element("contextmenuCategory",
@@ -75,11 +77,11 @@ wabi.element("contextmenuCategory",
 	},
 
 	set_icon: function(value) {
-		this.$elements.header.icon = value;
+		this.elements.header.$icon = value;
 	},
 
 	//
-	$tag: "category"
+	tag: "category"
 });
 
 wabi.element("contextmenuInner",
@@ -106,11 +108,12 @@ wabi.element("contextmenuInner",
 			element = wabi.createElement("contextmenuItem", this);
 		}
 
-		element.state = state;
+		console.log(state)
+		element.$ = state;
 	},
 
 	//
-	$tag: "inner"
+	tag: "inner"
 });
 
 wabi.element("contextmenuHeader",
@@ -128,5 +131,5 @@ wabi.element("contextmenuHeader",
 	},
 
 	//
-	$tag: "header"
+	tag: "header"
 });

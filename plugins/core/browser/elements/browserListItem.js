@@ -4,11 +4,7 @@ wabi.element("browserListItem", "listItem",
 {
 	elements: 
 	{
-		folder: {
-			type: "caret",
-			link: "open",
-			bind: "open"
-		},
+		caret: null,
 		icon: {
 			type: "type",
 			link: "type",
@@ -19,22 +15,23 @@ wabi.element("browserListItem", "listItem",
 			link: "value",
 			bind: "value"
 		},
-		tag: null
+		tag: {
+			type: null,
+			bind: "ext"
+		}
 	},
 
-	setup: function() 
+	set_folder: function(value) 
 	{
-		this.bind = { 
-			tag: "ext"
-		};
+		this.element("caret", value ? "caret" : null);
 	},
 
-	set_tag: function(tag) 
+	set_tag: function(value) 
 	{
-		if(tag)
+		if(value)
 		{
 			this.element("tag", "tag");
-			this.elements.tag.$value = tag;
+			this.elements.tag.$value = value;
 		}
 		else
 		{

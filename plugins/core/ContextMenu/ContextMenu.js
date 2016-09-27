@@ -120,11 +120,11 @@ editor.plugin("contextmenu",
 		{
 			var props = {};
 			this.extendMenu(props, menu);
-			this.contextmenu.value = props;
+			this.contextmenu.$value = props;
 		}
 		else 
 		{
-			this.contextmenu.value = menu.props;
+			this.contextmenu.$value = menu.props;
 		}
 
 		this.contextmenu.position(event.x, event.y);

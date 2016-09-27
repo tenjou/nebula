@@ -6,7 +6,8 @@ wabi.element("section",
 	{
 		header: {
 			type: "headerEx",
-			link: "name"
+			link: "name",
+			watch_open: "updateOpen"
 		},
 		content: {
 			type: "content",
@@ -14,12 +15,8 @@ wabi.element("section",
 		}
 	},
 
-	setup: function() {
-		this.elements.header.on("open", this.updateOpen, this);
-	},
-
-	updateOpen: function(event, value) {
-		this.elements.content.hidden = event.element.open;
+	updateOpen: function(value) {
+		this.elements.content.hidden = !value;
 	},
 
 	set open(value) {

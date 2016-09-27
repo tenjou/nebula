@@ -3,7 +3,7 @@
 wabi.element("caret", 
 {
 	state: {
-		value: false
+		value: true
 	},
 
 	prepare: function() {
