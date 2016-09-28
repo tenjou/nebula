@@ -302,11 +302,11 @@ wabi.element("basic",
 
 	_remove: function()
 	{
-		this.removeAll();
-
 		if(this.cleanup) {
 			this.cleanup();
 		}
+
+		this.removeAll();
 
 		if(this._data) {
 			this.data = null;
@@ -402,6 +402,10 @@ wabi.element("basic",
 		}
 		
 		return value;
+	},
+
+	removeStyle: function(key) {
+		this.domElement.style.removeProperty(key);
 	},
 
 	setCls: function(name, state) 

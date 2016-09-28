@@ -208,9 +208,28 @@ var wabi =
 		}
 	},
 
-	off: function(func, owner)
+	off: function(name, func, owner)
 	{
+		if(!func) {
+			return console.warn("(wabi.on) Invalid callback function passed");
+		}
 
+		var buffer = this.listeners[name];
+		if(!buffer) {
+			return console.warn("(wabi.off) No listeners found for event: " + name);
+		}
+
+		var num = buffer.length;
+		for(var n = 0; n < num; n++)
+		{
+			var listener = buffer[n];
+			if(listener.func === func && listener.owner === owner)
+			{
+				buffer[n] = buffer[num - 1];
+				buffer.pop();
+				break;
+			}
+		}
 	},
 
 	// TODO: Better method for extending classes, so that instanceof works on parent extends.
