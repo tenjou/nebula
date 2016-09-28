@@ -253,16 +253,14 @@ wabi.element("listItem",
 		}
 	},
 
-	prepare: function()
+	setup: function() 
 	{
 		this.attrib("tabindex", "0");
 
 		this.on("click", "*", function() {
 			this.select = true;
 		}, this);
-	},
-
-	setup: function() {
+		
 		this.editable = false;
 	},
 
@@ -309,6 +307,7 @@ wabi.element("listItem",
 	set_open: function(value) {},
 
 	handle_click: function(event) {
+		console.log("select")
 		this.select = true;
 	},
 

@@ -232,8 +232,6 @@ var wabi =
 		}
 	},
 
-	// TODO: Better method for extending classes, so that instanceof works on parent extends.
-	// TODO: Multi-level inheritance support.
 	element: function(name, extend, props) 
 	{
 		if(props === undefined) {
@@ -257,6 +255,7 @@ var wabi =
 		}
 	},	
 
+	// TODO: Re-do how properties are registered.
 	genPrototype: function(name, extend, props)
 	{
 		if(extend) 
@@ -292,6 +291,7 @@ var wabi =
 				var item = elementsProps[elementSlotId];
 				var state = {};
 				var watch = {};
+				var params = {};
 
 				var link = null;
 				var type = null;
@@ -312,14 +312,16 @@ var wabi =
 
 					for(var key in item)
 					{
-						if(key === "type" || key === "link") { continue; }
+						if(key === "type" || key === "link" || key === "bind") { continue; }
 
 						if(key[0] === "$") {
 							state[key.slice(1)] = item[key];
 						}
-
-						if(key.indexOf(watchKeyword) > -1) {
+						else if(key.indexOf(watchKeyword) > -1) {
 							watch[key.slice(watchKeywordLength)] = item[key];
+						}
+						else {
+							params[key] = item[key];
 						}
 					}
 				}
@@ -329,7 +331,8 @@ var wabi =
 					link: link,
 					slot: numElements++,
 					state: state,
-					watch: watch
+					watch: watch,
+					params: params
 				};
 
 				if(link)
@@ -513,33 +516,6 @@ var wabi =
 
 				this.defState(proto, key);
 			}
-			
-			// var link = statesLinked[key];
-			// if(link) 
-			// {
-			// 	if(key === "value") 
-			// 	{
-			// 		if(elementProto.set_value === undefined) {
-			// 			proto.set_value = null;
-			// 		}
-			// 		if(elementProto.value === undefined) {
-			// 			elementProto.value = undefined;
-			// 			delete states.value;
-			// 		}
-			// 	}
-
-			// 	this.defStateLink(proto, key, link);
-			// 	statesProto[key] = null;
-			// }
-			// else 
-			// {
-			// 	this.defState(proto, key);
-			// 	statesProto[key] = states[key];
-			// }
-		}
-
-		if(name === "test") {
-			console.log(statesProto)
 		}
 
 		function state() {};

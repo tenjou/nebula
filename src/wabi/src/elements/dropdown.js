@@ -14,46 +14,46 @@ wabi.element("dropdown",
 	elements: 
 	{
 		input: {
-			type: "staticInput"
+			type: "staticInput",
+			bind: "value",
+			region: true
 		},
-		caret: {
-			type: "icon"
-		},
+		caret: "icon",
 		list: {
 			type: "list",
-			link: "list"
+			$value: "fa-caret-down"
 		}
 	},
 
 	setup: function()
 	{
-		this.elements.input.flags |= this.Flag.REGION;
-
+		this.elements.list.on("click", this.selectOption, this);
+		
 		this.on("click", "staticInput", this.openMenu, this);
-		this.elements.list.on("click", "*", this.selectOption, this);
+		wabi.on("click", this.hideMenu, this);
+	},
 
-		this.elements.input.bind = "value";
-		this.elements.caret.$value = "fa-caret-down";
-		this.elements.list.hidden = true;
-
-		// wabi.on("click", this.hideMenu, this);
+	cleanup: function()
+	{
+		wabi.off("click", this.hideMenu, this);
 	},
 
 	set_value: function(value)
 	{
-		if(this._dataset) 
+		if(this._dataset)
 		{
-			var data = this.genDataBuffer();
-			var selectedData = data.get(value);
-			if(!selectedData) {
+			var data = this._dataset.get(value);
+			if(!data) {
 				this.elements.input.data = null;
+				this.elements.input.$value = "";
 				return "";
 			}
 
-			this.elements.input.data = selectedData;
+			this.elements.input.data = data;
 		}
 		else {
 			this.elements.input.data = null;
+			this.elements.input.$value = "";
 			return "";
 		}
 	},
@@ -103,12 +103,14 @@ wabi.element("dropdown",
 	},
 
 	hideMenu: function(event) {
+		console.log("HIDE")
 		this.elements.list.hidden = true;
 	},
 
 	selectOption: function(event)
 	{
 		event.stop();
+
 		this.$value = this.elements.list.cache.selected.data.id;
 		this.hideMenu();
 	},

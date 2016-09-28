@@ -16,40 +16,35 @@ editor.plugin("layout",
 				{
 					type: "toolbar",
 					$tab: "master",
-					$value: [
+					$value: [				
 						{
-							id: "ruler-horizontal",
-							type: "ruler",
-							orientation: "horizontal"
-						},					
-						// {
-						// 	id: "ruler-row-horizontal",
-						// 	type: "row",
-						// 	$value: [
-						// 		{
-						// 			type: "slot"
-						// 		},
-						// 		{
-						// 			id: "ruler-horizontal",
-						// 			type: "ruler",
-						// 			orientation: "horizontal"
-						// 		},
-						// 	]
-						// },
-						// {
-						// 	type: "row",
-						// 	$value: [
-						// 		{
-						// 			id: "ruler-vertical",
-						// 			type: "ruler",
-						// 			orientation: "vertical"
-						// 		},
-								// {
-								// 	id: "iframe",
-								// 	type: "slot"
-								// }
-						// 	]
-						// }						
+							id: "ruler-row-horizontal",
+							type: "row",
+							$value: [
+								{
+									type: "slot"
+								},
+								{
+									id: "ruler-horizontal",
+									type: "ruler",
+									$orientation: "horizontal"
+								},
+							]
+						},
+						{
+							type: "row",
+							$value: [
+								{
+									id: "ruler-vertical",
+									type: "ruler",
+									$orientation: "vertical"
+								},
+								{
+									id: "iframe",
+									type: "slot"
+								}
+							]
+						}						
 						
 					]
 				},

@@ -6,7 +6,7 @@ wabi.element("caret",
 		value: true
 	},
 
-	prepare: function() {
+	setup: function() {
 		this.setCls("fa", true);
 	},
 

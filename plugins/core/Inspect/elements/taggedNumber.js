@@ -3,7 +3,7 @@
 wabi.element("taggedNumber",
 {
 	state: {
-		color: "0x000000"
+		color: "#000"
 	},
 
 	elements: 

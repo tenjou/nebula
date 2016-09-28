@@ -1,6 +1,7 @@
 "use strict";
 
-// TODO: If slot element is not created - bindings should be on parent instead of child element.
+// TODO (maybe): If data or binding is removed reset value?
+// TODO: Check if child items can click through
 
 wabi.element.basic = function(parent, params)
 {
@@ -79,6 +80,8 @@ wabi.element("basic",
 		if(bind) {
 			element.bind = bind;
 		}
+
+		element.parent = this;
 	},
 
 	deinitElement: function(elementSlotId)
@@ -97,18 +100,20 @@ wabi.element("basic",
 
 	createElement: function(element, elementSlotId)
 	{
+		var elementSlot = this._metadata.elements[elementSlotId];
+		if(!elementSlot) {
+			console.warn("(wabi.element.basic.createElement) Invalid slot id: " + elementSlotId);
+			return null;
+		}		
+
 		var prevElement = this.elements[elementSlotId];
 		if(prevElement) {
 			prevElement.remove();
 		}
-		else if(!this._metadata.elements[elementSlotId]) {
-			console.warn("(wabi.element.basic.createElement) Invalid slot id: " + elementSlotId);
-			return null;
-		}
 
 		if(typeof element === "string")
 		{
-			element = wabi.createElement(element, this);
+			element = wabi.createElement(element);
 			if(!element) { 
 				return null; 
 			}
@@ -116,6 +121,11 @@ wabi.element("basic",
 		else if(!(element instanceof wabi.element.basic)) {
 			console.warn("(wabi.element.basic.createElement) Invalid element passed should be string or extend `wabi.element.basic`");
 			return null;
+		}
+
+		var params = elementSlot.params;
+		for(var key in params) {
+			element[key] = params[key];
 		}
 
 		element.flags |= (this.Flag.SLOT);
@@ -341,9 +351,14 @@ wabi.element("basic",
 			this._parent = null;
 		}
 
+		if(this.domElement.className) {
+			this.domElement.className = "";
+		}
+
 		this.flags = 0;
 		if(this._watching) { this._watching = null; }
-		if(this._listeners) { this._listeners = null; }
+		if(this.listeners) { this.listeners = null; }
+		if(this.childrenListeners) { this.childrenListeners = null; }
 	},
 
 	removeAll: function()
@@ -518,10 +533,10 @@ wabi.element("basic",
 			element = this;	
 		}
 
-		listeners = element._listeners;
+		listeners = element.listeners;
 		if(!listeners) {
 			listeners = {};
-			element._listeners = listeners;
+			element.listeners = listeners;
 		}
 
 		var buffer = listeners[event];
@@ -538,9 +553,9 @@ wabi.element("basic",
 	{
 		var event;
 
-		if(this._listeners)
+		if(this.listeners)
 		{
-			var buffer = this._listeners[eventName];
+			var buffer = this.listeners[eventName];
 			if(buffer)
 			{
 				event = new wabi.event(eventName, this, domEvent);
@@ -570,9 +585,9 @@ wabi.element("basic",
 
 	emitEx: function(event)
 	{
-		if(!this._listeners) { return; }
+		if(!this.listeners) { return; }
 
-		var buffer = this._listeners[event.name];
+		var buffer = this.listeners[event.name];
 		if(!buffer) { return; }
 
 		for(var n = 0; n < buffer.length; n++) {
@@ -770,7 +785,8 @@ wabi.element("basic",
 		{
 			if(this._data === data.instance) { return; }
 
-			if(this._data && this.flags & this.Flag.WATCHING) {
+			if(this._data && this.flags & this.Flag.WATCHING) 
+			{
 				this.flags &= ~this.Flag.WATCHING;
 				this._data.unwatch(this.handleDataChange, this);
 			}
@@ -782,7 +798,8 @@ wabi.element("basic",
 		{
 			if(this._data === data) { return; }
 
-			if(this._data && this.flags & this.Flag.WATCHING) {
+			if(this._data && this.flags & this.Flag.WATCHING) 
+			{
 				this.flags &= ~this.Flag.WATCHING;
 				this._data.unwatch(this.handleDataChange, this);
 			}
@@ -908,12 +925,8 @@ wabi.element("basic",
 		var element = domEvent.target.holder;
 		if(element && element !== this) 
 		{
-			event.element = element;
-
 			this._processChildEvent(element._metadata.name, event);
 			this._processChildEvent("*", event);
-			this.emitEx(event);
-			return;
 		}
 
 		if(this._onClick) {
@@ -1246,7 +1259,7 @@ wabi.element("basic",
 	flags: 0,
 	tag: null,
 
-	_listeners: null,
+	listeners: null,
 	children: null,
 	childrenListeners: null,
 	_preventableEvents: {
