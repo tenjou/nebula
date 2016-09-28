@@ -2,6 +2,10 @@
 
 wabi.element("taggedNumber",
 {
+	state: {
+		color: "0x000000"
+	},
+
 	elements: 
 	{
 		name: {
@@ -15,9 +19,6 @@ wabi.element("taggedNumber",
 	},
 	
 	set_color: function(value) {
-		this.$elements.name.style("background-color", value);
-	},
-
-	//
-	color: "0x000000"
+		this.elements.name.style("background-color", value);
+	}
 });

@@ -2,6 +2,12 @@
 
 wabi.element("number", 
 {
+	state: {
+		value: 0,
+		min: Number.MIN_SAFE_INTEGER,
+		max: Number.MAX_SAFE_INTEGER			
+	},
+
 	prepare: function() {
 		this.attrib("type", "text");
 	},
@@ -23,17 +29,17 @@ wabi.element("number",
 			}
 		}
 
-		this.$domElement.value = value + "";
+		this.domElement.value = value + "";
 
 		return value;
 	},
 
 	set_min: function(value) {
-		this.value = this.value;
+		this.$value = this.$value;
 	},
 
 	set_max: function(value) {
-		this.value = this.value;
+		this.$value = this.$value;
 	},
 
 	handle_keydown: function(event)
@@ -90,13 +96,9 @@ wabi.element("number",
 	},
 
 	handle_change: function(event) {
-		this.value = parseFloat(this.$domElement.value);
+		this.$value = parseFloat(this.domElement.value);
 	},
 
 	//
-	$tag: "input",
-
-	value: 0,
-	min: Number.MIN_SAFE_INTEGER,
-	max: Number.MAX_SAFE_INTEGER	
+	tag: "input"
 });

@@ -11,64 +11,64 @@ editor.plugin.meta2d.prototype.loadInspect = function()
 			$value: [		
 				{
 					type: "label",
-					name: "Position",
+					$name: "Position",
 					$value: [
 						{
 							type: "taggedNumber",
 							bind: "x",
-							name: "x",
-							color: "#D04031"
+							$name: "x",
+							$color: "#D04031"
 						},
 						{
 							type: "taggedNumber",
 							bind: "y",
-							name: "y",
-							color: "#72B529"
+							$name: "y",
+							$color: "#72B529"
 						}					
 					]
 				},
 				{
 					type: "labelNumber",
 					bind: "angle",
-					name: "Angle"
+					$name: "Angle"
 				},
 				{
 					type: "label",
-					name: "Scale",
-					value: [
+					$name: "Scale",
+					$value: [
 						{
 							type: "taggedNumber",
 							bind: "scaleX",
-							name: "x",
-							value: 1.0,
-							color: "#D04031"
+							$name: "x",
+							$value: 1.0,
+							$color: "#D04031"
 						},
 						{
 							type: "taggedNumber",
 							bind: "scaleY",
-							name: "y",
-							value: 1.0,
-							color: "#72B529"
+							$name: "y",
+							$value: 1.0,
+							$color: "#72B529"
 						}
 					]
 				},
 				{
 					type: "label",
-					name: "Anchor",
-					value: [
+					$name: "Anchor",
+					$value: [
 						{
 							type: "taggedNumber",
 							bind: "anchorX",
-							name: "x",
-							value: 1.0,
-							color: "#D04031"
+							$name: "x",
+							$value: 1.0,
+							$color: "#D04031"
 						},
 						{
 							type: "taggedNumber",
 							bind: "anchorY",
-							name: "y",
-							value: 1.0,
-							color: "#72B529"
+							$name: "y",
+							$value: 1.0,
+							$color: "#72B529"
 						}
 					]
 				}			
@@ -83,48 +83,48 @@ editor.plugin.meta2d.prototype.loadInspect = function()
 		},
 		{
 			type: "section",
-			name: "Rendering",
-			value: [
+			$name: "Rendering",
+			$value: [
 				{
 					type: "labelNumber",
 					bind: "z",
-					name: "Sorting Index"
+					$name: "Sorting Index"
 				},
 				{
 					type: "labelCheckbox",
 					bind: "hidden",
-					name: "Hidden"
+					$name: "Hidden"
 				}					
 			]
 		},
 		{
 			type: "section",
-			name: "Texture",
-			value: [
+			$name: "Texture",
+			$value: [
 				{
 					type: "labelDropdown",
-					name: "Texture",
 					bind: "texture",
-					dataset: "assets.texture",
-					emptyOption: true
+					$name: "Texture",
+					$dataset: "assets.texture",
+					$emptyOption: true
 				},
 				{
 					type: "label",
-					name: "Pivot",
-					value: [
+					$name: "Pivot",
+					$value: [
 						{
 							type: "taggedNumber",
 							bind: "pivotX",
-							name: "x",
-							value: 0.0,
-							color: "#D04031"
+							$name: "x",
+							$value: 0.0,
+							$color: "#D04031"
 						},
 						{
 							type: "taggedNumber",
 							bind: "pivotY",
-							name: "y",
-							value: 0.0,
-							color: "#72B529"
+							$name: "y",
+							$value: 0.0,
+							$color: "#72B529"
 						}
 					]
 				}			
@@ -135,8 +135,8 @@ editor.plugin.meta2d.prototype.loadInspect = function()
 	wabi.addFragment("inspect-layer", "inspect-general", [
 		{
 			type: "section",
-			name: "Rendering",
-			value: [
+			$name: "Rendering",
+			$value: [
 				{
 					type: "labelNumber",
 					bind: "z",

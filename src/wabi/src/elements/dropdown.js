@@ -2,6 +2,15 @@
 
 wabi.element("dropdown",
 {
+	state: 
+	{
+		value: "",
+		dataset: null,
+		filter: null,
+		sort: false,
+		emptyOption: false		
+	},
+
 	elements: 
 	{
 		input: {
@@ -18,36 +27,33 @@ wabi.element("dropdown",
 
 	setup: function()
 	{
-		this.$elements.input.$flags |= this.Flag.REGION;
+		this.elements.input.flags |= this.Flag.REGION;
 
 		this.on("click", "staticInput", this.openMenu, this);
-		this.$elements.list.on("click", "*", this.selectOption, this);
-	},
+		this.elements.list.on("click", "*", this.selectOption, this);
 
-	setup: function()
-	{
-		this.$elements.input.bind = "value";
-		this.$elements.caret.value = "fa-caret-down";
-		this.$elements.list.hidden = true;
+		this.elements.input.bind = "value";
+		this.elements.caret.$value = "fa-caret-down";
+		this.elements.list.hidden = true;
 
-		wabi.on("click", this.hideMenu, this);
+		// wabi.on("click", this.hideMenu, this);
 	},
 
 	set_value: function(value)
 	{
-		if(this.$dataset) 
+		if(this._dataset) 
 		{
 			var data = this.genDataBuffer();
 			var selectedData = data.get(value);
 			if(!selectedData) {
-				this.$elements.input.data = null;
+				this.elements.input.data = null;
 				return "";
 			}
 
-			this.$elements.input.data = selectedData;
+			this.elements.input.data = selectedData;
 		}
 		else {
-			this.$elements.input.data = null;
+			this.elements.input.data = null;
 			return "";
 		}
 	},
@@ -55,31 +61,27 @@ wabi.element("dropdown",
 	set_dataset: function(value)
 	{
 		if(!value) {
-			this.$dataset = null;
+			this._dataset = null;
 			return;
 		}
 
-		this.$dataset = wabi.globalData.get(value);
-		if(!this.$dataset) {
+		this._dataset = wabi.globalData.get(value);
+		if(!this._dataset) {
 			console.log("(wabi.element.dropdown.set_dataset) Data set not found: " + value);
 			return;
 		}
 	},
 
-	set_emptyOption: function(value) {},
-
-	set_open: function(value) {},
-
 	openMenu: function(event)
 	{
 		event.stop();
 
-		var list = this.$elements.list;
+		var list = this.elements.list;
 		list.removeAll();
 
-		if(!this.$dataset) { return; }
+		if(!this._dataset) { return; }
 
-		list.value = this.genDataBuffer();
+		list.$value = this.genDataBuffer();
 		list.hidden = false;
 	},
 
@@ -87,9 +89,9 @@ wabi.element("dropdown",
 	{
 		var buffer = {};
 		var data = new wabi.data(buffer);
-		var raw = this.$dataset.raw;
+		var raw = this._dataset.raw;
 
-		if(this.emptyOption) {
+		if(this.$emptyOption) {
 			buffer[""] = { value: "" };
 		}
 
@@ -101,22 +103,16 @@ wabi.element("dropdown",
 	},
 
 	hideMenu: function(event) {
-		this.$elements.list.hidden = true;
+		this.elements.list.hidden = true;
 	},
 
 	selectOption: function(event)
 	{
 		event.stop();
-		this.value = this.$elements.list.$cache.selected.data.id;
+		this.$value = this.elements.list.cache.selected.data.id;
 		this.hideMenu();
 	},
 
 	//
-	$dataset: null,
-
-	value: "",
-	dataset: null,
-	filter: null,
-	sort: false,
-	emptyOption: false
+	_dataset: null,
 });

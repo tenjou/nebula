@@ -26,6 +26,6 @@ wabi.element("checkbox",
 	},
 
 	toggle: function() {
-		this.value = !this.value;
+		this.$value = !this.$value;
 	}
 });

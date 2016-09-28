@@ -39,18 +39,28 @@ wabi.element("input",
 	set editable(value) 
 	{
 		if(value) {
-			this.attrib("readonly", "");
+			this.removeAttrib("readonly");
 		}
 		else {
-			this.removeAttrib("readonly");
+			this.attrib("readonly", "");
 		}
 	},
 
 	get editable() {
-		return (this.attrib("readonly") !== undefined);
+		return (this.attrib("readonly") === undefined);
 	},
 
 	handle_change: function(event) {
 		this.$value = this.domElement.value;
+	},
+
+	//
+	tag: "input"
+});
+
+wabi.element("staticInput", "input",
+{
+	setup: function() {
+		this.editable = false;
 	}
 });

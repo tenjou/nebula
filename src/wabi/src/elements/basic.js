@@ -53,6 +53,7 @@ wabi.element("basic",
 		var element = this.createElement(slotDef.type, elementSlotId);
 		if(!element) {
 			this.elements[elementSlotId] = null;
+			return;
 		}
 
 		var watch = slotDef.watch;
