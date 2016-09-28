@@ -356,6 +356,7 @@ wabi.element("basic",
 		}
 
 		this.flags = 0;
+		this._bind = null;
 		if(this._watching) { this._watching = null; }
 		if(this.listeners) { this.listeners = null; }
 		if(this.childrenListeners) { this.childrenListeners = null; }

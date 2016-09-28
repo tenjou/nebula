@@ -103,7 +103,6 @@ wabi.element("dropdown",
 	},
 
 	hideMenu: function(event) {
-		console.log("HIDE")
 		this.elements.list.hidden = true;
 	},
 

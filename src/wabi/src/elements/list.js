@@ -260,7 +260,7 @@ wabi.element("listItem",
 		this.on("click", "*", function() {
 			this.select = true;
 		}, this);
-		
+
 		this.editable = false;
 	},
 
@@ -304,10 +304,7 @@ wabi.element("listItem",
 		}
 	},
 
-	set_open: function(value) {},
-
 	handle_click: function(event) {
-		console.log("select")
 		this.select = true;
 	},
 
