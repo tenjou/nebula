@@ -2,11 +2,6 @@
 
 wabi.element("list",
 {
-	prepare: function() 
-	{
-		this.on("click", "*", this.handleItemClick, this);
-	},
-
 	setup: function()
 	{
 		this.cache = {
@@ -102,11 +97,7 @@ wabi.element("list",
 			return "listItem";
 		}
 	},
-
-	handleItemClick: function(event) {
-		this.select = event.target;
-	},
-
+	
 	createFolder: function()
 	{
 		var element = wabi.createElement("listItem", this);

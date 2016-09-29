@@ -18,11 +18,11 @@ wabi.element("dropdown",
 			bind: "value",
 			region: true
 		},
-		caret: "icon",
-		list: {
-			type: "list",
+		caret: {
+			type: "icon",
 			$value: "fa-caret-down"
-		}
+		},
+		list: "list"
 	},
 
 	setup: function()

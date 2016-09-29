@@ -124,6 +124,7 @@ editor.plugin("browser",
 		this.browserResources = wabi.createTemplate("browserResources");
 		this.browserResources.get("#resources").cache = this.cache;
 		this.browserResources.data = this.resources;
+		this.browserResources.on("click", "browserListItem", this.inspectItem, this);
 		this.browserResources.on("drop", [ "list", "browserListItem" ], this.handleResourceDrop, this);
 		this.browserResources.on("dragenter", [ "list", "browserListItem" ], this.handleDragEnter, this);
 		this.browserResources.on("dragleave", [ "list", "browserListItem" ], this.handleDragLeave, this);
@@ -132,7 +133,6 @@ editor.plugin("browser",
 		list.on("contextmenu", function(event) {
 			editor.plugins.contextmenu.show("resources", event.x, event.y);
 		});
-		list.on("click", "browserListItem", this.inspectItem, this);
 		list.on("contextmenu", "browserListItem", function(event) {
 			this.openContextMenu("resourcesItem", event);
 		}, this);
@@ -301,8 +301,8 @@ editor.plugin("browser",
 	},
 
 	inspectItem: function(event) {
-		event.element.select = true;
-		editor.plugins.inspect.show(event.element.data);
+		event.target.select = true;
+		editor.plugins.inspect.show(event.target.data);
 	},
 
 	deleteItem: function(event)
