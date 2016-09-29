@@ -18,7 +18,6 @@ wabi.element("word",
 
 		if(this.$value && value) 
 		{
-			console.log("highlight", value)
 			this.setCls("highlight", true);
 			
 			var self = this;

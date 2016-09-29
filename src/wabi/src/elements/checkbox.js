@@ -6,7 +6,7 @@ wabi.element("checkbox",
 		value: false
 	},
 
-	prepare: function() {
+	setup: function() {
 		this.attrib("tabindex", "0");
 	},
 

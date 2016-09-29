@@ -38,88 +38,36 @@ wabi.element("basic",
 {
 	create: null,
 
-	prepare: null,
-
-	initElement: function(elementSlotId)
+	element: function(slotId, element)
 	{
-		var slotDef = this._metadata.elements[elementSlotId];
-		if(!slotDef) {
-			return console.warn("(wabi.element.basic.initElement) No such slot defined: " + elementSlotId);
+		var elementSlot = this._metadata.elements[slotId];
+		if(!elementSlot) {
+			console.warn("(wabi.element.basic.element) Invalid slot id: " + slotId);
+			return null;
 		}
 
-		if(!slotDef.type) {
-			return console.warn("(wabi.element.basic.initElement) Element slot `" + elementSlotId + "` is not initializable because type is not defined");
-		}
-
-		var element = this.createElement(slotDef.type, elementSlotId);
-		if(!element) {
-			this.elements[elementSlotId] = null;
-			return;
-		}
-
-		var watch = slotDef.watch;
-		for(var key in watch) 
+		if(!element) 
 		{
-			var funcName = watch[key];
-			var func = this[funcName];
-			if(!func) 
-			{
-				console.warn("(wabi.element.basic.initElement) Slot `" + elementSlotId + "` watching on `" + 
-					key + "` uses undefined function: " + funcName);
-				continue;
+			var prevElement = this.elements[slotId];
+			if(prevElement) {
+				prevElement.remove();
 			}
 
-			element.watch(key, func, this);
-		}
-
-		if(slotDef.state) {
-			element.$ = slotDef.state;
-		}
-
-		var bind = this._metadata.elementsBinded[elementSlotId];
-		if(bind) {
-			element.bind = bind;
-		}
-
-		element.parent = this;
-	},
-
-	deinitElement: function(elementSlotId)
-	{
-		if(!this.elements) {
-			return console.warn("(wabi.element.basic.deinitElement) No elements created");
-		}
-
-		var element = this.elements[elementSlotId];
-		if(element === undefined) {
-			return console.warn("(wabi.element.basic.initElement) Such element does not exist: " + elementSlotId);
-		}
-
-		element.remove();
-	},
-
-	createElement: function(element, elementSlotId)
-	{
-		var elementSlot = this._metadata.elements[elementSlotId];
-		if(!elementSlot) {
-			console.warn("(wabi.element.basic.createElement) Invalid slot id: " + elementSlotId);
+			this.elements[slotId] = null;
 			return null;
-		}		
-
-		var prevElement = this.elements[elementSlotId];
-		if(prevElement) {
-			prevElement.remove();
 		}
 
 		if(typeof element === "string")
 		{
 			element = wabi.createElement(element);
 			if(!element) { 
+				this.elements[slotId] = null;
 				return null; 
 			}
 		}
 		else if(!(element instanceof wabi.element.basic)) {
-			console.warn("(wabi.element.basic.createElement) Invalid element passed should be string or extend `wabi.element.basic`");
+			console.warn("(wabi.element.basic.element) Invalid element passed should be string or extend `wabi.element.basic`");
+			this.elements[slotId] = null;
 			return null;
 		}
 
@@ -129,50 +77,40 @@ wabi.element("basic",
 		}
 
 		element.flags |= (this.Flag.SLOT);
-		element.slotId = elementSlotId;
-		this.elements[elementSlotId] = element;
+		element.slotId = slotId;
+		this.elements[slotId] = element;
 
-		var parentLink = this._metadata.elementsLinked[elementSlotId];
-		if(parentLink) 
+		var watch = elementSlot.watch;
+		for(var key in watch) 
 		{
+			var funcName = watch[key];
+			var func = this[funcName];
+			if(!func) 
+			{
+				console.warn("(wabi.element.basic.element) Slot `" + slotId + "` watching on `" + 
+					key + "` uses undefined function: " + funcName);
+				continue;
+			}
+
+			element.watch(key, func, this);
+		}
+
+		var parentLink = this._metadata.elementsLinked[slotId];
+		if(parentLink) {
 			element._parentLink = parentLink;
 			this._$[parentLink] = element;
-
-			var binds = this._metadata.elementsBinded[elementSlotId];
-			if(binds) {
-				element.bind = binds;
-			}
 		}
 
-		return element;
-	},
+		var binds = this._metadata.elementsBinded[slotId];
+		if(binds) {
+			element.bind = binds;
+		}	
 
-	element: function(id, element)
-	{
-		if(!element) 
-		{
-			var prevElement = this.elements[id];
-			if(prevElement === undefined) {
-				console.warn("(wabi.element.basic.element) Invalid slot id");
-				return null;
-			}
-
-			if(prevElement) {
-				prevElement.remove();
-			}
-			
-			return null;
+		if(elementSlot.state) {
+			element.$ = elementSlot.state;
 		}
 
-		if(typeof element === "string") {
-			element = wabi.createElement(element);
-		}
-
-		var element = this.createElement(element, id);
-		if(!element) { return null; }
-
-		var slotId = this._metadata.elements[id].slot;
-		var elementBefore = this.domElement.childNodes[slotId];
+		var elementBefore = this.domElement.childNodes[elementSlot.slot];
 		if(elementBefore) {
 			this.appendBefore(element, elementBefore.holder);
 		}
@@ -193,14 +131,8 @@ wabi.element("basic",
 				this.elements = {};
 			}
 			
-			for(var key in elements) 
-			{
-				if(elements[key].type) {
-					this.initElement(key);
-				}
-				else {
-					this.elements[key] = null;
-				}
+			for(var key in elements) {
+				this.element(key, elements[key].type);
 			}
 		}
 
@@ -227,15 +159,7 @@ wabi.element("basic",
 		}		
 	},
 
-	_setupElement: function(element)
-	{
-		if(!element) { return; }
-
-		var elementsBinded = this._metadata.elementsBinded;
-		if(elementsBinded[element.slotId]) {
-			element._bind = elementsBinded[element.slotId];
-		}
-	},
+	prepare: null,
 
 	setup: null,
 
@@ -353,6 +277,10 @@ wabi.element("basic",
 
 		if(this.domElement.className) {
 			this.domElement.className = "";
+		}
+
+		while(this.domElement.attributes.length > 0) {
+			this.domElement.removeAttribute(this.domElement.attributes[0].name);
 		}
 
 		this.flags = 0;

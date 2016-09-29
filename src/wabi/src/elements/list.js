@@ -97,7 +97,7 @@ wabi.element("list",
 			return "listItem";
 		}
 	},
-	
+
 	createFolder: function()
 	{
 		var element = wabi.createElement("listItem", this);
@@ -169,56 +169,6 @@ wabi.element("listItemHolder",
 		// if(this.itemElement) {
 		// 	this.itemElement.folder = value ? true : false;
 		// }
-	},
-
-	set_draggable: function(value)
-	{
-		if(value) {
-			this.attrib("draggable", "true");
-		}
-		else {
-			this.attrib("draggable", "false");
-		}
-	},
-
-	handle_dragstart: function(event) 
-	{
-		this.setCls("dragging", true);
-		this.cache.dragging = this;
-
-		event.domEvent.dataTransfer.effectAllowed = "move";
-	},
-
-	handle_dragend: function(event) 
-	{
-		this.setCls("dragging", false)
-	},
-
-	handle_dragenter: function(event) {
-		this.setCls("dragover", true);
-	},
-
-	handle_dragleave: function(event) {
-		this.setCls("dragover", false);
-	},
-
-	handle_dragover: function(event)
-	{
-		event.stop();
-		event.domEvent.dataTransfer.dropEffect = "move";
-	},
-
-	handle_drop: function(event) 
-	{
-		if(this === this.cache.dragging) { return; }
-
-		this.setCls("dragover", false);
-		this.folder = true;
-
-		var cacheData = this.cache.dragging.data;
-		this.data.push("content", cacheData);
-
-		event.stop();
 	},
 
 	updateOpen: function(event) {

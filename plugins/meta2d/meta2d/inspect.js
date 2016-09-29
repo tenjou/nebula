@@ -4,6 +4,8 @@ editor.plugin.meta2d.prototype.loadInspect = function()
 {
 	var inspect = editor.plugins.inspect;
 
+	wabi.addFragment("inspect-folder", "inspect-general")
+
 	wabi.addFragment("inspect-sprite", "inspect-general", [
 		{
 			type: "section",
