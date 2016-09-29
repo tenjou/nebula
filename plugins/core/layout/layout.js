@@ -10,8 +10,8 @@ editor.plugin("layout",
 				{
 					id: "browser",
 					type: "toolbar",
+					width: 270,
 					$tab: "Project",
-					width: 270
 				},
 				{
 					type: "toolbar",
@@ -22,7 +22,7 @@ editor.plugin("layout",
 							type: "row",
 							$value: [
 								{
-									type: "slot"
+									type: "div"
 								},
 								{
 									id: "ruler-horizontal",
@@ -41,7 +41,7 @@ editor.plugin("layout",
 								},
 								{
 									id: "iframe",
-									type: "slot"
+									type: "div"
 								}
 							]
 						}						

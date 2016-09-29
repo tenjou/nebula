@@ -2,14 +2,17 @@
 
 wabi.element("ruler", 
 {
+	state: {
+		orientation: ""
+	},
+
 	elements:
 	{
 		canvas: "canvas",
-		cursor: "slot"
+		cursor: "div"
 	},
 
-	prepare: function() 
-	{
+	prepare: function() {
 		this.on("mousemove", "*", this.updateMouseMove, this);
 	},
 
@@ -26,7 +29,7 @@ wabi.element("ruler",
 		var bounds = event.element.domElement.getBoundingClientRect();
 		var cursor;
 
-		switch(this.orientation)
+		switch(this.$orientation)
 		{
 			case "horizontal":
 				cursor = event.x - bounds.left;
@@ -42,7 +45,7 @@ wabi.element("ruler",
 
 	updateCursor: function(cursor)
 	{
-		switch(this.orientation)
+		switch(this.$orientation)
 		{
 			case "horizontal":
 				this.elements.cursor.style("left", cursor + "px");
@@ -68,7 +71,7 @@ wabi.element("ruler",
 		ctx.beginPath();
 
 		var step;
-		switch(this.orientation) 
+		switch(this.$orientation) 
 		{
 			case "horizontal":
 				step = 128;
@@ -98,7 +101,7 @@ wabi.element("ruler",
 
 		currStep *= -step;
 
-		switch(this.orientation)
+		switch(this.$orientation)
 		{
 			case "horizontal":
 			{
@@ -149,7 +152,7 @@ wabi.element("ruler",
 		canvasElement.width = this.domElement.offsetWidth;
 		canvasElement.height = this.domElement.offsetHeight;
 
-		switch(this.orientation) 
+		switch(this.$orientation) 
 		{
 			case "horizontal":
 				this.redrawRegion(0, canvasElement.width);
@@ -167,7 +170,7 @@ wabi.element("ruler",
 
 		var canvasElement = this.elements.canvas.domElement;
 
-		switch(this.orientation) 
+		switch(this.$orientation) 
 		{
 			case "horizontal":
 				this.redrawRegion(0, canvasElement.width);
@@ -180,6 +183,5 @@ wabi.element("ruler",
 	},
 
 	//
-	orientation: "",
 	position: 0
 });
