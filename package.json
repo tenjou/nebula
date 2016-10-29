@@ -1,5 +1,28 @@
 {
-  "name"    : "nebula",
-  "version" : "0.1",
-  "main"    : "main.js"
+	"name": "MetaEditor",
+	"version": "0.1.0",
+	"description": "Universal content management tool.",
+	"author": "Arturs Šefers <arthur.der.shefer@gmail.com>",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/tenjou/MetaEditor"
+	},
+	"scripts": {
+		"start": "build-replica -i lib/wabi/src -i lib/meta.utils.js -i src -i config.js -i plugins -I index.html -c builds/editor.min.js -u -w",
+		"start:dev": "build-replica -i lib/wabi/src -i lib/meta.utils.js -i src -i config.js -i plugins -I index.html -w",
+		"build": "build-replica -i lib/wabi/src -i lib/meta.utils.js -i src -i config.js -i plugins -c builds/editor.min.js -u"
+	},
+	"keywords": [
+		"editor",
+		"cms",
+		"2d",
+		"3d",
+		"wysiwyg",
+		"gamedev",
+		"webdev",
+		"meta2d",
+		"threejs",
+		"pixi"
+	],
+	"license": "MIT"		
 }

@@ -11,6 +11,11 @@ editor.plugin("inspect",
 			$value: [
 				{
 					type: "labelName",
+					bind: "@",
+					$name: "Id"
+				},			
+				{
+					type: "labelName",
 					bind: "value",
 					$name: "Name"
 				}						

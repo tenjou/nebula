@@ -6,7 +6,7 @@ wabi.element("browserListItem", "listItem",
 	{
 		caret: {
 			type: null,
-			watch_value: "handleCaretChange"
+			link: "open"
 		},
 		icon: {
 			type: "type",
@@ -25,16 +25,11 @@ wabi.element("browserListItem", "listItem",
 	},
 
 	setup: function() {
-		this.attrib("draggable", "true");
+		// this.attrib("draggable", "true");
 	},
 
 	set_folder: function(value) {
 		this.element("caret", value ? "caret" : null);
-	},
-
-	set_open: function(value)
-	{
-
 	},
 
 	set_tag: function(value) 
@@ -50,11 +45,6 @@ wabi.element("browserListItem", "listItem",
 		}
 	},
 
-	handleCaretChange: function(value)
-	{
-		console.log("caret", value)
-	},
-
 	handle_dblclick: function(event)
 	{
 		if(!this.elements.caret) { return; }
@@ -62,43 +52,78 @@ wabi.element("browserListItem", "listItem",
 		this.elements.caret.$value = !this.elements.caret.$value;
 	},
 
-	handle_dragstart: function(event) 
+	handle_dragenter: function(event) 
 	{
-		this.setCls("dragging", true);
-		this.cache.dragging = this;
+		// if(event.element === this) { return; }
 
-		event.domEvent.dataTransfer.effectAllowed = "move";
-	},
-
-	handle_dragend: function(event) 
-	{
-		this.setCls("dragging", false)
-	},
-
-	handle_dragenter: function(event) {
 		this.setCls("dragover", true);
 	},
 
-	handle_dragleave: function(event) {
+	handle_dragleave: function(event) 
+	{
+		// if(event.element === this) { return; }
+
 		this.setCls("dragover", false);
 	},
 
-	handle_dragover: function(event)
-	{
-		event.stop();
-		event.domEvent.dataTransfer.dropEffect = "move";
-	},
+	// handle_dragstart: function(event) 
+	// {
+	// 	this.setCls("dragging", true);
+	// 	this.cache.dragging = this;
 
-	handle_drop: function(event) 
-	{
-		if(this === this.cache.dragging) { return; }
+	// 	event.domEvent.dataTransfer.effectAllowed = "move";
+	// },
 
-		this.setCls("dragover", false);
-		this.folder = true;
+	// handle_dragend: function(event) 
+	// {
+	// 	this.setCls("dragging", false)
+	// },
 
-		var cacheData = this.cache.dragging.data;
-		this.data.push("content", cacheData);
+	// handle_dragenter: function(event) 
+	// {
+	// 	if(event.element === this) { return; }
 
-		event.stop();
-	},
+	// 	this.setCls("dragover", true);
+	// },
+
+	// handle_dragleave: function(event) 
+	// {
+	// 	if(event.element === this) { return; }
+
+	// 	this.setCls("dragover", false);
+	// },
+
+	// handle_dragover: function(event)
+	// {
+	// 	if(event.element === this) { return; }
+
+	// 	var bounds = this.domElement.getBoundingClientRect();
+	// 	// console.log(bounds);
+	// 	// console.log("cursor", event.x, event.y)
+
+	// 	if((bounds.top + 5) <= event.y) {
+	// 		console.log("drag-top");
+	// 		return;
+	// 	}
+	// 	else if((bounds.bottom - 5) >= event.y) {
+	// 		console.log("drag-bottom")
+	// 		return;
+	// 	}
+
+	// 	event.stop();
+	// 	event.domEvent.dataTransfer.dropEffect = "move";
+	// },
+
+	// handle_drop: function(event) 
+	// {
+	// 	if(event.element === this) { return; }
+
+	// 	this.setCls("dragover", false);
+	// 	this.folder = true;
+
+	// 	var cacheData = this.cache.dragging.data;
+	// 	this.data.push("content", cacheData);
+
+	// 	event.stop();
+	// },
 });

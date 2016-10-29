@@ -49,8 +49,8 @@ editor.plugin("projects",
 	{
 		this.template = wabi.createTemplate("projects");
 		this.template.on("click", "#create", this.createProject, this);
-		this.template.on("dblclick", "editableListItem", this.openProject, this);
-		this.template.on("contextmenu", "editableListItem", function(event) {
+		this.template.on("dblclick", "*", this.openProject, this);
+		this.template.on("contextmenu", "*", function(event) {
 			event.element.select = true;
 			editor.plugins.contextmenu.show("projectItem", event.x, event.y);
 		});

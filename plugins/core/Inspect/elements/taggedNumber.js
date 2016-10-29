@@ -17,10 +17,6 @@ wabi.element("taggedNumber",
 			link: "value"
 		}
 	},
-
-	cleanup: function() {
-		this.elements.name.removeStyle("background-color");
-	},
 	
 	set_color: function(value) {
 		this.elements.name.style("background-color", value);

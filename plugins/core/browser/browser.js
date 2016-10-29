@@ -115,7 +115,7 @@ editor.plugin("browser",
 		this.browserHierarchy.on("contextmenu", "browserListItem", function(event) {
 			this.openContextMenu("hierarchyItem", event);
 		}, this);
-		this.browserHierarchy.on("click", "browserListItem", this.inspectItem, this);
+		this.browserHierarchy.on("click", "*", this.inspectItem, this);
 		this.browserHierarchy.appendTo(parent);		
 	},
 
@@ -301,6 +301,7 @@ editor.plugin("browser",
 	},
 
 	inspectItem: function(event) {
+		console.log("INSPECT")
 		event.target.select = true;
 		editor.plugins.inspect.show(event.target.data);
 	},

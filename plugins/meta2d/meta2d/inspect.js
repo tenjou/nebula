@@ -1,5 +1,7 @@
 "use strict";
 
+"require meta2d";
+
 editor.plugin.meta2d.prototype.loadInspect = function()
 {
 	var inspect = editor.plugins.inspect;

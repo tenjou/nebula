@@ -1,5 +1,7 @@
 "use strict";
 
+"require ../editor";
+
 editor.connection =
 {
 	init: function() 

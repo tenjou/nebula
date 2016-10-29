@@ -1,0 +1,3 @@
+[submodule "lib/wabi"]
+	path = lib/wabi
+	url = https://github.com/tenjou/wabi.git
